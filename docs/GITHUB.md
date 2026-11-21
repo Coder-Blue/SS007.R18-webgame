@@ -27,3 +27,20 @@ content is the remaining non-TypeScript footprint.
 When adding a vendored runtime or generated JavaScript bundle, place it in one
 of the excluded directories or add a narrow `linguist-detectable=false` rule.
 Do not mark the game's own TypeScript as vendored.
+
+## Current result
+
+After the linguist exclusions and removal of the large vendored browser
+harness from Git tracking, GitHub reports:
+
+```text
+TypeScript  86.6%
+CSS         12.5%
+Nix          0.9%
+Shell        under 0.1%
+Primary language: TypeScript
+```
+
+The previous repository, with the full pull request review history, is retained
+at `Coder-Blue/SS007.R18-webgame-history`. This repository is the current
+primary and contains the same commit graph.
