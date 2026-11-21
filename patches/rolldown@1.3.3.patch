@@ -1,0 +1,17 @@
+diff --git a/dist/shared/binding-XhiChhlU.mjs b/dist/shared/binding-XhiChhlU.mjs
+index 0a75d2fda147a6fbb88574c6cb3eeb90fdc215ca..acc04d929981a169f51b08bf63ec6548c79ae962 100644
+--- a/dist/shared/binding-XhiChhlU.mjs
++++ b/dist/shared/binding-XhiChhlU.mjs
+@@ -31,8 +31,10 @@ var require_binding = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+ 	const isMusl = () => {
+ 		let musl = false;
+ 		if (process.platform === "linux") {
+-			musl = isMuslFromFilesystem();
+-			if (musl === null) musl = isMuslFromReport();
++			// A glibc Node can run on a musl host (Nix, Chimera). Trust the
++			// runtime report before the host /usr/bin/ldd script.
++			musl = isMuslFromReport();
++			if (musl === null) musl = isMuslFromFilesystem();
+ 			if (musl === null) musl = isMuslFromChildProcess();
+ 		}
+ 		return musl;

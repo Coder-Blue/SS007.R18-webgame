@@ -1,0 +1,17 @@
+diff --git a/dist/shared/binding-DXnWtC_4.mjs b/dist/shared/binding-DXnWtC_4.mjs
+index 985dbfafe3c62b35467742e87f4b9ae235dcd520..1534be32b98644c040eaac137c5426ac81291398 100644
+--- a/dist/shared/binding-DXnWtC_4.mjs
++++ b/dist/shared/binding-DXnWtC_4.mjs
+@@ -31,8 +31,10 @@ var require_binding = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+ 	const isMusl = () => {
+ 		let musl = false;
+ 		if (process.platform === "linux") {
+-			musl = isMuslFromFilesystem();
+-			if (musl === null) musl = isMuslFromReport();
++			// A glibc Node can run on a musl host (Nix, Chimera). Trust the
++			// runtime report before the host /usr/bin/ldd script.
++			musl = isMuslFromReport();
++			if (musl === null) musl = isMuslFromFilesystem();
+ 			if (musl === null) musl = isMuslFromChildProcess();
+ 		}
+ 		return musl;
