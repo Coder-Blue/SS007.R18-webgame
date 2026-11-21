@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Plugin } from "vite";
-import { ICON_NAMES } from "../src/ui/components/icon-names";
+import { ICON_NAMES } from "../src/ui/components/icon-names.ts";
 
 const VIRTUAL_ID = "virtual:icon-collections";
 const RESOLVED_ID = `\0${VIRTUAL_ID}`;
