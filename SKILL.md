@@ -1,6 +1,6 @@
 # SKILL.md
 
-The 18 target skill families are installed in `.agents/skills/` and linked into
+The managed skill families are installed in `.agents/skills/` and linked into
 the four supported runtimes: `.opencode/`, `.codex/`, `.claude/`, and
 `.agents/`. `skills-lock.json` pins the managed packages. Use
 `npx skills list` to inspect the live set.
@@ -13,6 +13,7 @@ the four supported runtimes: `.opencode/`, `.codex/`, `.claude/`, and
 | `vercel-labs/skills/find-skills` | `find-skills` | discovery before hand-rolling |
 | `mattpocock/skills/grill-me` | `grill-me` | design stress test |
 | `pbakaus/impeccable/impeccable` | `impeccable` | UI craft and audit |
+| `heydamir/unslop` | `unslop` | remove AI-looking UI tells and polish the design |
 | `dietrichgebert/ponytail/ponytail` | `ponytail` | smallest complete change |
 | `juliusbrussee/caveman/caveman` | `caveman` | terse communication mode |
 | `herdrdev/herdr/herdr` | `herdr` | pane orchestration when requested |
@@ -42,9 +43,12 @@ non-negotiable:
 2. Use `context7` before changing a third-party API. Fetch the library ID, then
    the focused context, and cite the retrieved version in the pull request.
 
-UI work loads `ui-sdk` plus `impeccable`. The UI engineer reads
-`node_modules/@ui-sdk/solid/docs/llms.txt`, runs the impeccable audit at the end
-and captures `1440x900` and `390x844` evidence. A design critique may add one
+UI work loads `ui-sdk`, `impeccable` and `unslop`. The UI engineer reads
+`node_modules/@ui-sdk/solid/docs/llms.txt`, runs the impeccable audit and the
+unslop nine-pass pass at the end, and captures `1440x900` and `390x844`
+evidence. The unslop pass keeps the product's content and order, starts from the
+existing brand direction, and changes spacing, color, icons, copy, type, layout,
+details, visuals and motion in that order. A design critique may add one
 `agency-agents` persona from `.agents/agency-agents/`; the reviewer remains a
 different instance. Browser work uses `chrome-devtools`; motion work uses
 `gsap-core`.

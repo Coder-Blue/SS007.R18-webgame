@@ -26,14 +26,15 @@ Load these before working. The full inventory and usage notes live in `SKILL.md`
 | `developer` | `solidjs`, `typescript-expert`, `pragmatic-functional-programming`, `ponytail`, `context7`, `graphify` |
 | `domain-economist` | `pragmatic-functional-programming`, `typescript-expert`, `graphify` |
 | `scene-engineer` | `threejs-fundamentals`, `threejs-geometry`, `threejs-materials`, `threejs-lighting`, `threejs-animation`, `threejs-loaders`, `threejs-textures`, `threejs-performance`, `threejs-postprocessing`, `threejs-shaders`, `threejs-interaction`, `threejs-react-three-fiber`, `threejs-asset-pipeline`, `gsap-core`, `chrome-devtools`, `graphify` |
-| `ui-engineer` | `ui-sdk`, `impeccable`, `agency-agents`, `modern-web-guidance`, `solidjs`, `chrome-devtools`, `context7` |
+| `ui-engineer` | `ui-sdk`, `impeccable`, `unslop`, `agency-agents`, `modern-web-guidance`, `solidjs`, `chrome-devtools`, `context7` |
 | `integrator` | `solidjs`, `modern-web-guidance`, `ponytail`, `chrome-devtools`, `graphify` |
-| `reviewer` | `impeccable`, `agency-agents`, `install-anti-slop`, `chrome-devtools`, `graphify` |
+| `reviewer` | `impeccable`, `unslop`, `agency-agents`, `install-anti-slop`, `chrome-devtools`, `graphify` |
 | `tester` | `chrome-devtools`, `typescript-expert`, `graphify` |
 | `docs` | `context7`, `ponytail`, `graphify` |
 
-UI changes also require the `impeccable` audit and, for a design review, one
-`agency-agents` persona. Browser evidence uses `chrome-devtools`. Library API
+UI changes also require the `impeccable` audit, the `unslop` nine-pass polish
+and, for a design review, one `agency-agents` persona. Browser evidence uses
+`chrome-devtools`. Library API
 questions use `context7` before reading `node_modules` or guessing.
 
 ## Sequence
