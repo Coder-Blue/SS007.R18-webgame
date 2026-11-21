@@ -53,11 +53,14 @@ luận tư nhân hóa. Kết thúc phụ thuộc vào thứ người chơi bảo
 
 ## Kết thúc
 
-- **Kiến trúc sư**: dư nợ không quá 25.000 tỷ, phủ đường toàn bộ, có cải cách
-  N-2, DPPA và VREM, tín nhiệm và độ hài lòng đủ cao.
-- **Kẻ săn mồi**: ngân quỹ lớn trong khi hộ dân và xưởng trì trệ.
-- **Sụp đổ**: mất khả năng thanh toán, bất ổn, bị miễn nhiệm hoặc tư nhân hóa
-  sớm dẫn tới khủng hoảng nguồn cung kiểu California/Texas.
+- **Kiến Trúc Sư An Ninh Quốc Gia**: dư nợ không quá 25.000 tỷ, phủ đường 100%
+  cả hộ dân lẫn bản xa, có N-2, DPPA và VREM, tín nhiệm và độ hài lòng từ 55,
+  độ tin cậy nguồn cung từ 95.
+- **Tư Bản Đỏ Độc Quyền**: ngân quỹ từ 28.000 tỷ, độ hài lòng dưới 50, và đã
+  nhận hối lộ hoặc để buôn lậu lan rộng.
+- **Vỡ Trận Thị Trường**: mọi trường hợp còn lại, gồm mất khả năng thanh toán,
+  bất ổn, bị miễn nhiệm hoặc tư nhân hóa sớm dẫn tới khủng hoảng nguồn cung
+  kiểu California/Texas.
 
 ## Công nghệ
 
@@ -74,16 +77,20 @@ gọi API Iconify.
 
 ## Bắt đầu
 
-Yêu cầu: Node.js 24, pnpm 12 và một môi trường Nix có direnv.
+Yêu cầu: Node.js 24 và pnpm 12. Trên Linux, Nix cùng direnv là đường được hỗ
+trợ sẵn; CI và macOS dùng Node trực tiếp.
 
 ```bash
+# Nếu dùng Nix/direnv
 direnv allow
 pnpm install
 pnpm dev
 ```
 
 Mở `http://localhost:3000`. `pnpm install` cũng cài hook Lefthook. Kiểm tra
-trình duyệt cần `nix develop .#playwright` để có Chromium và thư viện hệ thống.
+trình duyệt cần Chromium: trên Linux, `nix develop .#playwright` cung cấp
+Chromium và thư viện hệ thống; CI cài Chromium bằng Playwright; macOS dùng bộ
+nhớ đệm trình duyệt của máy.
 
 ## Lệnh
 
@@ -134,7 +141,7 @@ kết quả build, trạng thái lint/format, kiểm tra viewport hoặc ảnh c
 
 - `AGENTS.md`: luật cho mọi runtime agent.
 - `CODEBASE.md`: kiến trúc và mô hình kinh tế đã triển khai.
-- `AGENT_DIRECTORY.md`: danh sách vai trò, kỹ năng và quy trình Herdr.
+- `AGENT_DIRECTORY.md`: vai trò, bảng kỹ năng và quy trình Herdr.
 - `docs/GAME_DESIGN.md`: cơ chế và cân bằng chi tiết.
 - `docs/DEVELOPMENT.md`: quy trình địa phương, bản lưu và kiểm chứng.
 - `docs/VERIFICATION.md`: bằng chứng cổng và rủi ro còn lại.
