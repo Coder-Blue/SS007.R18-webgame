@@ -40,7 +40,7 @@
 
 @media (max-width: 1100px) {
   .modal {
-    @apply h-auto max-h-[88dvh] w-[min(94vw,620px)] rounded-[18px] p-4;
+    @apply h-auto max-h-[88dvh] w-[min(94vw,620px)] rounded-[var(--radius)] p-4;
   }
 
   .workspace-modal {
@@ -69,6 +69,6 @@
   }
 
   .ending-card {
-    @apply rounded-[10px];
+    @apply rounded-[var(--radius)];
   }
 }

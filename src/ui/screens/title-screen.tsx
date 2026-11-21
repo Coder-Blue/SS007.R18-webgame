@@ -57,7 +57,7 @@ export const TitleScreen = (props: {
         </div>
       </div>
       <p class="title-footer">
-        SS007.R18 · {t("app.footer")} · v{GAME_VERSION}
+        {t("app.yearSpan")} · {t("app.footer")} · v{GAME_VERSION}
       </p>
     </div>
   </div>
