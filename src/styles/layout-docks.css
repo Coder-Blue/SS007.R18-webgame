@@ -14,7 +14,7 @@
 }
 
 .dock-panel.panel {
-  @apply bg-paper/95 backdrop-blur-[12px];
+  @apply bg-paper;
 }
 
 .dock .panel-body {
@@ -26,15 +26,15 @@
 }
 
 .dock-pillar {
-  @apply grid w-full grid-cols-[30px_1fr] items-center gap-x-[9px] gap-y-[3px] rounded-[11px] border border-line bg-cream/60 p-2 text-left;
+  @apply grid w-full grid-cols-[30px_1fr] items-center gap-x-[9px] gap-y-[3px] rounded-none border-0 border-b border-line bg-transparent px-0 py-2 text-left;
 }
 
 .dock-pillar:hover {
-  @apply border-gold bg-cream;
+  @apply bg-gold/10;
 }
 
 .dock-pillar-icon {
-  @apply row-span-2 grid h-[30px] w-[30px] place-items-center rounded-[9px] bg-forest-800 text-gold-light;
+  @apply row-span-2 grid h-[30px] w-[30px] place-items-center rounded-[4px] border border-outline bg-forest-800 text-gold-light;
 }
 
 .dock-pillar-copy {
@@ -58,7 +58,7 @@
 }
 
 .selection-card {
-  @apply flex items-center justify-between rounded-[10px] border border-dashed border-gold-dark bg-paper-2 px-[10px] py-2;
+  @apply flex items-center justify-between rounded-[4px] border-2 border-dashed border-gold-dark/70 bg-paper-2 px-[10px] py-2;
 }
 
 .selection-card strong {
@@ -66,11 +66,11 @@
 }
 
 .dock-note {
-  @apply flex items-center gap-[6px] rounded-[9px] bg-forest-700/8 px-[9px] py-[7px] text-[0.68rem] font-semibold text-forest-700;
+  @apply flex items-center gap-[6px] rounded-[4px] border border-forest-600/30 bg-forest-600/8 px-[9px] py-[7px] text-[0.66rem] font-bold text-forest-700;
 }
 
 .finance-hero {
-  @apply flex flex-col gap-[3px] rounded-xl bg-forest-800 px-3 py-[10px] text-paper;
+  @apply flex flex-col gap-[3px] rounded-[6px] border-2 border-gold-dark/70 bg-forest-800 px-3 py-[10px] text-paper;
 }
 
 .finance-hero span {
@@ -79,6 +79,14 @@
 
 .finance-hero strong {
   @apply text-[1.25rem] text-gold-light;
+}
+
+.finance-hero .badge[data-tone="good"] {
+  @apply border-gold-light/40 bg-forest-600 text-gold-light;
+}
+
+.finance-hero .badge[data-tone="bad"] {
+  @apply border-gold-light/30 bg-rust/30 text-cream-warm;
 }
 
 .dock-meter {
@@ -90,7 +98,7 @@
 }
 
 .dock-kpis div {
-  @apply flex flex-col gap-[2px] rounded-lg bg-ink/5 p-[6px];
+  @apply flex flex-col gap-[2px] border-b border-line px-0 py-[5px];
 }
 
 .dock-kpis span {
@@ -102,8 +110,10 @@
 }
 
 .bottom-dock {
-  @apply absolute bottom-[calc(14px+var(--safe-bottom))] left-1/2 z-[18] flex -translate-x-1/2 items-center gap-[10px] rounded-full border border-gold-light/22 px-[10px] py-[7px] text-paper shadow-lift backdrop-blur-[12px];
-  background: oklch(22.68% 0.0341 158.05 / 0.84);
+  @apply absolute bottom-[calc(14px+var(--safe-bottom))] left-1/2 z-[18] flex -translate-x-1/2 items-center gap-[10px] rounded-[8px] border-2 border-gold-dark/80 bg-forest-950 px-2 py-[6px] text-paper shadow-panel;
+  box-shadow:
+    inset 0 2px 0 oklch(100% 0 0 / 0.08),
+    var(--shadow-panel);
 }
 
 .bottom-dock-tabs {
@@ -111,14 +121,14 @@
 }
 
 .bottom-dock-tab {
-  @apply inline-flex min-h-[40px] items-center gap-[6px] rounded-full border-0 px-[11px] text-[0.7rem] font-semibold text-paper/78;
+  @apply inline-flex min-h-[40px] items-center gap-[6px] rounded-[4px] border-0 px-[10px] text-[0.66rem] font-extrabold tracking-[0.03em] text-paper/80 uppercase;
   background: transparent;
 }
 
 .bottom-dock-tab:hover {
-  @apply bg-gold-light/14 text-gold-light;
+  @apply bg-gold text-forest-950;
 }
 
 .bottom-dock-status {
-  @apply inline-flex items-center gap-[5px] border-l border-gold-light/18 pl-[10px] text-[0.64rem] text-paper/52;
+  @apply inline-flex items-center gap-[5px] border-l-2 border-gold-light/20 pl-[10px] text-[0.62rem] font-semibold text-gold-light/65;
 }

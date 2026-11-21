@@ -15,7 +15,7 @@
 .action-card,
 .build-card,
 .reform-card {
-  @apply flex items-center justify-between gap-[10px] rounded-[11px] border border-line bg-cream/45 px-[10px] py-[9px];
+  @apply flex items-center justify-between gap-[10px] border-b border-line bg-transparent px-0 py-[9px];
 }
 
 .action-card-main,
@@ -26,7 +26,7 @@
 
 .action-icon,
 .build-icon {
-  @apply grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-forest-700/10 text-forest-700;
+  @apply grid h-8 w-8 shrink-0 place-items-center rounded-[4px] border border-outline/20 bg-forest-700/10 text-forest-700;
 }
 
 .build-icon[data-grade="asphalt"] {
@@ -64,7 +64,7 @@
 .action-cost > span,
 .build-side > span,
 .reform-side > span {
-  @apply text-[0.66rem] font-bold whitespace-nowrap text-gold-dark;
+  @apply text-[0.66rem] font-extrabold whitespace-nowrap text-gold-dark tabular-nums;
 }
 
 .meter-block {
@@ -165,15 +165,15 @@
 }
 
 [data-slot="slider-track"] {
-  @apply relative h-[7px] w-full cursor-pointer rounded-full bg-ink/13;
+  @apply relative h-[8px] w-full cursor-pointer rounded-[2px] border border-outline/25 bg-paper-3;
 }
 
 [data-slot="slider-indicator"] {
-  @apply absolute top-0 left-0 h-full rounded-[inherit] bg-linear-to-r from-gold-light to-gold;
+  @apply absolute top-0 left-0 h-full rounded-[1px] bg-gold;
 }
 
 [data-slot="slider-thumb"] {
-  @apply absolute top-1/2 -mt-[14px] -ml-[14px] h-7 w-7 cursor-grab rounded-full border-2 border-cream-warm bg-forest-700 shadow-[0_2px_6px_oklch(27.44%_0.0448_155.85_/_0.3)];
+  @apply absolute top-1/2 -mt-[13px] -ml-[13px] h-[26px] w-[26px] cursor-grab rounded-[4px] border-2 border-outline bg-gold shadow-[0_2px_0_oklch(19.39%_0.0246_156.24_/_0.35)];
 }
 
 [data-slot="slider-thumb"]:has(:focus-visible) {

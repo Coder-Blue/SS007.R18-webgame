@@ -3,11 +3,11 @@
 }
 
 .big-number {
-  @apply block text-[1.8rem] leading-[1.1] text-forest-900;
+  @apply block text-[1.8rem] leading-[1.05] font-extrabold text-forest-900 tabular-nums;
 }
 
 .policy-role-card {
-  @apply flex flex-col gap-1 rounded-[11px] bg-forest-800 p-[10px] text-paper;
+  @apply flex flex-col gap-1 rounded-[6px] border-2 border-gold-dark/70 bg-forest-800 p-[10px] text-paper;
 }
 
 .policy-role-card svg {
@@ -43,11 +43,11 @@
 }
 
 .reform-card[data-enabled="true"] {
-  @apply border-forest-600/28 bg-forest-600/6;
+  @apply border-forest-600/50 bg-forest-600/8;
 }
 
 .table-wrap {
-  @apply overflow-x-auto rounded-[10px] border border-line;
+  @apply overflow-x-auto rounded-[6px] border-2 border-outline/20;
 }
 
 .data-table {
@@ -65,7 +65,7 @@
 }
 
 .data-table thead th {
-  @apply bg-ink/5 text-[0.56rem] tracking-[0.05em] text-ink-soft uppercase;
+  @apply border-b-2 border-outline/30 bg-paper-2 text-[0.54rem] font-extrabold tracking-[0.08em] text-forest-900 uppercase;
 }
 
 .data-table tbody tr:last-child td {
@@ -77,7 +77,7 @@
 }
 
 .annual-card {
-  @apply flex flex-col gap-[7px] rounded-[10px] border border-line bg-cream/45 px-[10px] py-[9px];
+  @apply flex flex-col gap-[7px] border-b border-line px-0 py-[9px];
 }
 
 .annual-head {
@@ -101,7 +101,7 @@
 }
 
 .report-line {
-  @apply flex justify-between gap-2 border-b border-dashed border-line py-[3px] text-[0.66rem];
+  @apply flex justify-between gap-2 border-b border-line py-[3px] text-[0.68rem];
 }
 
 .report-line strong {
@@ -139,14 +139,12 @@
 }
 
 .toast {
-  @apply fixed bottom-[calc(84px+var(--safe-bottom))] left-1/2 z-[90] flex max-w-[min(520px,calc(100vw_-_24px))] -translate-x-1/2 items-center gap-2 rounded-xl border border-gold-light/30 px-[14px] py-[10px] text-[0.76rem] text-paper shadow-lift;
-  background: oklch(22.68% 0.0341 158.05 / 0.94);
+  @apply fixed bottom-[calc(84px+var(--safe-bottom))] left-1/2 z-[90] flex max-w-[min(520px,calc(100vw_-_24px))] -translate-x-1/2 items-center gap-2 rounded-[6px] border-2 border-gold-dark bg-forest-950 px-[14px] py-[10px] text-[0.74rem] font-semibold text-paper shadow-panel;
   animation: toast-in 0.28s var(--ease-out);
 }
 
 .toast[data-kind="error"] {
-  @apply border-rust/50;
-  background: oklch(29.98% 0.0845 30.86 / 0.96);
+  @apply border-rust bg-[oklch(29.98%_0.0845_30.86)];
 }
 
 @keyframes toast-in {

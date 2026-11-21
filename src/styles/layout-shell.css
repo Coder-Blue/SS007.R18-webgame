@@ -32,8 +32,7 @@
 }
 
 .scene-badge {
-  @apply inline-flex items-center gap-[6px] rounded-full border border-gold-light/24 px-[11px] py-[6px] text-[0.72rem] font-semibold text-paper backdrop-blur-[8px];
-  background: oklch(22.68% 0.0341 158.05 / 0.72);
+  @apply inline-flex items-center gap-[6px] rounded-[4px] border-2 border-gold-light/40 bg-forest-950 px-[10px] py-[5px] text-[0.68rem] font-bold tracking-[0.04em] text-paper uppercase;
 }
 
 .scene-controls {
@@ -41,8 +40,7 @@
 }
 
 .scene-reset {
-  @apply inline-flex min-h-11 items-center gap-2 rounded-full border border-gold-light/30 px-[14px] text-[0.74rem] font-semibold text-paper backdrop-blur-[8px];
-  background: oklch(22.68% 0.0341 158.05 / 0.74);
+  @apply inline-flex min-h-11 items-center gap-2 rounded-[6px] border-2 border-gold-light/40 bg-forest-950 px-[12px] text-[0.7rem] font-bold tracking-[0.04em] text-paper uppercase;
 }
 
 .scene-hint {
@@ -50,18 +48,16 @@
 }
 
 .scene-loading {
-  @apply absolute inset-0 grid place-items-center font-semibold tracking-[0.04em] text-gold-light;
-  background: oklch(17.33% 0.0219 155.73 / 0.62);
+  @apply absolute inset-0 grid place-items-center font-bold tracking-[0.08em] text-gold-light uppercase;
+  background: oklch(17.33% 0.0219 155.73 / 0.78);
 }
 
 .top-bar {
-  @apply absolute left-3 right-3 z-20 flex min-h-[60px] items-center gap-[18px] rounded-[var(--radius)] border border-gold-light/24 px-[14px] py-2 text-paper shadow-lift backdrop-blur-[14px];
+  @apply absolute left-3 right-3 z-20 flex min-h-[60px] items-center gap-[18px] rounded-[var(--radius)] border-2 border-gold-dark/80 bg-forest-950 px-[14px] py-2 text-paper shadow-panel;
   top: calc(12px + var(--safe-top));
-  background: linear-gradient(
-    180deg,
-    oklch(26.41% 0.0411 157.42 / 0.94),
-    oklch(21.15% 0.0314 157.89 / 0.9)
-  );
+  box-shadow:
+    inset 0 2px 0 oklch(100% 0 0 / 0.08),
+    var(--shadow-panel);
 }
 
 .brand-block {
@@ -69,9 +65,8 @@
 }
 
 .brand-mark {
-  @apply grid h-9 w-9 place-items-center rounded-xl text-forest-900;
-  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-deep));
-  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.35);
+  @apply grid h-9 w-9 place-items-center rounded-[6px] border-2 border-outline bg-gold text-forest-950;
+  box-shadow: inset 0 2px 0 oklch(100% 0 0 / 0.35);
 }
 
 .brand-copy {
@@ -87,11 +82,11 @@
 }
 
 .date-block {
-  @apply flex min-w-[138px] flex-col border-l border-gold-light/20 pl-4 leading-[1.25];
+  @apply flex min-w-[138px] flex-col border-l-2 border-gold-light/25 pl-4 leading-[1.2];
 }
 
 .date-main {
-  @apply text-[0.84rem] font-bold;
+  @apply text-[0.84rem] font-extrabold;
 }
 
 .date-sub {
@@ -107,7 +102,7 @@
 }
 
 .top-gauge-label {
-  @apply flex items-center gap-[5px] text-[0.61rem] tracking-[0.07em] uppercase text-paper/62;
+  @apply flex items-center gap-[5px] text-[0.58rem] font-bold tracking-[0.1em] uppercase text-gold-light/75;
 }
 
 .top-gauge strong {

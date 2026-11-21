@@ -50,7 +50,7 @@
   }
 
   .top-bar {
-    @apply min-h-[52px] rounded-[14px];
+    @apply min-h-[52px] rounded-[8px];
   }
 
   .top-actions .advance-btn.desktop-only {
@@ -74,7 +74,7 @@
   }
 
   .scene-badges {
-    top: calc(76px + var(--safe-top));
+    top: calc(128px + var(--safe-top));
   }
 
   .modal-title {
@@ -113,10 +113,6 @@
 
   .title-actions .btn {
     @apply w-full;
-  }
-
-  .title-kicker {
-    @apply text-[0.58rem];
   }
 
   .title-tagline {
@@ -182,26 +178,21 @@
   }
 
   .mobile-nav {
-    @apply absolute right-0 bottom-0 left-0 z-[25] grid grid-cols-5 border-t border-gold-light/18 px-2 pt-2 backdrop-blur-[14px];
+    @apply absolute right-0 bottom-0 left-0 z-[25] grid grid-cols-5 border-t-2 border-gold-dark/80 bg-forest-950 px-2 pt-2;
     padding-bottom: calc(8px + var(--safe-bottom));
-    background: linear-gradient(
-      to top,
-      oklch(20.35% 0.0307 156.5 / 0.98),
-      oklch(20.35% 0.0307 156.5 / 0.88)
-    );
   }
 
   .mobile-tab {
-    @apply flex min-h-12 flex-col items-center justify-center gap-[3px] rounded-[10px] border-0 text-[0.58rem] font-semibold text-paper/68;
+    @apply flex min-h-12 flex-col items-center justify-center gap-[3px] rounded-[4px] border-0 text-[0.56rem] font-bold tracking-[0.02em] text-paper/70 uppercase;
     background: transparent;
   }
 
   .mobile-tab:active {
-    @apply bg-gold-light/12 text-gold-light;
+    @apply bg-gold text-forest-950;
   }
 
   .scene-badges {
-    top: calc(72px + var(--safe-top));
+    top: calc(128px + var(--safe-top));
   }
 
   .scene-controls {
@@ -247,7 +238,7 @@
   }
 
   .title-screen {
-    @apply items-end px-[18px] pt-6;
+    @apply items-end px-[16px] pt-6;
     padding-bottom: calc(24px + var(--safe-bottom));
     background:
       linear-gradient(
@@ -264,7 +255,7 @@
   }
 
   .title-main {
-    @apply text-[clamp(2.4rem,13vw,4rem)];
+    @apply text-[clamp(2.3rem,12vw,3.8rem)];
   }
 
   .title-acts {
