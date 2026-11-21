@@ -15,3 +15,6 @@ test-results
 .direnv
 
 graphify-out/
+
+# Large vendored browser harness; restore with npx skills experimental_install
+.agents/skills/impeccable/scripts/
