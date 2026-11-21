@@ -151,12 +151,22 @@ ul {
   scroll-behavior: auto !important;
 }
 
+[data-motion="reduced"] .title-prompt {
+  animation: none !important;
+  opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+  }
+
+  .title-prompt {
+    animation: none !important;
+    opacity: 1;
   }
 }
 

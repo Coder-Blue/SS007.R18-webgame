@@ -48,8 +48,19 @@
 }
 
 .title-role {
-  @apply inline-flex w-fit items-center gap-2 rounded-[4px] border-2 border-gold-dark/80 bg-forest-900 px-3 py-2 text-[0.68rem] font-bold tracking-[0.03em] text-gold-light uppercase;
+  @apply inline-flex w-fit max-w-full items-center gap-2 rounded-[4px] border-2 border-gold-dark/80 bg-forest-900 px-3 py-2 text-left text-[0.68rem] font-bold tracking-[0.03em] text-gold-light uppercase;
   background: oklch(22.68% 0.0341 158.05 / 0.5);
+}
+
+.title-prompt {
+  @apply w-fit text-[0.66rem] font-extrabold tracking-[0.2em] text-gold-light uppercase;
+  animation: prompt-pulse 1.8s steps(2, end) infinite;
+}
+
+@keyframes prompt-pulse {
+  50% {
+    opacity: 0.35;
+  }
 }
 
 .title-actions {

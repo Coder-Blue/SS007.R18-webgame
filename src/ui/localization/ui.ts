@@ -13,6 +13,7 @@ export const uiCopy: CopyDictionary = {
   "app.settings": "Cài đặt",
   "app.about": "Về trò chơi",
   "app.startHint": "Chọn một ván mới hoặc tiếp tục bản lưu gần nhất.",
+  "app.pressStart": "Nhấn Bắt đầu nhiệm kỳ để vào làng",
   "app.role": "Chủ tịch Tổng công ty Gạo làng",
   "app.act1": "Hồi I · Bao phủ phổ quát",
   "app.act2": "Hồi II · Tranh luận tư nhân hóa",

@@ -22,6 +22,7 @@ export const TitleScreen = (props: {
         <Icon icon="lucide:landmark" size={16} />
         <span>{t("app.role")}</span>
       </div>
+      <p class="title-prompt">{t("app.pressStart")}</p>
       <div class="title-actions">
         <ActionButton variant="gold" size="lg" icon="lucide:play" onClick={props.onStart}>
           {t("app.newGame")}
