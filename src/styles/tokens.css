@@ -24,6 +24,7 @@
   --color-rust: oklch(54.09% 0.1441 32.94);
   --color-rust-dark: oklch(41.52% 0.1165 31.42);
   --color-teal: oklch(54.3% 0.0649 184.45);
+  --color-outline: oklch(19.39% 0.0246 156.24);
   --color-line: oklch(23.66% 0.0169 66.86 / 0.14);
   --color-line-strong: oklch(23.66% 0.0169 66.86 / 0.24);
 
@@ -55,9 +56,9 @@
   --shadow-sm: var(--shadow-panel);
   --shadow: var(--shadow-lift);
   --shadow-lg: var(--shadow-deep);
-  --radius-sm: 10px;
-  --radius: 16px;
-  --radius-lg: 22px;
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 16px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --font-ui: var(--font-sans);
@@ -139,7 +140,7 @@ ul {
 }
 
 :focus-visible {
-  @apply outline-2 outline-offset-2 outline-gold;
+  @apply outline-3 outline-offset-2 outline-gold;
 }
 
 [data-motion="reduced"] *,

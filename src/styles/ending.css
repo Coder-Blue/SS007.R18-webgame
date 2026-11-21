@@ -1,5 +1,5 @@
 .ending-screen {
-  @apply fixed inset-0 z-[80] grid place-items-center overflow-y-auto p-5 backdrop-blur-[6px];
+  @apply fixed inset-0 z-[80] grid place-items-center overflow-y-auto p-5;
   background:
     radial-gradient(70% 60% at 50% 30%, oklch(76.03% 0.1236 82.19 / 0.18), transparent 60%),
     oklch(16.03% 0.0203 158.27 / 0.88);
@@ -11,7 +11,7 @@
 }
 
 .ending-card {
-  @apply relative z-[1] flex w-[min(94vw,760px)] flex-col gap-3 rounded-[26px] border border-gold-light/24 bg-paper p-[clamp(20px,4vw,38px)] shadow-deep;
+  @apply relative z-[1] flex w-[min(94vw,760px)] flex-col gap-3 rounded-[var(--radius)] border-2 border-gold-dark bg-paper p-[clamp(20px,4vw,38px)] shadow-deep;
 }
 
 .ending-head {
@@ -31,7 +31,7 @@
 }
 
 .ending-reason {
-  @apply border-l-[3px] border-gold bg-gold/10 px-[11px] py-[9px] text-[0.76rem] font-semibold text-[oklch(45.81%_0.0831_81.11)];
+  @apply rounded-[4px] border-2 border-gold-dark/60 bg-gold/12 px-[11px] py-[9px] text-[0.74rem] font-bold text-[oklch(42%_0.075_80)];
 }
 
 .ending-actions {
@@ -69,6 +69,6 @@
   }
 
   .ending-card {
-    @apply rounded-[20px];
+    @apply rounded-[10px];
   }
 }

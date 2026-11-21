@@ -15,7 +15,7 @@
 }
 
 .overview-score {
-  @apply flex flex-[0_0_120px] flex-col gap-[5px] rounded-xl bg-forest-800 p-[10px] text-paper;
+  @apply flex flex-[0_0_120px] flex-col gap-[5px] rounded-[6px] border-2 border-gold-dark/70 bg-forest-800 p-[10px] text-paper;
 }
 
 .overview-score .score-label {
@@ -31,7 +31,7 @@
 }
 
 .pillar-card {
-  @apply flex flex-col gap-[7px] rounded-xl border border-line bg-cream/50 p-[10px];
+  @apply flex flex-col gap-[7px] border-b border-line px-0 py-[9px];
 }
 
 .pillar-top {
@@ -39,7 +39,7 @@
 }
 
 .pillar-icon {
-  @apply grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-forest-800 text-gold-light;
+  @apply grid h-8 w-8 shrink-0 place-items-center rounded-[4px] border border-outline bg-forest-800 text-gold-light;
 }
 
 .pillar-top div {
@@ -63,11 +63,11 @@
 }
 
 .goal {
-  @apply flex items-start gap-2 rounded-[9px] bg-ink/3 px-2 py-[7px];
+  @apply flex items-start gap-2 border-b border-line px-0 py-[7px];
 }
 
 .goal-check {
-  @apply grid h-6 w-6 shrink-0 place-items-center rounded-full border border-line-strong text-ink-faint;
+  @apply grid h-5 w-5 shrink-0 place-items-center rounded-[3px] border-2 border-line-strong text-ink-faint;
 }
 
 .goal-check.is-done {
@@ -104,7 +104,7 @@
 }
 
 .supply-mix-bar {
-  @apply flex h-[10px] overflow-hidden rounded-full bg-ink/10;
+  @apply flex h-[10px] overflow-hidden rounded-[2px] border border-outline/25 bg-paper-3;
 }
 
 .mix-self {

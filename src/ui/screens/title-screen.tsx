@@ -1,6 +1,6 @@
 import type { JSX } from "@solidjs/web";
 import { Show } from "solid-js";
-import { ActionButton, Badge } from "../components/base";
+import { ActionButton } from "../components/base";
 import { Icon } from "../components/icons";
 import { t } from "../localization";
 import { GAME_VERSION } from "~/domain";
@@ -15,13 +15,6 @@ export const TitleScreen = (props: {
   <div class="title-screen">
     <div class="title-vignette" />
     <div class="title-content">
-      <div class="title-kicker">
-        <span class="brand-seal">
-          <Icon icon="tabler:wheat" size={18} />
-        </span>
-        <span>{t("app.yearSpan")}</span>
-        <Badge tone="gold">SS007.R18</Badge>
-      </div>
       <h1 class="title-main">{t("app.title")}</h1>
       <p class="title-sub">{t("app.subtitle")}</p>
       <p class="title-tagline">{t("app.tagline")}</p>
@@ -63,7 +56,7 @@ export const TitleScreen = (props: {
         </div>
       </div>
       <p class="title-footer">
-        {t("app.footer")} · v{GAME_VERSION}
+        SS007.R18 · {t("app.footer")} · v{GAME_VERSION}
       </p>
     </div>
   </div>

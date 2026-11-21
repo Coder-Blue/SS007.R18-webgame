@@ -118,6 +118,21 @@ test("save, reload, and continue restore the player state", async ({ page }) => 
   await expectMonth(page, "Tháng 2/2022");
 });
 
+test("captures the title screen and game shell for visual review", async ({ page }, testInfo) => {
+  await page.goto("/");
+  await page.waitForTimeout(1_200);
+  await testInfo.attach(`${testInfo.project.name}-title`, {
+    body: await page.screenshot(),
+    contentType: "image/png",
+  });
+  await startGame(page);
+  await page.waitForTimeout(1_200);
+  await testInfo.attach(`${testInfo.project.name}-game`, {
+    body: await page.screenshot(),
+    contentType: "image/png",
+  });
+});
+
 test("event decision appears in June and resolves into a consequence", async ({ page }) => {
   await startGame(page);
 
