@@ -24,6 +24,11 @@ const SessionPrefsSchema = v.object({
   reducedMotion: v.optional(v.boolean(), false),
 });
 
+const SaveEnvelopeSchema = v.object({
+  format: v.literal("dqkt-save"),
+  version: v.literal(SAVE_VERSION),
+});
+
 export const DEFAULT_PREFS: SessionPrefs = {
   activeSlot: null,
   panel: "overview",
@@ -115,7 +120,17 @@ export const listSaves = (): readonly (SaveMeta | null)[] => SLOT_IDS.map((slot)
 export const hasAnySave = (): boolean => {
   if (!hasStorage()) return false;
 
-  return ALL_SLOT_IDS.some((slot) => window.localStorage.getItem(keyFor(slot)) !== null);
+  return ALL_SLOT_IDS.some((slot) => {
+    const raw = window.localStorage.getItem(keyFor(slot));
+
+    if (raw === null) return false;
+
+    try {
+      return v.safeParse(SaveEnvelopeSchema, JSON.parse(raw)).success;
+    } catch {
+      return false;
+    }
+  });
 };
 
 export const latestSave = (): {

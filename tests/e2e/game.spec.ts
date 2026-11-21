@@ -36,6 +36,43 @@ test("reserves the continue action and keeps settings reachable on mobile", asyn
   await expect(page.getByRole("heading", { name: /Độc Quyền Kinh Tế/i })).toBeVisible();
 });
 
+test("exposes named meters, the motion switch, and mobile tab state", async ({ page }) => {
+  await startGame(page);
+
+  const meters = page.getByRole("meter");
+  await expect.poll(() => meters.count()).toBeGreaterThan(0);
+
+  const invalid = await meters.evaluateAll((nodes) =>
+    nodes
+      .filter((node) => {
+        const label = node.getAttribute("aria-label");
+        const now = Number(node.getAttribute("aria-valuenow"));
+        const max = Number(node.getAttribute("aria-valuemax"));
+
+        return !label || Number.isNaN(now) || now < 0 || now > max;
+      })
+      .map((node) => node.outerHTML),
+  );
+
+  expect(invalid).toEqual([]);
+
+  await page.getByRole("button", { name: "Kho lưu và cài đặt" }).click();
+  await expect(page.getByRole("switch", { name: "Giảm chuyển động" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".save-modal")).toHaveCount(0);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const tariffTab = page.locator(".mobile-tab").filter({ hasText: "Giá" });
+  const overviewTab = page.locator(".mobile-tab").filter({ hasText: "Tổng quan" });
+  await tariffTab.click();
+  await expect(tariffTab).toHaveAttribute("aria-expanded", "true");
+  await expect(overviewTab).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator(".sheet-tab").filter({ hasText: "Giá" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+});
+
 test("loads the deferred village scene once and recovers from a failed chunk", async ({ page }) => {
   let blocked = true;
 

@@ -79,14 +79,18 @@ and registers only the names listed in `icon-names.ts`, so the repository
 contains no hand-written SVG and the page makes no Iconify API request. The
 package is patched for Solid 2's attribute namespace and element typings.
 
-## Open Graph image
+## Open Graph image and public metadata
 
 `routes/og.png.ts` is a Nitro route enabled by `serverDir: "."` in
 `nitro.config.ts`. Takumi builds a 1200x630 card from the local Be Vietnam Pro
 TTF weights under `public/fonts/`; Nitro bundles those files as server assets so
 the Vercel function does not need a self-fetch, and `ImageResponse` streams the
-card with a one-day immutable cache. Public font responses use a thirty-day
-shared cache. Nitro bundles the Takumi WASM backend for production; Vite dev
+card with a one-day immutable cache. Public font and image responses use a
+thirty-day shared cache. `routes/sitemap.xml.ts` and `routes/robots.txt.ts`
+publish the single public URL and its sitemap. The root route owns the social
+metadata, while the index route owns the canonical and robots directives so a
+404 response is never advertised as indexable. Nitro bundles the Takumi WASM
+backend for production; Vite dev
 feeds the WASM bytes directly because pnpm's virtual store hides the native
 addon. The root route advertises an absolute `/og.png` URL through the Open
 Graph and Twitter tags, using `VITE_SITE_URL` with the Vercel project URL as

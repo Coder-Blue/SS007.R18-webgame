@@ -76,7 +76,7 @@ export const MobileNav = (): JSX.Element => {
             type="button"
             class="mobile-tab"
             aria-haspopup="dialog"
-            aria-expanded={open() ? "true" : "false"}
+            aria-expanded={open() && panel() === tab.id ? "true" : "false"}
             onClick={() => openPanel(tab.id)}
           >
             <Icon icon={tab.icon} size={20} />

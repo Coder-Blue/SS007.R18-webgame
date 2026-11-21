@@ -64,6 +64,7 @@ export const Bar = (props: {
 }): JSX.Element => {
   const max = props.max ?? 100;
   const ratio = () => (max <= 0 ? 0 : Math.max(0, Math.min(1, props.value / max)));
+  const current = () => Math.round(Math.max(0, Math.min(props.value, max)));
 
   return (
     <div
@@ -73,8 +74,8 @@ export const Bar = (props: {
       aria-label={props.label ?? "Chỉ số"}
       aria-valuemin={0}
       aria-valuemax={max}
-      aria-valuenow={Math.round(props.value)}
-      aria-valuetext={`${Math.round(props.value)} trên ${max}`}
+      aria-valuenow={current()}
+      aria-valuetext={`${current()} trên ${max}`}
     >
       <span class="bar-fill" style={{ width: `${ratio() * 100}%` }} />
     </div>
@@ -177,6 +178,7 @@ export const ProgressRing = (props: {
   const stroke = props.stroke ?? 5;
   const max = props.max ?? 100;
   const ratio = () => (max <= 0 ? 0 : Math.max(0, Math.min(1, props.value / max)));
+  const current = () => Math.round(Math.max(0, Math.min(props.value, max)));
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
 
@@ -188,8 +190,8 @@ export const ProgressRing = (props: {
       aria-label={props.label ?? "Chỉ số"}
       aria-valuemin={0}
       aria-valuemax={max}
-      aria-valuenow={Math.round(props.value)}
-      aria-valuetext={`${Math.round(props.value)} trên ${max}`}
+      aria-valuenow={current()}
+      aria-valuetext={`${current()} trên ${max}`}
     >
       <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} aria-hidden="true">
         <circle

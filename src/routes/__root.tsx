@@ -52,11 +52,9 @@ export const Route = createRootRoute({
         name: "twitter:image:alt",
         content: "Độc Quyền Kinh Tế, trò chơi quản lý gạo làng Việt Nam",
       },
-      { name: "robots", content: "index, follow, max-image-preview:large" },
       { name: "color-scheme", content: "light" },
     ],
     links: [
-      { rel: "canonical", href: `${SITE_URL}/` },
       { rel: "sitemap", type: "application/xml", href: `${SITE_URL}/sitemap.xml` },
       {
         rel: "preload",
