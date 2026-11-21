@@ -1,10 +1,5 @@
 .game-shell {
-  @apply relative h-[100dvh] w-full overflow-hidden;
-  background: radial-gradient(
-    circle at 30% 20%,
-    oklch(39.96% 0.0592 154.34) 0%,
-    var(--color-forest-900) 65%
-  );
+  @apply relative h-[100dvh] w-full overflow-hidden bg-forest-950;
 }
 
 .title-poster {
@@ -41,44 +36,41 @@
 }
 
 .scene-badge {
-  @apply inline-flex items-center gap-[6px] rounded-[4px] border-2 border-gold-light/40 bg-forest-950 px-[10px] py-[5px] text-[0.68rem] font-bold tracking-[0.04em] text-paper uppercase;
+  @apply inline-flex items-center gap-[8px] rounded-[4px] border border-paper/20 bg-forest-950/90 px-[12px] py-[4px] text-[0.68rem] font-medium tracking-normal text-paper/80;
 }
 
 .scene-controls {
-  @apply absolute right-[18px] bottom-[96px] z-[4];
+  @apply absolute right-[20px] bottom-[96px] z-[4];
 }
 
 .scene-reset {
-  @apply inline-flex min-h-11 items-center gap-2 rounded-[6px] border-2 border-gold-light/40 bg-forest-950 px-[12px] text-[0.7rem] font-bold tracking-[0.04em] text-paper uppercase;
+  @apply inline-flex min-h-11 items-center gap-2 rounded-[8px] border border-paper/20 bg-forest-950 px-[12px] text-[0.7rem] font-medium tracking-normal text-paper/80;
 }
 
 .scene-hint {
-  @apply pointer-events-none absolute bottom-4 left-1/2 z-[3] -translate-x-1/2 text-[0.66rem] tracking-[0.02em] whitespace-nowrap text-paper/72;
+  @apply pointer-events-none absolute bottom-4 left-1/2 z-[3] -translate-x-1/2 text-[0.7rem] tracking-normal whitespace-nowrap text-paper/72;
 }
 
 .scene-loading {
-  @apply absolute inset-0 grid place-items-center font-bold tracking-[0.08em] text-gold-light uppercase;
+  @apply absolute inset-0 grid place-items-center text-[0.8rem] font-medium tracking-normal text-paper/70;
   background: oklch(17.33% 0.0219 155.73 / 0.78);
 }
 
 .scene-error {
-  @apply absolute bottom-[96px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-[6px] border-2 border-rust bg-forest-950 px-3 py-2 text-[0.72rem] font-bold text-paper shadow-panel;
+  @apply absolute bottom-[96px] left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-[6px] border border-rust bg-forest-950 px-3 py-2 text-[0.72rem] font-medium text-paper shadow-panel;
 }
 
 .top-bar {
-  @apply absolute left-3 right-3 z-20 flex min-h-[60px] items-center gap-[18px] rounded-[var(--radius)] border-2 border-gold-dark/80 bg-forest-950 px-[14px] py-2 text-paper shadow-panel;
+  @apply absolute left-3 right-3 z-20 flex min-h-[60px] items-center gap-[20px] rounded-[var(--radius)] border border-paper/15 bg-forest-950 px-[16px] py-2 text-paper shadow-panel;
   top: calc(12px + var(--safe-top));
-  box-shadow:
-    inset 0 2px 0 oklch(100% 0 0 / 0.08),
-    var(--shadow-panel);
 }
 
 .brand-block {
-  @apply flex min-w-[190px] items-center gap-[10px];
+  @apply flex min-w-[190px] items-center gap-[12px];
 }
 
 .brand-mark {
-  @apply grid h-9 w-9 place-items-center rounded-[6px] border-2 border-outline bg-gold text-forest-950;
+  @apply grid h-9 w-9 place-items-center rounded-[6px] border border-outline bg-gold text-forest-950;
   box-shadow: inset 0 2px 0 oklch(100% 0 0 / 0.35);
 }
 
@@ -87,27 +79,27 @@
 }
 
 .brand-copy strong {
-  @apply text-[0.84rem] tracking-[0.01em];
+  @apply text-[0.88rem] font-semibold tracking-normal;
 }
 
 .brand-copy span {
-  @apply text-[0.58rem] tracking-[0.16em] uppercase text-gold-light opacity-80;
+  @apply text-[0.68rem] tracking-normal text-paper/55;
 }
 
 .date-block {
-  @apply flex min-w-[138px] flex-col border-l-2 border-gold-light/25 pl-4 leading-[1.2];
+  @apply flex min-w-[138px] flex-col border-l border-paper/15 pl-4 leading-[1.2];
 }
 
 .date-main {
-  @apply text-[0.84rem] font-extrabold;
+  @apply text-[0.88rem] font-semibold;
 }
 
 .date-sub {
-  @apply text-[0.64rem] text-paper/62;
+  @apply text-[0.68rem] text-paper/60;
 }
 
 .top-gauges {
-  @apply flex flex-1 justify-center gap-[14px];
+  @apply flex flex-1 justify-center gap-[16px];
 }
 
 .top-gauge {
@@ -115,15 +107,15 @@
 }
 
 .top-gauge-label {
-  @apply flex items-center gap-[5px] text-[0.58rem] font-bold tracking-[0.1em] uppercase text-gold-light/75;
+  @apply flex items-center gap-[4px] text-[0.68rem] font-medium tracking-normal text-paper/55;
 }
 
 .top-gauge strong {
-  @apply text-[0.8rem];
+  @apply text-[0.88rem] font-semibold;
 }
 
 .top-actions {
-  @apply flex items-center gap-[7px];
+  @apply flex items-center gap-[8px];
 }
 
 .mobile-status {

@@ -77,7 +77,6 @@ export const EndingScreen = (): JSX.Element => {
           aria-modal="true"
           aria-label={endingTitle(ending().id)}
         >
-          <div class="ending-glow" />
           <div class="ending-card">
             <div class="ending-head">
               <Badge

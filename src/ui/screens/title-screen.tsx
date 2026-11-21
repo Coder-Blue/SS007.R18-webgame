@@ -36,10 +36,12 @@ export const TitleScreen = (props: {
         >
           Tiếp tục ván đang lưu
         </ActionButton>
-        <ActionButton variant="secondary" size="lg" icon="lucide:save" onClick={props.onOpenLoad}>
+      </div>
+      <div class="title-utilities">
+        <ActionButton variant="ghost" size="sm" icon="lucide:save" onClick={props.onOpenLoad}>
           Mở kho lưu
         </ActionButton>
-        <ActionButton variant="ghost" size="lg" icon="lucide:book-open" onClick={props.onTutorial}>
+        <ActionButton variant="ghost" size="sm" icon="lucide:book-open" onClick={props.onTutorial}>
           Luật chơi
         </ActionButton>
       </div>

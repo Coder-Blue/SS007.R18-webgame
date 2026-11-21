@@ -1,27 +1,27 @@
 .line-stats {
-  @apply flex items-center justify-between gap-2 text-[0.72rem] font-semibold;
+  @apply flex items-center justify-between gap-2 text-[0.76rem] font-medium;
 }
 
 .market-grid {
-  @apply grid grid-cols-2 gap-[7px];
+  @apply grid grid-cols-2 gap-[8px];
 }
 
 .action-list,
 .build-list,
 .reform-list {
-  @apply flex flex-col gap-[7px];
+  @apply flex flex-col gap-[8px];
 }
 
 .action-card,
 .build-card,
 .reform-card {
-  @apply flex items-center justify-between gap-[10px] border-b border-line bg-transparent px-0 py-[9px];
+  @apply flex items-center justify-between gap-[12px] border-b border-line bg-transparent px-0 py-[8px];
 }
 
 .action-card-main,
 .build-main,
 .reform-main {
-  @apply flex min-w-0 items-start gap-[9px];
+  @apply flex min-w-0 items-start gap-[8px];
 }
 
 .action-icon,
@@ -46,13 +46,13 @@
 .action-card-main strong,
 .build-main strong,
 .reform-main strong {
-  @apply text-[0.74rem];
+  @apply text-[0.78rem] font-medium;
 }
 
 .action-card-main p,
 .build-main p,
 .reform-main p {
-  @apply text-[0.63rem] leading-[1.45] text-ink-soft;
+  @apply text-[0.68rem] leading-[1.45] text-ink-soft;
 }
 
 .action-cost,
@@ -64,15 +64,15 @@
 .action-cost > span,
 .build-side > span,
 .reform-side > span {
-  @apply text-[0.66rem] font-extrabold whitespace-nowrap text-gold-ink tabular-nums;
+  @apply text-[0.7rem] font-semibold whitespace-nowrap text-forest-900 tabular-nums;
 }
 
 .meter-block {
-  @apply flex flex-col gap-[5px];
+  @apply flex flex-col gap-[4px];
 }
 
 .meter-row {
-  @apply flex items-center justify-between gap-2 text-[0.7rem];
+  @apply flex items-center justify-between gap-2 text-[0.74rem];
 }
 
 .meter-row strong {
@@ -84,15 +84,15 @@
 }
 
 .coverage-copy {
-  @apply flex flex-col gap-[3px];
+  @apply flex flex-col gap-[4px];
 }
 
 .coverage-copy strong {
-  @apply text-[0.68rem];
+  @apply text-[0.72rem] font-medium;
 }
 
 .coverage-copy span {
-  @apply text-[0.68rem] font-bold text-gold-ink;
+  @apply text-[0.72rem] font-medium text-forest-900;
 }
 
 .ring {
@@ -117,15 +117,15 @@
 }
 
 .ring-label {
-  @apply absolute text-[0.66rem] font-bold text-ink;
+  @apply absolute text-[0.7rem] font-medium text-ink;
 }
 
 .fleet-row {
-  @apply flex items-start justify-between gap-[10px];
+  @apply flex items-start justify-between gap-[12px];
 }
 
 .fleet-row strong {
-  @apply text-[0.8rem];
+  @apply text-[0.84rem] font-semibold;
 }
 
 .inline-actions {
@@ -133,27 +133,27 @@
 }
 
 .tariff-summary {
-  @apply grid grid-cols-2 gap-[7px];
+  @apply grid grid-cols-2 gap-[8px];
 }
 
 .slider-list {
-  @apply flex flex-col gap-[14px];
+  @apply flex flex-col gap-[16px];
 }
 
 .slider-row {
-  @apply flex flex-col gap-[5px];
+  @apply flex flex-col gap-[4px];
 }
 
 .slider-head {
-  @apply flex items-center justify-between gap-2 text-[0.72rem] font-semibold;
+  @apply flex items-center justify-between gap-2 text-[0.76rem] font-medium;
 }
 
 .slider-head strong {
-  @apply text-gold-ink tabular-nums;
+  @apply text-forest-900 tabular-nums;
 }
 
 .slider-scale {
-  @apply flex justify-between text-[0.58rem] text-ink-faint;
+  @apply flex justify-between text-[0.68rem] text-ink-faint;
 }
 
 [data-slot="slider"] {
@@ -169,11 +169,11 @@
 }
 
 [data-slot="slider-indicator"] {
-  @apply absolute top-0 left-0 h-full rounded-[1px] bg-gold;
+  @apply absolute top-0 left-0 h-full rounded-[2px] bg-gold;
 }
 
 [data-slot="slider-thumb"] {
-  @apply absolute top-1/2 -mt-[13px] -ml-[13px] h-[26px] w-[26px] cursor-grab rounded-[4px] border-2 border-outline bg-gold shadow-[0_2px_0_oklch(19.39%_0.0246_156.24_/_0.35)];
+  @apply absolute top-1/2 -mt-[12px] -ml-[12px] h-[28px] w-[28px] cursor-grab rounded-[4px] border border-outline bg-gold shadow-[0_2px_0_oklch(19.39%_0.0246_156.24_/_0.35)];
 }
 
 [data-slot="slider-thumb"]:has(:focus-visible) {
@@ -181,7 +181,7 @@
 }
 
 [data-slot="slider-thumb"][data-dragging] {
-  @apply scale-[1.08] cursor-grabbing;
+  @apply cursor-grabbing;
 }
 
 [data-slot="slider-thumb"] input {

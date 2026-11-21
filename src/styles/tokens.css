@@ -130,7 +130,7 @@ h2,
 h3,
 h4,
 strong {
-  @apply font-bold tracking-[-0.01em];
+  @apply font-medium tracking-normal;
 }
 
 ul {
@@ -182,7 +182,7 @@ ul {
 }
 
 .muted {
-  @apply text-[0.82rem] leading-[1.55] text-ink-soft;
+  @apply text-[0.84rem] leading-[1.55] text-ink-soft;
 }
 
 .negative {
@@ -190,11 +190,11 @@ ul {
 }
 
 .eyebrow {
-  @apply text-[0.66rem] font-bold tracking-[0.14em] text-gold-ink uppercase;
+  @apply text-[0.68rem] font-medium tracking-normal text-ink-soft;
 }
 
 .stack-lg {
-  @apply flex flex-col gap-[14px];
+  @apply flex flex-col gap-[16px];
 }
 
 .desktop-only {

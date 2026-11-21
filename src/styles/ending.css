@@ -1,29 +1,21 @@
 .ending-screen {
-  @apply fixed inset-0 z-[80] grid place-items-center overflow-y-auto p-5;
-  background:
-    radial-gradient(70% 60% at 50% 30%, oklch(76.03% 0.1236 82.19 / 0.18), transparent 60%),
-    oklch(16.03% 0.0203 158.27 / 0.88);
-}
-
-.ending-glow {
-  @apply pointer-events-none absolute h-[min(80vw,760px)] w-[min(80vw,760px)] rounded-full;
-  background: radial-gradient(circle, oklch(76.03% 0.1236 82.19 / 0.18), transparent 65%);
+  @apply fixed inset-0 z-[80] grid place-items-center overflow-y-auto bg-forest-950/90 p-5;
 }
 
 .ending-card {
-  @apply relative z-[1] flex w-[min(94vw,760px)] flex-col gap-3 rounded-[var(--radius)] border-2 border-gold-dark bg-paper p-[clamp(20px,4vw,38px)] shadow-deep;
+  @apply relative z-[1] flex w-[min(94vw,760px)] flex-col gap-3 rounded-[var(--radius)] border border-outline/20 bg-paper p-[clamp(20px,4vw,40px)] shadow-deep;
 }
 
 .ending-head {
-  @apply flex items-center justify-between gap-[10px];
+  @apply flex items-center justify-between gap-[12px];
 }
 
 .ending-date {
-  @apply text-[0.7rem] font-bold text-gold-ink;
+  @apply text-[0.7rem] font-medium text-ink-soft;
 }
 
 .ending-card h1 {
-  @apply text-[clamp(1.8rem,4vw,3rem)] leading-[1.05] tracking-[-0.03em] text-forest-900 text-balance;
+  @apply text-[clamp(1.8rem,4vw,3rem)] leading-[1.05] font-semibold tracking-[-0.03em] text-forest-900 text-balance;
 }
 
 .ending-body {
@@ -31,7 +23,7 @@
 }
 
 .ending-reason {
-  @apply rounded-[4px] border-2 border-gold-dark/60 bg-gold/12 px-[11px] py-[9px] text-[0.74rem] font-bold text-[oklch(42%_0.075_80)];
+  @apply rounded-[6px] border border-line bg-paper-2 px-[12px] py-[8px] text-[0.76rem] text-ink-soft;
 }
 
 .ending-actions {
