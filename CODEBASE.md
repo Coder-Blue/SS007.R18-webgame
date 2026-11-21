@@ -82,12 +82,15 @@ package is patched for Solid 2's attribute namespace and element typings.
 ## Open Graph image
 
 `routes/og.png.ts` is a Nitro route enabled by `serverDir: "."` in
-`nitro.config.ts`. Takumi builds a 1200x630 card from the Be Vietnam Pro files
-under `public/fonts/`, and `ImageResponse` streams it with a one-day immutable
-cache. Nitro bundles the Takumi WASM backend for production; Vite dev feeds the
-WASM bytes directly because pnpm's virtual store hides the native addon. The
-root route advertises an absolute `/og.png` URL through the Open Graph and
-Twitter tags, using `VITE_SITE_URL` with the Vercel project URL as fallback.
+`nitro.config.ts`. Takumi builds a 1200x630 card from the local Be Vietnam Pro
+TTF weights under `public/fonts/`; Nitro bundles those files as server assets so
+the Vercel function does not need a self-fetch, and `ImageResponse` streams the
+card with a one-day immutable cache. Public font responses use a seven-day
+shared cache. Nitro bundles the Takumi WASM backend for production; Vite dev
+feeds the WASM bytes directly because pnpm's virtual store hides the native
+addon. The root route advertises an absolute `/og.png` URL through the Open
+Graph and Twitter tags, using `VITE_SITE_URL` with the Vercel project URL as
+fallback.
 Preview it after a build with:
 
 ```bash

@@ -3,6 +3,13 @@
 All notable changes are recorded here. The format follows Keep a Changelog and
 the project uses semantic versioning for save-compatible releases.
 
+## [Unreleased]
+
+### Changed
+
+- Self-hosted Be Vietnam Pro TTF weights replace the Latin and Vietnamese WOFF2
+  subsets across the UI, preload manifest and Open Graph image.
+
 ## [1.0.0] - 2026-11-21
 
 ### Added
