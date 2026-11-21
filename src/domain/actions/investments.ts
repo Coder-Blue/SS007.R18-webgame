@@ -20,6 +20,7 @@ import { finishAction, pay, requirePlaying } from "./helpers";
 export const investmentCost = (state: GameState, kind: InvestmentKind): number => {
   const production = state.production;
   const fleetSteps = Math.max(0, Math.round((state.infrastructure.fleet - 120) / FLEET_STEP));
+
   switch (kind) {
     case "hydro":
       return HYDRO_COST + Math.max(0, production.hydroPaddies - 5) * 180;
@@ -59,11 +60,15 @@ const atCap = (state: GameState, kind: InvestmentKind): boolean => {
 
 export const investAction = (state: GameState, kind: InvestmentKind): ActionResult => {
   const blocked = requirePlaying(state);
+
   if (blocked !== null) return blocked;
+
   if (atCap(state, kind)) return err({ code: "action.at-cap" });
   const paid = pay(state, investmentCost(state, kind));
+
   if (!paid.ok) return paid;
   const next = paid.value;
+
   if (kind === "hydro") {
     return finishAction({
       ...next,
@@ -73,6 +78,7 @@ export const investAction = (state: GameState, kind: InvestmentKind): ActionResu
       },
     });
   }
+
   if (kind === "mechanized") {
     return finishAction({
       ...next,
@@ -82,6 +88,7 @@ export const investAction = (state: GameState, kind: InvestmentKind): ActionResu
       },
     });
   }
+
   if (kind === "irrigation") {
     return finishAction({
       ...next,
@@ -91,6 +98,7 @@ export const investAction = (state: GameState, kind: InvestmentKind): ActionResu
       },
     });
   }
+
   if (kind === "rnd") {
     return finishAction({
       ...next,
@@ -100,12 +108,14 @@ export const investAction = (state: GameState, kind: InvestmentKind): ActionResu
       },
     });
   }
+
   if (kind === "fleet") {
     return finishAction({
       ...next,
       infrastructure: fleetUpgrade(next.infrastructure, FLEET_STEP),
     });
   }
+
   if (kind === "campaign") {
     return finishAction({
       ...next,
@@ -120,6 +130,7 @@ export const investAction = (state: GameState, kind: InvestmentKind): ActionResu
       },
     });
   }
+
   return finishAction({
     ...next,
     metrics: {

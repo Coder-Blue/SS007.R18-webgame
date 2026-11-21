@@ -62,6 +62,7 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
   const onPointerDown = (event: PointerEvent): void => {
     options.canvas.setPointerCapture(event.pointerId);
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
     if (pointers.size === 1) {
       dragging = true;
       moved = 0;
@@ -76,17 +77,22 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
 
   const onPointerMove = (event: PointerEvent): void => {
     const previous = pointers.get(event.pointerId);
+
     if (previous === undefined) return;
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
     if (pointers.size === 2) {
       const [a, b] = [...pointers.values()];
       const distance = Math.hypot((a?.x ?? 0) - (b?.x ?? 0), (a?.y ?? 0) - (b?.y ?? 0));
+
       if (pinchStart > 0) {
         view.distance = clamp(pinchDistance * (pinchStart / Math.max(1, distance)), 15, 52);
         apply();
       }
+
       return;
     }
+
     if (!dragging) return;
     const dx = event.clientX - previous.x;
     const dy = event.clientY - previous.y;
@@ -100,11 +106,15 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
       moved < 8 &&
       Math.abs(event.clientX - startX) < 8 &&
       Math.abs(event.clientY - startY) < 8;
+
     pointers.delete(event.pointerId);
+
     if (pointers.size === 0) {
       dragging = false;
+
       if (wasTap) options.onTap(event.clientX, event.clientY);
     }
+
     if (pointers.size < 2) pinchStart = 0;
   };
 
@@ -126,6 +136,7 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
     resize: (width: number, height: number) => {
       camera.aspect = width / Math.max(1, height);
       camera.updateProjectionMatrix();
+
       if (!userMovedCamera) {
         view.distance = camera.aspect < 0.85 ? 42 : 31;
         apply();

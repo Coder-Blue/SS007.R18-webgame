@@ -67,9 +67,10 @@ Valibot.
 - **Pure domain.** Economic formulas and state transitions are pure functions
   over readonly data. Randomness is a seeded value threaded through ticks.
   Results use the local `Result` discriminated union.
-- **File budget.** No `.ts`, `.tsx`, `.css`, or `.json` source file over 500
-  lines. Generated `routeTree.gen.ts` and lockfiles are exempt. Prefer many
-  cohesive files under 250 lines.
+- **File budget.** No owned `.ts`, `.tsx`, `.css`, or `.json` source file over
+  500 lines. Generated `routeTree.gen.ts`, lockfiles and the vendored
+  `tools/oxlint/anti-slop/` plugin are exempt; `pnpm check:lines` reports the
+  vendored count explicitly. Prefer many cohesive files under 250 lines.
 - **Zero emojis.** Not in code, comments, UI, docs, commits, or logs. Use SVG
   icons through `src/ui/components/icons.tsx`.
 - **Minimal comments.** Explain a non-obvious economic edge case, a Three.js
@@ -104,6 +105,26 @@ The reviewer holds auto-merge authority only after every gate in
 Every change must leave reproducible evidence: test output, coverage summary,
 build output, lint/format status, a viewport check, or a screenshot. Do not
 claim a gate passed without the command output that proves it.
+
+## Skills
+
+Load the skill before starting work that it owns. The routing table in
+`AGENT_DIRECTORY.md` maps every role to its skills. Context7 is mandatory
+before changing a dependency API; graphify is mandatory before exploring code;
+the impeccable and agency-agents reviews are mandatory before UI polish.
+
+Do not install, update or vendor a skill inside an unrelated feature branch.
+Skill changes travel in their own issue with provenance in `skills-lock.json`
+and `tools/oxlint/anti-slop/UPSTREAM.md`.
+
+## Anti-slop
+
+`tools/oxlint/anti-slop` is vendored at the pinned skill snapshot. Its rules run
+at error level from `.oxlintrc.json`; `oxc/no-accumulating-spread` runs beside
+them. `require-readable-spacing` is autofixable, so run `pnpm exec oxlint --fix`
+and then `pnpm format` before deciding a finding is real. Do not suppress a
+rule, weaken its severity or add an unsafe cast to make lint pass. A cast that
+is genuinely safe gets a `SAFETY:` comment stating the checked invariant.
 
 ## graphify
 

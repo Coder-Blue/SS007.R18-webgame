@@ -23,6 +23,7 @@ export const PolicyPanel = (): JSX.Element => {
   });
   const canN2 = () => state().clock.year >= 2024;
   const preview = () => recoveryFor(state().finance, state().clock.year, rate(), true);
+
   const reforms = [
     {
       key: "nsmo" as const,
@@ -52,6 +53,7 @@ export const PolicyPanel = (): JSX.Element => {
       icon: "scale" as const,
     },
   ];
+
   return (
     <div class="stack-lg">
       <Panel title={t("policy.title")} kicker={t("panel.policyDesc")} icon="landmark">

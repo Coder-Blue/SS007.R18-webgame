@@ -1,7 +1,11 @@
 export type Season = "spring" | "summer" | "autumn" | "winter";
+
 export type Act = 1 | 2 | 3;
+
 export type Phase = "title" | "playing" | "ended";
+
 export type RoadGrade = "dirt" | "cobble" | "asphalt";
+
 export type InvestmentKind =
   | "hydro"
   | "mechanized"
@@ -10,7 +14,9 @@ export type InvestmentKind =
   | "fleet"
   | "campaign"
   | "crackdown";
+
 export type EndingId = "architect" | "predator" | "collapse";
+
 export type EndingReason =
   | "debt"
   | "unrest"

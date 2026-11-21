@@ -26,6 +26,7 @@ export const InfrastructurePanel = (): JSX.Element => {
   const { store, actions } = useGame();
   const state = store.state;
   const infra = () => state().infrastructure;
+
   return (
     <div class="stack-lg">
       <Panel title={t("panel.infrastructure")} kicker={t("pillar.infrastructureTag")} icon="road">
@@ -85,6 +86,7 @@ export const InfrastructurePanel = (): JSX.Element => {
           <For each={grades}>
             {(grade) => {
               const project = ROAD_PROJECTS[grade];
+
               return (
                 <div class="build-card">
                   <div class="build-main">

@@ -4,13 +4,18 @@ import { finishAction, pay, requirePlaying } from "./helpers";
 
 export const importRiceAction = (state: GameState): ActionResult => {
   const blocked = requirePlaying(state);
+
   if (blocked !== null) return blocked;
+
   if (state.production.riceInventory >= 600) {
     return { ok: false, error: { code: "action.stock-full" } };
   }
+
   const cost = IMPORT_RICE_VOLUME * state.market.ricePrice * IMPORT_RICE_MARKUP;
   const paid = pay(state, cost);
+
   if (!paid.ok) return paid;
+
   return finishAction({
     ...paid.value,
     production: {

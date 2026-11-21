@@ -1,6 +1,16 @@
 {
   "include": ["**/*.ts", "**/*.tsx", "scripts/**/*.ts", "tests/**/*.ts", "*.ts"],
-  "exclude": ["node_modules", ".output", "dist", "coverage"],
+  "exclude": [
+    "node_modules",
+    ".output",
+    "dist",
+    "coverage",
+    "tools",
+    ".agents",
+    ".claude",
+    ".codex",
+    ".opencode"
+  ],
   "compilerOptions": {
     "strict": true,
     "noUncheckedIndexedAccess": true,

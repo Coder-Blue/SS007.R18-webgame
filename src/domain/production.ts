@@ -22,7 +22,9 @@ export const computeProduction = (
 ): ProductionResult => {
   const hydro =
     production.hydroPaddies * 24 * (1 - 0.55 * market.drought) * (1 + 0.02 * production.rndLevel);
+
   const fertilizerFactor = Math.max(0.82, 1 - Math.max(0, fertilizerIndex(market) - 1) * 0.18);
+
   const mechanized =
     production.mechanizedPaddies *
     30 *
@@ -30,8 +32,10 @@ export const computeProduction = (
     (1 + 0.03 * production.rndLevel) *
     fertilizerFactor *
     Math.max(0.85, Math.min(1.05, metrics.industrialOutput / 100));
+
   const costPerTonne = productionCostPerTonne(market, production.rndLevel);
   const ownProduction = hydro + mechanized;
+
   return {
     hydro,
     mechanized,

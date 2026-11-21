@@ -52,6 +52,7 @@ describe("endings", () => {
         ],
       },
     };
+
     expect(finalReliability(state)).toBe(96);
     expect(finalReliability(initial)).toBe(initial.metrics.reliability);
   });
@@ -70,6 +71,7 @@ describe("endings", () => {
         reliability: 99,
       },
     };
+
     expect(evaluateFinalEnding(state).id).toBe("architect");
     expect(
       evaluateFinalEnding({
@@ -93,6 +95,7 @@ describe("endings", () => {
       metrics: { ...initial.metrics, satisfaction: 40 },
       events: { ...initial.events, flags: ["bribe_accepted"] },
     };
+
     expect(evaluateFinalEnding(state).id).toBe("predator");
     expect(
       evaluateFinalEnding({
@@ -113,17 +116,20 @@ describe("endings", () => {
       ...initial,
       ending: { id: "collapse" as const, reason: "debt" as const, year: 2022, month: 1 },
     };
+
     expect(withEndingCheck(ended)).toBe(ended);
     expect(
       withEndingCheck({ ...initial, finance: { ...initial.finance, debt: 61_000 } }).phase,
     ).toBe("ended");
     expect(withEndingCheck(initial)).toBe(initial);
     expect(withFinalCheck(initial)).toBe(initial);
+
     const december = {
       ...initial,
       clock: { year: 2026, month: 12, tick: 59 },
       finance: { ...initial.finance, debt: 40_000 },
     };
+
     expect(withFinalCheck(december).phase).toBe("ended");
     expect(withFinalCheck(ended)).toBe(ended);
   });

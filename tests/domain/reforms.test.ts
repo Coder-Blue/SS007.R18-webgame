@@ -19,6 +19,7 @@ describe("reform revenue", () => {
       { ...initial.policy, dppa: true, vrem: true, twoPartTariff: true },
       initial.village,
     );
+
     expect(revenue.dppa).toBe(240);
     expect(revenue.vrem).toBeCloseTo(252);
     expect(revenue.twoPart).toBe(48);

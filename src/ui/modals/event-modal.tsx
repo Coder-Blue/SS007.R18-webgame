@@ -16,15 +16,19 @@ import { activeEvent } from "~/domain";
 export const EventModal = (): JSX.Element => {
   const { store, actions } = useGame();
   const state = store.state;
+
   const [outcome, setOutcome] = createSignal<{
     readonly title: string;
     readonly body: string;
   } | null>(null);
+
   const event = () => activeEvent(state());
+
   const choose = (choiceId: string, outcomeKey: string, titleKey: string): void => {
     setOutcome({ title: t(titleKey), body: t(outcomeKey) });
     actions.resolve(choiceId);
   };
+
   return (
     <>
       <Show when={event()}>

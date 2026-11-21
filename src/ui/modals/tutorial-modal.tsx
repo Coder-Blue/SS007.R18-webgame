@@ -27,10 +27,12 @@ export const TutorialModal = (props: {
 }): JSX.Element => {
   const [index, setIndex] = createSignal(0);
   const current = () => steps[index()] ?? steps[0]!;
+
   const close = (): void => {
     props.onFinish();
     props.onClose();
   };
+
   return (
     <Dialog open={props.open} onOpenChange={(open) => (open ? undefined : props.onClose())}>
       <DialogBackdrop class="modal-backdrop" />

@@ -56,6 +56,7 @@ describe("metrics", () => {
       vrem: true,
       nsmo: true,
     };
+
     const withReform = nextIndustrialOutput(100, 100, 7.4, reform, 3);
     const without = nextIndustrialOutput(100, 100, 7.4, initial.policy, 3);
     expect(withReform).toBeGreaterThan(without);
@@ -66,11 +67,13 @@ describe("metrics", () => {
 
   it("computes satisfaction from coverage, tariff and flags", () => {
     const base = nextSatisfaction(context());
+
     const universal = nextSatisfaction(
       context({
         infrastructure: { ...initial.infrastructure, coverage: 100, remoteCoverage: 100 },
       }),
     );
+
     const strained = nextSatisfaction(
       context({
         reliability: 60,
@@ -78,6 +81,7 @@ describe("metrics", () => {
         flags: ["bribe_accepted"],
       }),
     );
+
     expect(universal).toBeGreaterThan(base);
     expect(strained).toBeLessThan(base);
     expect(
@@ -88,6 +92,7 @@ describe("metrics", () => {
 
   it("computes trust from reforms, debate and scandals", () => {
     const base = nextTrust({ ...context(), metricsDebate: 50 }, 4);
+
     const reformed = nextTrust(
       {
         ...context({
@@ -103,6 +108,7 @@ describe("metrics", () => {
       },
       4,
     );
+
     const scandal = nextTrust(
       {
         ...context({
@@ -112,6 +118,7 @@ describe("metrics", () => {
       },
       10,
     );
+
     expect(reformed).toBeGreaterThan(base);
     expect(scandal).toBeLessThan(base);
     expect(nextTrust({ ...context(), metricsDebate: 50 }, 20)).toBeLessThan(base);

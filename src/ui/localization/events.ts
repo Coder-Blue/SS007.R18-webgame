@@ -1,4 +1,6 @@
-export const eventCopy: Readonly<Record<string, string>> = {
+import type { CopyDictionary } from "./contracts";
+
+export const eventCopy: CopyDictionary = {
   "event.kind.weather": "Thời tiết",
   "event.kind.shock": "Cú sốc",
   "event.kind.debate": "Tranh luận",

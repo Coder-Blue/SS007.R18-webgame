@@ -25,6 +25,7 @@ const box = (
   mesh.position.set(x, y, z);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
+
   return mesh;
 };
 
@@ -41,9 +42,11 @@ const roof = (
     new THREE.ConeGeometry(Math.max(width, depth) * 0.72, height, 4),
     material(color),
   );
+
   mesh.rotation.y = Math.PI / 4;
   mesh.position.set(x, y, z);
   mesh.castShadow = true;
+
   return mesh;
 };
 
@@ -54,25 +57,31 @@ const hut = (x: number, z: number): THREE.Group => {
   group.add(body, roofMesh);
   group.position.set(x, 0.8, z);
   group.userData.selection = "hut";
+
   return group;
 };
 
 const tree = (x: number, z: number, scale: number): THREE.Group => {
   const group = new THREE.Group();
+
   const trunk = new THREE.Mesh(
     new THREE.CylinderGeometry(0.1, 0.14, 0.8, 5),
     material(PALETTE.trunk),
   );
+
   trunk.position.y = 0.4;
+
   const crown = new THREE.Mesh(
     new THREE.ConeGeometry(0.7, 1.6, 6),
     material(x % 2 === 0 ? PALETTE.tree : PALETTE.treeDark),
   );
+
   crown.position.y = 1.5;
   crown.castShadow = true;
   group.add(trunk, crown);
   group.scale.setScalar(scale);
   group.position.set(x, 0.8, z);
+
   return group;
 };
 
@@ -81,26 +90,32 @@ const paddy = (x: number, z: number, index: number): THREE.Mesh => {
     new THREE.BoxGeometry(2.1, 0.16, 2.1),
     material(index % 3 === 0 ? PALETTE.terraceWater : PALETTE.terrace),
   );
+
   mesh.position.set(x, 0.92, z);
   mesh.receiveShadow = true;
   mesh.userData.selection = index < 6 ? "hydro" : "mechanized";
+
   return mesh;
 };
 
 export const createTerrain = (): TerrainBuild => {
   const group = new THREE.Group();
   const selectables: THREE.Object3D[] = [];
+
   const island = new THREE.Mesh(
     new THREE.CylinderGeometry(16, 16.8, 1.4, 10),
     material(PALETTE.groundDark),
   );
+
   island.position.y = -0.35;
   island.receiveShadow = true;
   group.add(island);
+
   const grass = new THREE.Mesh(
     new THREE.CylinderGeometry(15.4, 16, 0.35, 10),
     material(PALETTE.ground),
   );
+
   grass.position.y = 0.45;
   grass.receiveShadow = true;
   group.add(grass);
@@ -110,11 +125,13 @@ export const createTerrain = (): TerrainBuild => {
       new THREE.ConeGeometry(3.4 * scale, 4.6 * scale, 5),
       material(z < 0 ? PALETTE.mountain : PALETTE.mountainDark),
     );
+
     peak.position.set(x, 2.4 * scale + 0.4, z);
     peak.castShadow = true;
     peak.receiveShadow = true;
     group.add(peak);
   };
+
   mountain(-10, -8, 1.2);
   mountain(-4, -10, 0.9);
   mountain(4, -9, 1.1);
@@ -126,6 +143,7 @@ export const createTerrain = (): TerrainBuild => {
     [8.8, 7.2],
     [-8.8, 8.1],
   ];
+
   for (const [x, z] of hutPositions) {
     const h = hut(x, z);
     group.add(h);
@@ -144,6 +162,7 @@ export const createTerrain = (): TerrainBuild => {
     new THREE.BoxGeometry(16, 0.06, 0.9),
     material(PALETTE.river, { transparent: true, opacity: 0.82 }),
   );
+
   river.position.set(1.5, 0.64, 5.9);
   river.rotation.y = -0.18;
   group.add(river);
@@ -164,6 +183,7 @@ export const createTerrain = (): TerrainBuild => {
     [0.4, 12.1, 0.7],
     [10.2, 9.4, 0.75],
   ];
+
   for (const [x, z, scale] of treePositions) group.add(tree(x, z, scale));
 
   return { group, selectables };

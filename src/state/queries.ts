@@ -20,11 +20,14 @@ export const useGameSnapshot = (store: GameStore) =>
 
 export const useAdvanceMonth = (store: GameStore) => {
   const client = useQueryClient();
+
   return useMutation(() => ({
     mutationFn: async (): Promise<TickOutcome | null> => {
       const result = store.advance();
+
       if (!result.ok) return null;
       await client.invalidateQueries({ queryKey: gameKeys.all });
+
       return result.value;
     },
   }));
@@ -33,8 +36,10 @@ export const useAdvanceMonth = (store: GameStore) => {
 export const useAutoPlay = (store: GameStore, advance: () => void, delayMs: number): void => {
   createTrackedEffect(() => {
     if (!store.autoPlay() || store.state().phase !== "playing") return;
+
     if (store.state().events.activeId !== null) return;
     const timer = setInterval(advance, delayMs);
+
     return () => clearInterval(timer);
   });
 };

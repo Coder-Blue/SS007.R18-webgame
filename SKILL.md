@@ -30,6 +30,39 @@ the four supported runtimes: `.opencode/`, `.codex/`, `.claude/`, and
 
 `ui-sdk` is installed in addition because the app uses `@ui-sdk/solid`.
 
+## Skill routing
+
+The role table in `AGENT_DIRECTORY.md` is authoritative. Two rules are
+non-negotiable:
+
+1. Run `graphify query "<question>"` before the first grep or source read for a
+   codebase question. Use `graphify path` for relationships and
+   `graphify explain` for a concept. Re-index after a merge with
+   `graphify update .`.
+2. Use `context7` before changing a third-party API. Fetch the library ID, then
+   the focused context, and cite the retrieved version in the pull request.
+
+UI work loads `ui-sdk` plus `impeccable`. The UI engineer reads
+`node_modules/@ui-sdk/solid/docs/llms.txt`, runs the impeccable audit at the end
+and captures `1440x900` and `390x844` evidence. A design critique may add one
+`agency-agents` persona from `.agents/agency-agents/`; the reviewer remains a
+different instance. Browser work uses `chrome-devtools`; motion work uses
+`gsap-core`.
+
+## Anti-slop
+
+The plugin is vendored from `dmmulroy/anti-slop` commit
+`63dbb09f73438e550a6991dc6d778f979ffbf183` through the `install-anti-slop`
+skill. The entry point is `tools/oxlint/anti-slop/index.ts`; provenance and local
+adaptations are recorded in `tools/oxlint/anti-slop/UPSTREAM.md`.
+
+All generic rules are enabled at error level in `.oxlintrc.json`. The
+`require-readable-spacing` rule is autofixable; run `pnpm exec oxlint --fix` then
+`pnpm format`. Semantic findings need a real change, not a suppression. The
+`oxc/no-accumulating-spread` companion rule is enabled beside the plugin.
+`@oxlint/plugins` is pinned to the installed `oxlint` version so rule and host
+move together.
+
 ## ui-sdk context
 
 Read `node_modules/@ui-sdk/solid/docs/llms.txt` before changing Dialogs,

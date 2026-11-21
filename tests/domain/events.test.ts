@@ -35,6 +35,7 @@ describe("events", () => {
       ...june,
       events: { ...june.events, queue: ["drought_2022"] },
     };
+
     const scheduled = scheduleEvents(queued);
     expect(scheduled.events.activeId).toBe("drought_2022");
     expect(scheduled.events.queue).toEqual([]);
@@ -55,6 +56,7 @@ describe("events", () => {
     const scheduled = scheduleEvents(state);
     expect(scheduled.events.activeId).toBe("drought_2022");
     expect(scheduled.events.queue).toContain("debate_sunk_cost");
+
     const cleared = scheduleEvents({
       ...state,
       events: {
@@ -62,6 +64,7 @@ describe("events", () => {
         resolved: ["drought_2022", "fertilizer_2022", "currency_2023"],
       },
     });
+
     expect(cleared.events.activeId).toBe("debate_sunk_cost");
   });
 
@@ -71,11 +74,14 @@ describe("events", () => {
       clock: { year: 2022, month: 8, tick: 7 },
       finance: { ...june.finance, debt: 50_000 },
     };
+
     expect(dueEventIds(state)).toContain("debt_warning");
+
     const resolved = scheduleEvents({
       ...state,
       events: { ...state.events, resolved: ["debt_warning"] },
     });
+
     expect(activeEvent(resolved)?.id).toBe("drought_2022");
   });
 
@@ -85,6 +91,7 @@ describe("events", () => {
       -500,
       0,
     );
+
     expect(spent.finance.cash).toBe(0);
     expect(spent.finance.debt).toBe(14_400);
     expect(appendFlags(["a"], ["a", "b", "b"])).toEqual(["a", "b"]);
@@ -113,6 +120,7 @@ describe("events", () => {
     const state = scheduleEvents(june);
     const resolved = resolveEvent(state, "import");
     expect(resolved.ok).toBe(true);
+
     if (resolved.ok) {
       expect(resolved.value.production.riceInventory).toBe(state.production.riceInventory + 80);
       expect(resolved.value.events.resolved).toContain("drought_2022");
@@ -127,8 +135,10 @@ describe("events", () => {
       clock: { year: 2024, month: 4, tick: 27 },
       events: { ...initial.events, activeId: "dppa_petition" },
     };
+
     const approved = resolveEvent(dppa, "pilot");
     expect(approved.ok).toBe(true);
+
     if (approved.ok) expect(approved.value.policy.dppa).toBe(true);
 
     const california = {
@@ -136,8 +146,10 @@ describe("events", () => {
       clock: { year: 2023, month: 11, tick: 22 },
       events: { ...initial.events, activeId: "california_2001" },
     };
+
     const collapse = resolveEvent(california, "freeze");
     expect(collapse.ok).toBe(true);
+
     if (collapse.ok) {
       expect(collapse.value.phase).toBe("ended");
       expect(collapse.value.ending?.reason).toBe("california");
@@ -150,8 +162,10 @@ describe("events", () => {
       clock: { year: 2023, month: 10, tick: 21 },
       events: { ...initial.events, activeId: "debate_sunk_cost" },
     };
+
     const resolved = resolveEvent(state, "privatize");
     expect(resolved.ok).toBe(true);
+
     if (resolved.ok) {
       expect(resolved.value.ending?.reason).toBe("privatization");
       expect(resolved.value.phase).toBe("ended");
@@ -165,8 +179,10 @@ describe("events", () => {
       finance: { ...initial.finance, debt: 50_000 },
       events: { ...initial.events, activeId: DEBT_WARNING_EVENT.id },
     };
+
     const resolved = resolveEvent(state, "bailout");
     expect(resolved.ok).toBe(true);
+
     if (resolved.ok) {
       expect(resolved.value.finance.debt).toBe(42_000);
       expect(resolved.value.events.flags).toContain("bailout_taken");

@@ -24,13 +24,28 @@ export interface VillageSceneOptions {
   readonly reducedMotion: () => boolean;
 }
 
+const SCENE_SELECTIONS = [
+  "hydro",
+  "mechanized",
+  "hut",
+  "workshop",
+  "road",
+  "fleet",
+] as const satisfies readonly SceneSelection[];
+
+const isSceneSelection = (value: unknown): value is SceneSelection =>
+  SCENE_SELECTIONS.some((selection) => selection === value);
+
 const selectionOf = (object: THREE.Object3D): SceneSelection | null => {
   let current: THREE.Object3D | null = object;
+
   while (current !== null) {
     const value = current.userData.selection;
-    if (typeof value === "string") return value as SceneSelection;
+
+    if (isSceneSelection(value)) return value;
     current = current.parent;
   }
+
   return null;
 };
 
@@ -41,6 +56,7 @@ export const createVillageScene = (options: VillageSceneOptions): VillageScene =
     alpha: true,
     powerPreference: "high-performance",
   });
+
   renderer.setPixelRatio(
     Math.min(
       window.devicePixelRatio || 1,
@@ -54,10 +70,12 @@ export const createVillageScene = (options: VillageSceneOptions): VillageScene =
   renderer.toneMappingExposure = 1.05;
 
   const scene = new THREE.Scene();
+
   const cameraRig: CameraRig = createCameraRig({
     canvas: options.canvas,
     onTap: (x, y) => pick(x, y),
   });
+
   const terrain = createTerrain();
   const buildings = createBuildings();
   const roads = createRoads();
@@ -67,12 +85,14 @@ export const createVillageScene = (options: VillageSceneOptions): VillageScene =
   scene.add(new THREE.AmbientLight(0xffffff, 0.35));
 
   const raycaster = new THREE.Raycaster();
+
   const selectables: THREE.Object3D[] = [
     ...terrain.selectables,
     ...buildings.selectables,
     ...roads.selectables,
     ...fleet.selectables,
   ];
+
   let currentState: GameState | null = null;
   let selected: SceneSelection | null = null;
   let selectedObject: THREE.Object3D | null = null;
@@ -92,7 +112,9 @@ export const createVillageScene = (options: VillageSceneOptions): VillageScene =
     if (selectedObject !== null && selectedObject !== object) {
       selectedObject.scale.set(1, 1, 1);
     }
+
     selectedObject = object;
+
     if (object !== null) {
       object.scale.set(1.06, 1.06, 1.06);
     }
@@ -100,15 +122,19 @@ export const createVillageScene = (options: VillageSceneOptions): VillageScene =
 
   const pick = (clientX: number, clientY: number): void => {
     const rect = options.canvas.getBoundingClientRect();
+
     const pointer = new THREE.Vector2(
       ((clientX - rect.left) / rect.width) * 2 - 1,
       -((clientY - rect.top) / rect.height) * 2 + 1,
     );
+
     raycaster.setFromCamera(pointer, cameraRig.camera);
     const hits = raycaster.intersectObjects(selectables, true);
     const hit = hits[0];
+
     if (hit === undefined) return;
     const selection = selectionOf(hit.object);
+
     if (selection === null) return;
     selected = selection;
     highlight(hit.object);
@@ -127,10 +153,12 @@ export const createVillageScene = (options: VillageSceneOptions): VillageScene =
     const delta = Math.min(0.05, (time - lastTime) / 1000);
     lastTime = time;
     elapsed += delta;
+
     if (currentState !== null) {
       fleet.update(currentState, elapsed);
       smokeTick(currentState, elapsed);
     }
+
     weather.tick(delta);
     renderer.render(scene, cameraRig.camera);
     frame = requestAnimationFrame(loop);
@@ -139,10 +167,12 @@ export const createVillageScene = (options: VillageSceneOptions): VillageScene =
   const smokeTick = (state: GameState, time: number): void => {
     for (let index = 0; index < buildings.smokeStacks.length; index += 1) {
       const smoke = buildings.smokeStacks[index];
+
       if (smoke === undefined) continue;
       const baseY = 3.1;
       smoke.position.y = baseY + ((time * 0.35 + index * 0.7) % 1.1);
-      const material = (smoke as THREE.Mesh).material;
+      const material = smoke.material;
+
       if (material instanceof THREE.MeshBasicMaterial) {
         material.opacity =
           Math.max(0, 0.5 - ((time * 0.2 + index * 0.3) % 0.6)) *
@@ -177,6 +207,7 @@ export const createVillageScene = (options: VillageSceneOptions): VillageScene =
         if (object instanceof THREE.Mesh || object instanceof THREE.Points) {
           object.geometry.dispose();
           const materialValue = object.material;
+
           if (Array.isArray(materialValue)) {
             for (const item of materialValue) item.dispose();
           } else {

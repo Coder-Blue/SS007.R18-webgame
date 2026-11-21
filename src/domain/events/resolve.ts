@@ -7,6 +7,7 @@ import { appendFlags, applyCashDebt, applyUnlocks, clampMetric } from "./effects
 
 const applyEffects = (state: GameState, effect: EventEffects): GameState => {
   const financed = applyCashDebt(state, effect.cashDelta, effect.debtDelta);
+
   const metrics = {
     ...financed.metrics,
     trust: clampMetric(financed.metrics.trust + effect.trustDelta),
@@ -16,6 +17,7 @@ const applyEffects = (state: GameState, effect: EventEffects): GameState => {
     reliability: clampMetric(financed.metrics.reliability + effect.reliabilityDelta),
     debateScore: clampMetric(financed.metrics.debateScore + effect.debateDelta),
   };
+
   const infrastructure = {
     ...financed.infrastructure,
     coverage: clamp(financed.infrastructure.coverage + effect.coverageDelta, 0, 100),
@@ -25,6 +27,7 @@ const applyEffects = (state: GameState, effect: EventEffects): GameState => {
       100,
     ),
   };
+
   return {
     ...financed,
     metrics,
@@ -43,10 +46,13 @@ const applyEffects = (state: GameState, effect: EventEffects): GameState => {
 
 export const resolveEvent = (state: GameState, choiceId: string): Result<GameState> => {
   const definition = activeEvent(state);
+
   if (definition === null) return err("event.none-active");
   const choice = definition.choices.find((item) => item.id === choiceId);
+
   if (choice === undefined) return err("event.unknown-choice");
   const applied = applyEffects(state, choice.effects);
+
   const ended =
     choice.effects.ending === undefined
       ? applied
@@ -60,6 +66,7 @@ export const resolveEvent = (state: GameState, choiceId: string): Result<GameSta
             month: state.clock.month,
           },
         };
+
   return ok(
     withEndingCheck({
       ...ended,

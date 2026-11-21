@@ -23,6 +23,7 @@ export const GameProvider = (props: { readonly children: JSX.Element }): JSX.Ele
   const store = createGameStore();
   const actions = createGameActions(store);
   const client = makeClient();
+
   return (
     <QueryClientProvider client={client}>
       <GameContext value={{ store, actions }}>{props.children}</GameContext>
@@ -32,6 +33,8 @@ export const GameProvider = (props: { readonly children: JSX.Element }): JSX.Ele
 
 export const useGame = (): GameContextValue => {
   const context = useContext(GameContext);
+
   if (context === undefined) throw new Error("useGame must be used inside GameProvider");
+
   return context;
 };

@@ -29,8 +29,9 @@ describe("tariffs", () => {
   it("accepts a valid in-ceiling tariff", () => {
     const validated = validateTariffs(tiers, 7.4, 13.8);
     expect(validated.ok).toBe(true);
+
     if (validated.ok) {
-      expect(validated.value.tiers).toBe(tiers);
+      expect(validated.value.tiers).toEqual(tiers);
       expect(validated.value.workshop).toBe(7.4);
       expect(validated.value.ceiling).toBe(13.8);
     }
@@ -42,20 +43,14 @@ describe("tariffs", () => {
     [[8, 10, 12, 15], 5, "tariff.workshop-out-of-band"],
     [[10.2, 13.2, 18.0, 26.0], 9.2, "tariff.above-ceiling"],
   ] as const)("rejects invalid tariff input %j / %j", (candidate, workshop, error) => {
-    const result = validateTariffs(
-      candidate as unknown as readonly [number, number, number, number],
-      workshop,
-      13.8,
-    );
+    const result = validateTariffs(candidate, workshop, 13.8);
+
     expect(result).toEqual({ ok: false, error });
   });
 
   it("rejects a malformed tier list defensively", () => {
-    const result = validateTariffs(
-      [8, 10, 12] as unknown as readonly [number, number, number, number],
-      7.4,
-      13.8,
-    );
+    const result = validateTariffs([8, 10, 12], 7.4, 13.8);
+
     expect(result).toEqual({ ok: false, error: "tariff.missing-tier" });
   });
 

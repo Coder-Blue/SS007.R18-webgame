@@ -56,12 +56,15 @@ export const createGameActions = (store: GameStore): GameActions => ({
   resolve: (choiceId) => store.resolve(choiceId),
   save: (slot) => {
     const result = saveToSlot(slot, store.state());
+
     return result.ok;
   },
   load: (slot) => {
     const result = loadFromSlot(slot);
+
     if (!result.ok) return false;
     store.setState(result.value);
+
     return true;
   },
   exportJson: () => exportSave(store.state()),

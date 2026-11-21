@@ -10,6 +10,7 @@ export interface RoadBuildResult {
 
 export const buildRoad = (infrastructure: Infrastructure, grade: RoadGrade): RoadBuildResult => {
   const project = ROAD_PROJECTS[grade];
+
   const coverage = clamp(
     Math.max(
       infrastructure.coverage + project.coverage,
@@ -18,7 +19,9 @@ export const buildRoad = (infrastructure: Infrastructure, grade: RoadGrade): Roa
     0,
     100,
   );
+
   const remoteCoverage = clamp(infrastructure.remoteCoverage + project.remoteCoverage, 0, 100);
+
   const next: Infrastructure = {
     ...infrastructure,
     dirtKm: infrastructure.dirtKm + (grade === "dirt" ? project.km : 0),
@@ -27,6 +30,7 @@ export const buildRoad = (infrastructure: Infrastructure, grade: RoadGrade): Roa
     coverage,
     remoteCoverage,
   };
+
   return { infrastructure: next, cost: project.cost, km: project.km };
 };
 
@@ -43,7 +47,9 @@ export const logisticsEfficiency = (fleet: number): number =>
 
 export const roadQualityIndex = (infrastructure: Infrastructure): number => {
   const total = infrastructure.dirtKm + infrastructure.cobbleKm + infrastructure.asphaltKm;
+
   if (total === 0) return 0.4;
+
   return (
     (infrastructure.dirtKm * 0.4 + infrastructure.cobbleKm * 0.7 + infrastructure.asphaltKm * 1) /
     total

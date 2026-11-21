@@ -3,28 +3,38 @@ import { MONTHS_PER_YEAR } from "./constants";
 
 export const seasonOf = (month: number): Season => {
   if (month <= 3) return "spring";
+
   if (month <= 6) return "summer";
+
   if (month <= 9) return "autumn";
+
   return "winter";
 };
 
 export const seasonFactor = (month: number): number => {
   const season = seasonOf(month);
+
   if (season === "summer") return 1.08;
+
   if (season === "winter") return 0.96;
+
   return 1;
 };
 
 export const actOf = (year: number, month: number): Act => {
   if (year < 2023) return 1;
+
   if (year === 2023 && month < 10) return 1;
+
   if (year === 2023) return 2;
+
   return 3;
 };
 
 export const nextClock = (clock: Clock): Clock => {
   const month = clock.month === MONTHS_PER_YEAR ? 1 : clock.month + 1;
   const year = clock.month === MONTHS_PER_YEAR ? clock.year + 1 : clock.year;
+
   return { year, month, tick: clock.tick + 1 };
 };
 

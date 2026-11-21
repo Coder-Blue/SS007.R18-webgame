@@ -25,15 +25,18 @@ describe("production", () => {
       { ...initial.market, drought: 1 },
       initial.metrics,
     );
+
     expect(dry.hydro).toBeLessThan(initial.production.hydroPaddies * 24);
   });
 
   it("fertilizer and fuel increase production cost", () => {
     const cheap = productionCostPerTonne(initial.market, 0);
+
     const expensive = productionCostPerTonne(
       { ...initial.market, fertilizerPrice: 14, fuelPrice: 32 },
       0,
     );
+
     expect(expensive).toBeGreaterThan(cheap);
     expect(productionCostPerTonne(initial.market, 3)).toBeLessThan(cheap);
   });
@@ -44,6 +47,7 @@ describe("production", () => {
       { ...initial.market, fertilizerPrice: 20 },
       initial.metrics,
     );
+
     expect(result.mechanized).toBeGreaterThan(0);
   });
 
@@ -52,10 +56,12 @@ describe("production", () => {
       ...initial.metrics,
       industrialOutput: 0,
     });
+
     const high = computeProduction(initial.production, initial.market, {
       ...initial.metrics,
       industrialOutput: 400,
     });
+
     expect(high.mechanized).toBeGreaterThan(low.mechanized);
   });
 

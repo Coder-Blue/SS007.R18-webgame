@@ -5,6 +5,7 @@ import { N2_RATE_DEFAULT } from "./constants";
 
 export const reliabilityOf = (supplied: number, demand: number): number => {
   if (demand <= 0) return 100;
+
   return clamp((supplied / demand) * 100, 0, 100);
 };
 
@@ -29,10 +30,13 @@ export const nextInflation = (
 ): number => {
   const tariffChange =
     previousTariff > 0 ? ((averageTariff - previousTariff) / previousTariff) * 100 : 0;
+
   const riceChange =
     previousRicePrice > 0 ? ((ricePrice - previousRicePrice) / previousRicePrice) * 100 : 0;
+
   const recoveryPush = Math.max(0, recoveryRate - N2_RATE_DEFAULT) * 2.4;
   const target = 3 + tariffChange * 1.1 + riceChange * 0.45 + recoveryPush;
+
   return clamp(previous + (target - previous) * 0.35, 0, 28);
 };
 
@@ -45,14 +49,18 @@ export const nextIndustrialOutput = (
 ): number => {
   const reliabilityPull = (reliability - 95) * 0.0012;
   const tariffPull = (8 - workshopTariff) * 0.002;
+
   const reformPull =
     (policy.dppa ? 0.0018 : 0) + (policy.vrem ? 0.0015 : 0) + (policy.nsmo ? 0.0008 : 0);
+
   const inflationDrag = inflation > 8 ? -0.0025 : 0;
+
   return clamp(previous * (1 + reliabilityPull + tariffPull + reformPull + inflationDrag), 65, 175);
 };
 
 export const nextSatisfaction = (context: MetricContext): number => {
   const averageTariff = averageHouseholdTariff(context.tariffs);
+
   const target =
     70 +
     (context.reliability - 95) * 1.25 +
@@ -64,6 +72,7 @@ export const nextSatisfaction = (context: MetricContext): number => {
     (context.policy.antiSmuggling ? 2 : 0) +
     (context.flags.includes("farmers_helped") ? 3 : 0) +
     (context.flags.includes("bribe_accepted") ? -4 : 0);
+
   return clamp(
     context.previous.satisfaction + (target - context.previous.satisfaction) * 0.35,
     0,
@@ -73,15 +82,18 @@ export const nextSatisfaction = (context: MetricContext): number => {
 
 export const nextTrust = (context: MetricsDebateContext, inflation: number): number => {
   const averageTariff = averageHouseholdTariff(context.tariffs);
+
   const reformBonus =
     (context.policy.n2Enabled ? 4 : 0) +
     (context.policy.nsmo ? 2 : 0) +
     (context.policy.dppa ? 2 : 0) +
     (context.policy.vrem ? 2 : 0);
+
   const scandal =
     (context.flags.includes("bribe_accepted") ? 9 : 0) +
     (context.flags.includes("smuggling_rampant") ? 6 : 0) +
     (context.flags.includes("privatization_accepted") ? 60 : 0);
+
   const target =
     58 +
     context.infrastructure.coverage * 0.22 +
@@ -93,6 +105,7 @@ export const nextTrust = (context: MetricsDebateContext, inflation: number): num
     Math.max(0, averageTariff - 12) * 1.2 -
     Math.max(0, context.tariffs.workshop - 8) * 1.8 -
     scandal;
+
   return clamp(context.previous.trust + (target - context.previous.trust) * 0.32, 0, 100);
 };
 
@@ -111,6 +124,7 @@ export const advanceMetrics = (
   previousRicePrice: number,
 ): MetricsStep => {
   const averageTariff = averageHouseholdTariff(context.tariffs);
+
   const inflation = nextInflation(
     context.previous.inflation,
     averageTariff,
@@ -119,6 +133,7 @@ export const advanceMetrics = (
     previousRicePrice,
     context.policy.n2Rate,
   );
+
   const industrialOutput = nextIndustrialOutput(
     context.industrialOutput,
     context.reliability,
@@ -126,13 +141,17 @@ export const advanceMetrics = (
     context.policy,
     inflation,
   );
+
   const withIndustry: MetricContext = { ...context, industrialOutput };
   const satisfaction = nextSatisfaction(withIndustry);
+
   const debateContext: MetricsDebateContext = {
     ...withIndustry,
     metricsDebate: context.previous.debateScore,
   };
+
   const trust = nextTrust(debateContext, inflation);
+
   return {
     metrics: {
       ...context.previous,

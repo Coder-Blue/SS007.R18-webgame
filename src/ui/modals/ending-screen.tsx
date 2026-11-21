@@ -9,19 +9,25 @@ import { ARCHITECT_DEBT_MAX, type EndingId } from "~/domain";
 
 const endingCopy = (id: EndingId): string => {
   if (id === "architect") return "ending.architect.body";
+
   if (id === "predator") return "ending.predator.body";
+
   return "ending.collapse.body";
 };
 
 const endingTitle = (id: EndingId): string => {
   if (id === "architect") return "ending.architect.title";
+
   if (id === "predator") return "ending.predator.title";
+
   return "ending.collapse.title";
 };
 
 const gradeKey = (id: EndingId): string => {
   if (id === "architect") return "ending.gradeArchitect";
+
   if (id === "predator") return "ending.gradePredator";
+
   return "ending.gradeCollapse";
 };
 
@@ -39,6 +45,7 @@ const download = (content: string): void => {
 export const EndingScreen = (): JSX.Element => {
   const { store, actions } = useGame();
   const state = store.state;
+
   return (
     <Show when={state().ending}>
       {(ending) => (

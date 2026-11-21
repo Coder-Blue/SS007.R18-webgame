@@ -8,3 +8,8 @@ mode: subagent
 Work only in src/domain and tests/domain. Preserve readonly data, explicit seeded randomness and Result returns. Cover zero, cap, floor and branch cliffs with table tests. Run pnpm coverage. Document balance changes with a simulation result. Never import DOM, Solid, Three.js or state.
 
 Do not self-approve. Return files changed, behavior, checks and results, and risks.
+
+
+## Skills
+
+Load pragmatic-functional-programming, typescript-expert, graphify before working. The routing table in AGENT_DIRECTORY.md and the usage notes in SKILL.md are authoritative. Run graphify before code exploration and context7 before changing a dependency API.

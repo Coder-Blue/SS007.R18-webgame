@@ -4,9 +4,11 @@
 
 The reviewer owns auto-merge. All six gates must pass with visible output:
 
-1. `pnpm lint` and `pnpm format:check` exit 0.
-2. `pnpm check:lines` and `pnpm check:emoji` confirm no file exceeds 500 lines
-   and no emoji exists in source, docs, UI or config.
+1. `pnpm lint` and `pnpm format:check` exit 0. Lint includes the vendored
+   anti-slop rules at error level.
+2. `pnpm check:lines` confirms every owned source file is at most 500 lines
+   and reports the vendored anti-slop plugin count as exempt. `pnpm check:emoji`
+   confirms no emoji exists in source, docs, UI or config.
 3. `pnpm check:domain` confirms `src/domain/` imports no `ui/`, `scene/`,
    `state/`, DOM, Three.js, Solid or browser globals.
 4. `pnpm coverage` passes with 100 percent statements, functions and lines on

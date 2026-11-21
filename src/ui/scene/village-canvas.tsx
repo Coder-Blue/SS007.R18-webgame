@@ -12,6 +12,7 @@ import { seasonOf } from "~/domain";
 
 const reduced = (): boolean => {
   if (typeof document === "undefined") return false;
+
   return document.documentElement.dataset.motion === "reduced";
 };
 
@@ -38,18 +39,24 @@ export const VillageCanvas = (props: {
     });
     controller.update(state());
     setReady(true);
+
     return () => {
       controller?.dispose();
       controller = null;
     };
   });
+
   const weatherLabel = (): string => {
     if (state().market.drought > 0.6) return t("scene.weatherDrought");
     const season = seasonOf(state().clock.month);
+
     if (season === "summer") return t("scene.weatherMonsoon");
+
     if (season === "winter") return t("scene.weatherWinter");
+
     return t("scene.weatherClear");
   };
+
   return (
     <div
       class="scene-wrap"

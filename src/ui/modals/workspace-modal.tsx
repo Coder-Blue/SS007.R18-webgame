@@ -17,6 +17,7 @@ import { FinancePanel } from "../panels/finance-panel";
 import { PolicyPanel } from "../panels/policy-panel";
 import { HistoryPanel } from "../panels/history-panel";
 import type { PanelId } from "../mobile/mobile-nav";
+import { PANEL_IDS } from "../mobile/mobile-nav";
 
 const tabs: readonly { readonly id: PanelId; readonly label: string }[] = [
   { id: "overview", label: "panel.overview" },
@@ -30,11 +31,17 @@ const tabs: readonly { readonly id: PanelId; readonly label: string }[] = [
 
 const PanelBody = (props: { readonly panel: PanelId }): JSX.Element => {
   if (props.panel === "production") return <ProductionPanel />;
+
   if (props.panel === "infrastructure") return <InfrastructurePanel />;
+
   if (props.panel === "tariffs") return <TariffPanel />;
+
   if (props.panel === "finance") return <FinancePanel />;
+
   if (props.panel === "policy") return <PolicyPanel />;
+
   if (props.panel === "history") return <HistoryPanel />;
+
   return <OverviewPanel />;
 };
 
@@ -57,7 +64,9 @@ export const WorkspaceModal = (props: {
       </div>
       <Tabs
         value={props.panel}
-        onValueChange={(value) => props.onPanel((value ?? "overview") as PanelId)}
+        onValueChange={(value) =>
+          props.onPanel(PANEL_IDS.find((panel) => panel === value) ?? "overview")
+        }
       >
         <TabsList class="workspace-tabs" aria-label={t("mobile.sheetTitle")}>
           {tabs.map((tab) => (

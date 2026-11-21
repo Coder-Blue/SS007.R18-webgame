@@ -1,4 +1,6 @@
-export const uiCopy: Readonly<Record<string, string>> = {
+import type { CopyDictionary } from "./contracts";
+
+export const uiCopy: CopyDictionary = {
   "app.title": "Độc Quyền Kinh Tế",
   "app.subtitle": "The Rice Monopoly",
   "app.tagline":

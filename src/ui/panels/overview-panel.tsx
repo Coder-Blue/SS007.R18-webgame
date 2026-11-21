@@ -45,8 +45,10 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
   const last = () => state().finance.monthlyHistory[state().finance.monthlyHistory.length - 1];
   const projection = () => projectFinance(state());
   const recovery = () => recoveryOf(state());
+
   const goals = (): readonly Goal[] => {
     const current = state();
+
     return [
       {
         label: t("overview.goalCoverage"),
@@ -71,6 +73,7 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
       },
     ];
   };
+
   return (
     <div class="stack-lg">
       <Panel title={t("overview.situation")} kicker={actLabel(state().act)} icon="chart">

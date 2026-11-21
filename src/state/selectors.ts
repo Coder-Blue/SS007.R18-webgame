@@ -16,10 +16,12 @@ export const projectFinance = (state: GameState): Projection => {
   const recovery = recoveryOf(state).monthlyCredit;
   const debtRatio = state.finance.debtLimit > 0 ? state.finance.debt / state.finance.debtLimit : 1;
   const netMonthly = (last?.netResult ?? 0) + recovery;
+
   const runwayMonths =
     netMonthly >= 0
       ? 99
       : Math.max(0, (state.finance.debtLimit - state.finance.debt) / Math.abs(netMonthly));
+
   return {
     monthlyFixed,
     recovery,

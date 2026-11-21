@@ -17,6 +17,7 @@ import {
   deleteSlot,
   listSaves,
   readSession,
+  SLOT_IDS,
   slotMeta,
   writeSession,
   type SlotId,
@@ -24,6 +25,7 @@ import {
 
 const slotName = (slot: SlotId): string => {
   if (slot === "autosave") return t("save.autosave");
+
   return t("save.slot", { index: slot.replace("slot", "") });
 };
 
@@ -59,45 +61,58 @@ export const SaveMenu = (props: {
   const [reduced, setReduced] = createSignal(readSession().reducedMotion);
   const slots = () => (refresh(), listSaves());
   const autosave = () => (refresh(), slotMeta("autosave"));
+
   const reload = (): void => {
     setRefresh(refresh() + 1);
   };
+
   const applyMotion = (value: boolean): void => {
     setReduced(value);
     const prefs = readSession();
     writeSession({ ...prefs, reducedMotion: value });
+
     if (typeof document !== "undefined") {
       document.documentElement.dataset.motion = value ? "reduced" : "full";
     }
   };
+
   const save = (slot: SlotId): void => {
     if (actions.save(slot)) {
       writeSession({ ...readSession(), activeSlot: slot });
       props.onNotice(t("notice.saved"));
       reload();
+
       return;
     }
+
     props.onNotice(t("error.save.write-failed"));
   };
+
   const load = (slot: SlotId): void => {
     if (actions.load(slot)) {
       writeSession({ ...readSession(), activeSlot: slot });
       props.onNotice(t("notice.loaded"));
       props.onLoaded();
       props.onClose();
+
       return;
     }
+
     props.onNotice(t("error.save.empty"));
   };
+
   const importFile = (file: File | undefined): void => {
     if (file === undefined) return;
     const reader = new FileReader();
     reader.addEventListener("load", () => {
       const result = actions.importJson(String(reader.result));
+
       if (!result.ok) {
         props.onNotice(t("save.importError"));
+
         return;
       }
+
       store.setState(result.value.state);
       props.onNotice(t("notice.imported"));
       props.onLoaded();
@@ -105,6 +120,7 @@ export const SaveMenu = (props: {
     });
     reader.readAsText(file);
   };
+
   return (
     <Dialog open={props.open} onOpenChange={(open) => (open ? undefined : props.onClose())}>
       <DialogBackdrop class="modal-backdrop" />
@@ -120,7 +136,8 @@ export const SaveMenu = (props: {
         <div class="slot-list">
           <For each={slots()}>
             {(meta, index) => {
-              const slot = `slot${index() + 1}` as SlotId;
+              const slot = SLOT_IDS[index()] ?? "slot1";
+
               return (
                 <div class="slot-card" data-current={meta !== null && state().clock.tick > 0}>
                   <div class="slot-main">

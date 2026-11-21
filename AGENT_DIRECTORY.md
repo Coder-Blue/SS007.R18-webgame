@@ -16,6 +16,26 @@ OpenCode, Claude Code, Codex and the generic `.agents` folder.
 | `tester` | Vitest, Playwright, coverage and regression fixtures | weaken assertions to pass |
 | `docs` | AGENTS, CODEBASE, ADR, changelog, operator notes | claim evidence that was not run |
 
+## Skills per role
+
+Load these before working. The full inventory and usage notes live in `SKILL.md`.
+
+| Role | Skills |
+| --- | --- |
+| `architect` | `grill-me`, `pragmatic-functional-programming`, `context7`, `graphify` |
+| `developer` | `solidjs`, `typescript-expert`, `pragmatic-functional-programming`, `ponytail`, `context7`, `graphify` |
+| `domain-economist` | `pragmatic-functional-programming`, `typescript-expert`, `graphify` |
+| `scene-engineer` | `threejs-fundamentals`, `threejs-geometry`, `threejs-materials`, `threejs-lighting`, `threejs-animation`, `threejs-loaders`, `threejs-textures`, `threejs-performance`, `threejs-postprocessing`, `threejs-shaders`, `threejs-interaction`, `threejs-react-three-fiber`, `threejs-asset-pipeline`, `gsap-core`, `chrome-devtools`, `graphify` |
+| `ui-engineer` | `ui-sdk`, `impeccable`, `agency-agents`, `modern-web-guidance`, `solidjs`, `chrome-devtools`, `context7` |
+| `integrator` | `solidjs`, `modern-web-guidance`, `ponytail`, `chrome-devtools`, `graphify` |
+| `reviewer` | `impeccable`, `agency-agents`, `install-anti-slop`, `chrome-devtools`, `graphify` |
+| `tester` | `chrome-devtools`, `typescript-expert`, `graphify` |
+| `docs` | `context7`, `ponytail`, `graphify` |
+
+UI changes also require the `impeccable` audit and, for a design review, one
+`agency-agents` persona. Browser evidence uses `chrome-devtools`. Library API
+questions use `context7` before reading `node_modules` or guessing.
+
 ## Sequence
 
 $$
@@ -51,9 +71,10 @@ Role names for Herdr agent names: `architect`, `developer`, `reviewer`,
 ```
 Role: <role>
 Read: AGENTS.md, CODEBASE.md, CODING_CONVENTION.md, TARGET.md
+Skills: <skills from the role table in AGENT_DIRECTORY.md>
 Issue: <atomic outcome>
 Paths: <owned files>
-Constraints: zero classes, zero emojis, <500 LOC/file, Vietnamese UI, English code
+Constraints: zero classes, zero emojis, <500 LOC/file, Vietnamese UI, English code, anti-slop lint clean
 Acceptance: <observable behavior + test names>
 Evidence: paste command output, coverage table, build result, viewport notes
 ```
