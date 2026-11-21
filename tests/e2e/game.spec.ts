@@ -30,6 +30,28 @@ test("registers the Iconify custom element for the rendered icons", async ({ pag
   expect(registered).toBe(true);
 });
 
+test("serves the generated Open Graph image and advertises absolute URLs", async ({
+  request,
+  page,
+}) => {
+  const response = await request.get("/og.png");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toBe("image/png");
+  expect(response.headers()["cache-control"]).toContain("max-age=86400");
+  const png = await response.body();
+  expect(png.subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  expect(png.readUInt32BE(16)).toBe(1200);
+  expect(png.readUInt32BE(20)).toBe(630);
+
+  await page.goto("/");
+  const image = await page.locator('meta[property="og:image"]').getAttribute("content");
+  expect(image).toMatch(/^https:\/\/.+\/og\.png$/);
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+    "content",
+    "summary_large_image",
+  );
+});
+
 test("title, tutorial, and first month on every viewport", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /Độc Quyền Kinh Tế/i })).toBeVisible();

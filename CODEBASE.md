@@ -7,10 +7,10 @@ this file is the map of the code.
 ## Runtime shape
 
 TanStack Start with the Solid adapter serves one file route, `/`. The game is a
-client-side state machine; there are no server functions or database tables.
-The document shell renders the Vietnamese locale, Be Vietnam Pro, the app CSS,
-and the game. TanStack Solid Query owns the month mutation, snapshot queries and
-the optional autoplay loop.
+client-side state machine; the only server route is `/og.png`, a Nitro handler
+that renders the social card with Takumi. The document shell renders the
+Vietnamese locale, Be Vietnam Pro, the app CSS, and the game. TanStack Solid
+Query owns the month mutation, snapshot queries and the optional autoplay loop.
 
 ```
 UI controls
@@ -76,6 +76,23 @@ All iconography comes from Lucide and Tabler through
 and registers only the names listed in `icon-names.ts`, so the repository
 contains no hand-written SVG and the page makes no Iconify API request. The
 package is patched for Solid 2's attribute namespace and element typings.
+
+## Open Graph image
+
+`routes/og.png.ts` is a Nitro route enabled by `serverDir: "."` in
+`nitro.config.ts`. Takumi builds a 1200x630 card from the Be Vietnam Pro files
+under `public/fonts/`, and `ImageResponse` streams it with a one-day immutable
+cache. Nitro bundles the Takumi WASM backend for production; Vite dev feeds the
+WASM bytes directly because pnpm's virtual store hides the native addon. The
+root route advertises an absolute `/og.png` URL through the Open Graph and
+Twitter tags, using `VITE_SITE_URL` with the Vercel project URL as fallback.
+Preview it after a build with:
+
+```bash
+pnpm build
+PORT=3100 node .output/server/index.mjs
+curl -o og.png http://127.0.0.1:3100/og.png
+```
 
 ## Economy
 

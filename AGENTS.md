@@ -18,6 +18,7 @@ describe what is actually implemented.
 - UI SDK for Solid (`@ui-sdk/solid`) for accessible unstyled primitives.
 - Iconify icons for Solid (`@iconify-icon/solid`) with generated Lucide and
   Tabler data, Tailwind CSS 4, Be Vietnam Pro, GSAP and Three.js.
+- Takumi with Nitro for the generated Open Graph image.
 - Valibot for every runtime boundary. Do not add Zod.
 - Vite 8, TypeScript 5.9, Vitest 5, oxlint and oxfmt.
 - Nix flakes with `glibc` and `musl` development shells; Vercel deployment.
