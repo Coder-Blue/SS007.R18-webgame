@@ -26,13 +26,20 @@ const expectMonth = async (page: Page, label: string): Promise<void> => {
 test("renders icons through the Iconify custom element", async ({ page }) => {
   await page.goto("/");
   const icon = page.locator("iconify-icon").first();
-  await expect(icon).toBeVisible();
-  const registered = await page.evaluate(() => customElements.get("iconify-icon") !== undefined);
-  expect(registered).toBe(true);
-  const hasSvg = await icon.evaluate(
-    (element) => element.shadowRoot?.querySelector("svg") !== null,
-  );
-  expect(hasSvg).toBe(true);
+  await expect(icon).toHaveCount(1);
+  const result = await icon.evaluate((element) => {
+    const svg = element.shadowRoot?.querySelector("svg");
+    const box = svg?.getBoundingClientRect();
+
+    return {
+      registered: customElements.get("iconify-icon") !== undefined,
+      width: box?.width ?? 0,
+      height: box?.height ?? 0,
+    };
+  });
+  expect(result.registered).toBe(true);
+  expect(result.width).toBeGreaterThan(0);
+  expect(result.height).toBeGreaterThan(0);
 });
 
 test("title, tutorial, and first month on every viewport", async ({ page }) => {
