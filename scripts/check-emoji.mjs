@@ -23,19 +23,7 @@ const walk = (directory) => {
 
 for (const root of roots) walk(root);
 
-for (const file of [
-  "README.md",
-  "AGENTS.md",
-  "AGENT_DIRECTORY.md",
-  "CHANGELOG.md",
-  "CI_CD_PIPELINE.md",
-  "CODEBASE.md",
-  "CODING_CONVENTION.md",
-  "CONTRIBUTE.md",
-  "SECURITY.md",
-  "SKILL.md",
-  "TARGET.md",
-]) {
+for (const file of readdirSync(".").filter((entry) => entry.endsWith(".md"))) {
   try {
     readFileSync(file, "utf8");
     files.push(file);
