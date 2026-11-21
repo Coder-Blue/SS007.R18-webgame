@@ -8,7 +8,6 @@ import {
 } from "@ui-sdk/solid/dialog";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs";
 import { IconButton } from "../components/base";
-import { t } from "../localization";
 import { OverviewPanel } from "../panels/overview-panel";
 import { ProductionPanel } from "../panels/production-panel";
 import { InfrastructurePanel } from "../panels/infrastructure-panel";
@@ -20,13 +19,13 @@ import type { PanelId } from "../mobile/mobile-nav";
 import { PANEL_IDS } from "../mobile/mobile-nav";
 
 const tabs: readonly { readonly id: PanelId; readonly label: string }[] = [
-  { id: "overview", label: "panel.overview" },
-  { id: "production", label: "panel.production" },
-  { id: "infrastructure", label: "panel.infrastructure" },
-  { id: "tariffs", label: "panel.tariffs" },
-  { id: "finance", label: "panel.finance" },
-  { id: "policy", label: "panel.policy" },
-  { id: "history", label: "panel.history" },
+  { id: "overview", label: "Tổng quan" },
+  { id: "production", label: "Sản xuất" },
+  { id: "infrastructure", label: "Truyền tải" },
+  { id: "tariffs", label: "Bán lẻ & giá" },
+  { id: "finance", label: "Tài chính" },
+  { id: "policy", label: "Chính sách" },
+  { id: "history", label: "Lịch sử" },
 ];
 
 const PanelBody = (props: { readonly panel: PanelId }): JSX.Element => {
@@ -56,11 +55,11 @@ export const WorkspaceModal = (props: {
     <DialogContent class="modal workspace-modal">
       <div class="workspace-head">
         <div>
-          <p class="eyebrow">{t("mobile.sheetTitle")}</p>
-          <DialogTitle class="modal-title">{t("app.title")}</DialogTitle>
-          <DialogDescription class="modal-desc">{t("panel.overviewDesc")}</DialogDescription>
+          <p class="eyebrow">Bảng điều hành</p>
+          <DialogTitle class="modal-title">Độc Quyền Kinh Tế</DialogTitle>
+          <DialogDescription class="modal-desc">Bức tranh làng trong tháng này.</DialogDescription>
         </div>
-        <IconButton icon="lucide:x" label={t("panel.close")} onClick={props.onClose} />
+        <IconButton icon="lucide:x" label="Đóng" onClick={props.onClose} />
       </div>
       <Tabs
         value={props.panel}
@@ -68,9 +67,9 @@ export const WorkspaceModal = (props: {
           props.onPanel(PANEL_IDS.find((panel) => panel === value) ?? "overview")
         }
       >
-        <TabsList class="workspace-tabs" aria-label={t("mobile.sheetTitle")}>
+        <TabsList class="workspace-tabs" aria-label="Bảng điều hành">
           {tabs.map((tab) => (
-            <TabsTab value={tab.id}>{t(tab.label)}</TabsTab>
+            <TabsTab value={tab.id}>{tab.label}</TabsTab>
           ))}
         </TabsList>
         {tabs.map((tab) => (

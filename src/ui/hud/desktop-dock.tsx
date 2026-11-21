@@ -3,11 +3,27 @@ import { For, Show } from "solid-js";
 import { useGame } from "../game-context";
 import { ActionButton, Badge, Bar, Panel } from "../components/base";
 import { Icon, type IconName } from "../components/icons";
-import { t } from "../localization";
 import { formatBillion, formatPercent, formatTonne } from "~/state/format";
 import { averageHouseholdTariff, recoveryOf, type GameState } from "~/domain";
 import { projectFinance } from "~/state/selectors";
 import type { PanelId } from "../mobile/mobile-nav";
+
+const sceneLabel = (selection: string): string => {
+  switch (selection) {
+    case "hydro":
+      return "Ruộng nước";
+    case "mechanized":
+      return "Ruộng cơ giới";
+    case "hut":
+      return "Bản xa";
+    case "workshop":
+      return "Xưởng làng";
+    case "fleet":
+      return "Đoàn xe";
+    default:
+      return "Tuyến đường";
+  }
+};
 
 const pillars = (
   state: GameState,
@@ -19,21 +35,21 @@ const pillars = (
   detail: string;
 }[] => [
   {
-    label: t("pillar.production"),
+    label: "Sản xuất",
     icon: "tabler:wheat",
     value: Math.min(100, (state.metrics.reliability ?? 100) * 0.6 + 20),
     tone: "good",
     detail: formatTonne(state.production.riceInventory),
   },
   {
-    label: t("pillar.infrastructure"),
+    label: "Truyền tải",
     icon: "lucide:road",
     value: state.infrastructure.remoteCoverage,
     tone: state.infrastructure.remoteCoverage >= 80 ? "good" : "warn",
     detail: formatPercent(state.infrastructure.coverage),
   },
   {
-    label: t("pillar.retail"),
+    label: "Phân phối",
     icon: "lucide:scale",
     value: Math.max(
       0,
@@ -56,13 +72,8 @@ export const LeftDock = (props: {
   const recovery = () => recoveryOf(state());
 
   return (
-    <aside class="dock dock-left desktop-only" aria-label={t("panel.valueChain")}>
-      <Panel
-        title={t("panel.valueChain")}
-        kicker={t("hud.pillars")}
-        icon="lucide:landmark"
-        class="dock-panel"
-      >
+    <aside class="dock dock-left desktop-only" aria-label="Chuỗi giá trị">
+      <Panel title="Chuỗi giá trị" kicker="Ba trụ cột" icon="lucide:landmark" class="dock-panel">
         <div class="dock-pillars">
           <For each={pillars(state())}>
             {(pillar) => (
@@ -98,7 +109,7 @@ export const LeftDock = (props: {
             icon="lucide:road"
             onClick={() => actions.buildRoad("asphalt")}
           >
-            {t("action.buildAsphalt")}
+            Đường nhựa
           </ActionButton>
           <ActionButton
             size="sm"
@@ -106,7 +117,7 @@ export const LeftDock = (props: {
             icon="lucide:droplets"
             onClick={() => actions.invest("hydro")}
           >
-            {t("action.hydro")}
+            Mở ruộng nước
           </ActionButton>
           <ActionButton
             size="sm"
@@ -114,19 +125,19 @@ export const LeftDock = (props: {
             icon="lucide:warehouse"
             onClick={() => actions.importRice()}
           >
-            {t("action.importRice")}
+            Nhập gạo dự trữ
           </ActionButton>
         </div>
         <Show when={props.selected !== null}>
           <div class="selection-card">
             <div>
-              <span class="eyebrow">{t("scene.stats")}</span>
-              <strong>{t(`scene.${props.selected ?? "road"}`)}</strong>
+              <span class="eyebrow">Thông tin khu vực</span>
+              <strong>{sceneLabel(props.selected ?? "road")}</strong>
             </div>
             <button
               type="button"
               class="icon-btn"
-              aria-label={t("scene.close")}
+              aria-label="Đóng thông tin"
               onClick={props.onClearSelected}
             >
               <Icon icon="lucide:x" size={15} />
@@ -136,9 +147,7 @@ export const LeftDock = (props: {
         <Show when={recovery().monthlyCredit > 0}>
           <div class="dock-note">
             <Icon icon="lucide:coins" size={15} />
-            <span>
-              N-2 +{formatBillion(recovery().monthlyCredit)}/{t("chart.months", { count: 1 })}
-            </span>
+            <span>N-2 +{formatBillion(recovery().monthlyCredit)}/1 tháng gần nhất</span>
           </div>
         </Show>
       </Panel>
@@ -156,42 +165,42 @@ export const RightDock = (props: {
   const average = () => averageHouseholdTariff(state().tariffs);
 
   return (
-    <aside class="dock dock-right desktop-only" aria-label={t("panel.finance")}>
+    <aside class="dock dock-right desktop-only" aria-label="Tài chính">
       <Panel
-        title={t("panel.finance")}
-        kicker={t("finance.pnl")}
+        title="Tài chính"
+        kicker="Báo cáo lãi lỗ tháng"
         icon="lucide:wallet"
         class="dock-panel"
       >
         <div class="finance-hero">
-          <span>{t("hud.cash")}</span>
+          <span>Ngân quỹ</span>
           <strong>{formatBillion(state().finance.cash)}</strong>
           <Badge tone={(last()?.netResult ?? 0) >= 0 ? "good" : "bad"}>
-            {t("finance.net")} {formatBillion(last()?.netResult ?? 0)}
+            Kết quả tháng {formatBillion(last()?.netResult ?? 0)}
           </Badge>
         </div>
         <div class="dock-meter">
           <div class="meter-row">
-            <span>{t("hud.debt")}</span>
+            <span>Dư nợ</span>
             <strong>{formatBillion(state().finance.debt)}</strong>
           </div>
           <Bar
             value={projection().debtRatio * 100}
             tone={projection().isDanger ? "bad" : "warn"}
-            label={t("hud.debt")}
+            label="Dư nợ"
           />
         </div>
         <div class="dock-kpis">
           <div>
-            <span>{t("tariff.average")}</span>
+            <span>Giá bình quân có trọng số</span>
             <strong>{average().toFixed(2)}</strong>
           </div>
           <div>
-            <span>{t("tariff.ceiling")}</span>
+            <span>Trần của Chairman</span>
             <strong>{state().tariffs.ceiling.toFixed(2)}</strong>
           </div>
           <div>
-            <span>{t("hud.inflation")}</span>
+            <span>Lạm phát</span>
             <strong>{formatPercent(state().metrics.inflation)}</strong>
           </div>
         </div>
@@ -202,7 +211,7 @@ export const RightDock = (props: {
             icon="lucide:scale"
             onClick={() => props.onOpenPanel("tariffs")}
           >
-            {t("panel.tariffs")}
+            Bán lẻ & giá
           </ActionButton>
           <ActionButton
             size="sm"
@@ -210,12 +219,14 @@ export const RightDock = (props: {
             icon="lucide:landmark"
             onClick={() => props.onOpenPanel("policy")}
           >
-            {t("panel.policy")}
+            Chính sách
           </ActionButton>
         </div>
         <div class="dock-note">
           <Icon icon={state().policy.n2Enabled ? "lucide:check" : "lucide:clock"} size={15} />
-          <span>{state().policy.n2Enabled ? t("hud.recoveryActive") : t("policy.n2")}</span>
+          <span>
+            {state().policy.n2Enabled ? "Đang thu hồi chi phí N-2." : "Thu hồi chi phí N-2"}
+          </span>
         </div>
         <ActionButton
           size="sm"
@@ -224,7 +235,7 @@ export const RightDock = (props: {
           onClick={() => actions.enactRecovery()}
           disabled={state().clock.year < 2024 || state().policy.n2Enabled}
         >
-          {state().policy.n2Enabled ? t("policy.enabled") : t("policy.enact")}
+          {state().policy.n2Enabled ? "Đang áp dụng" : "Ban hành"}
         </ActionButton>
       </Panel>
     </aside>

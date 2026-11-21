@@ -8,7 +8,6 @@ import {
   DrawerTitle,
 } from "@ui-sdk/solid/drawer";
 import { Icon, type IconName } from "../components/icons";
-import { t } from "../localization";
 import { OverviewPanel } from "../panels/overview-panel";
 import { ProductionPanel } from "../panels/production-panel";
 import { InfrastructurePanel } from "../panels/infrastructure-panel";
@@ -37,11 +36,11 @@ export const PANEL_IDS = [
 ] as const satisfies readonly PanelId[];
 
 const tabs: readonly { readonly id: PanelId; readonly label: string; readonly icon: IconName }[] = [
-  { id: "overview", label: "mobile.overview", icon: "lucide:gauge" },
-  { id: "production", label: "mobile.production", icon: "tabler:wheat" },
-  { id: "infrastructure", label: "mobile.infrastructure", icon: "lucide:road" },
-  { id: "tariffs", label: "mobile.tariffs", icon: "lucide:scale" },
-  { id: "policy", label: "mobile.policy", icon: "lucide:landmark" },
+  { id: "overview", label: "Tổng quan", icon: "lucide:gauge" },
+  { id: "production", label: "Sản xuất", icon: "tabler:wheat" },
+  { id: "infrastructure", label: "Đường", icon: "lucide:road" },
+  { id: "tariffs", label: "Giá", icon: "lucide:scale" },
+  { id: "policy", label: "Chính sách", icon: "lucide:landmark" },
 ];
 
 const PanelView = (props: { readonly panel: PanelId }): JSX.Element => {
@@ -71,11 +70,11 @@ export const MobileNav = (): JSX.Element => {
 
   return (
     <>
-      <nav class="mobile-nav" aria-label={t("mobile.sheetTitle")}>
+      <nav class="mobile-nav" aria-label="Bảng điều hành">
         {tabs.map((tab) => (
           <button type="button" class="mobile-tab" onClick={() => openPanel(tab.id)}>
             <Icon icon={tab.icon} size={20} />
-            <span>{t(tab.label)}</span>
+            <span>{tab.label}</span>
           </button>
         ))}
       </nav>
@@ -83,8 +82,8 @@ export const MobileNav = (): JSX.Element => {
         <DrawerBackdrop class="sheet-backdrop" />
         <DrawerContent class="mobile-sheet">
           <div class="sheet-head">
-            <DrawerTitle class="modal-title">{t("mobile.sheetTitle")}</DrawerTitle>
-            <DrawerClose class="icon-btn" aria-label={t("panel.close")}>
+            <DrawerTitle class="modal-title">Bảng điều hành</DrawerTitle>
+            <DrawerClose class="icon-btn" aria-label="Đóng">
               <Icon icon="lucide:x" size={18} />
             </DrawerClose>
           </div>
@@ -96,7 +95,7 @@ export const MobileNav = (): JSX.Element => {
                 data-active={panel() === tab.id}
                 onClick={() => setPanel(tab.id)}
               >
-                {t(tab.label)}
+                {tab.label}
               </button>
             ))}
             <button
@@ -105,7 +104,7 @@ export const MobileNav = (): JSX.Element => {
               data-active={panel() === "history"}
               onClick={() => setPanel("history")}
             >
-              {t("panel.history")}
+              Lịch sử
             </button>
           </div>
           <div class="sheet-body">

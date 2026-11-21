@@ -11,7 +11,6 @@ import { Switch, SwitchThumb } from "@ui-sdk/solid/switch";
 import { useGame } from "../game-context";
 import { ActionButton, Badge, Divider, IconButton } from "../components/base";
 import { Icon } from "../components/icons";
-import { t } from "../localization";
 import {
   clearAllSaves,
   deleteSlot,
@@ -24,9 +23,9 @@ import {
 } from "~/state/persistence";
 
 const slotName = (slot: SlotId): string => {
-  if (slot === "autosave") return t("save.autosave");
+  if (slot === "autosave") return "Tự động lưu";
 
-  return t("save.slot", { index: slot.replace("slot", "") });
+  return `Ô ${slot.replace("slot", "")}`;
 };
 
 const time = (iso: string): string => {
@@ -79,26 +78,26 @@ export const SaveMenu = (props: {
   const save = (slot: SlotId): void => {
     if (actions.save(slot)) {
       writeSession({ ...readSession(), activeSlot: slot });
-      props.onNotice(t("notice.saved"));
+      props.onNotice("Đã lưu ván chơi.");
       reload();
 
       return;
     }
 
-    props.onNotice(t("error.save.write-failed"));
+    props.onNotice("Không ghi được vào bộ nhớ trình duyệt.");
   };
 
   const load = (slot: SlotId): void => {
     if (actions.load(slot)) {
       writeSession({ ...readSession(), activeSlot: slot });
-      props.onNotice(t("notice.loaded"));
+      props.onNotice("Đã tải ván chơi.");
       props.onLoaded();
       props.onClose();
 
       return;
     }
 
-    props.onNotice(t("error.save.empty"));
+    props.onNotice("Ô lưu này đang trống.");
   };
 
   const importFile = (file: File | undefined): void => {
@@ -108,13 +107,13 @@ export const SaveMenu = (props: {
       const result = actions.importJson(String(reader.result));
 
       if (!result.ok) {
-        props.onNotice(t("save.importError"));
+        props.onNotice("Không đọc được tệp lưu.");
 
         return;
       }
 
       store.setState(result.value.state);
-      props.onNotice(t("notice.imported"));
+      props.onNotice("Đã nhập bản lưu.");
       props.onLoaded();
       props.onClose();
     });
@@ -127,12 +126,12 @@ export const SaveMenu = (props: {
       <DialogContent class="modal save-modal">
         <div class="save-head">
           <div>
-            <p class="eyebrow">{t("app.title")}</p>
-            <DialogTitle class="modal-title">{t("save.title")}</DialogTitle>
+            <p class="eyebrow">Độc Quyền Kinh Tế</p>
+            <DialogTitle class="modal-title">Kho lưu và cài đặt</DialogTitle>
           </div>
-          <IconButton icon="lucide:x" label={t("save.close")} onClick={props.onClose} />
+          <IconButton icon="lucide:x" label="Đóng" onClick={props.onClose} />
         </div>
-        <DialogDescription class="modal-desc">{t("save.slots")}</DialogDescription>
+        <DialogDescription class="modal-desc">Ba ô lưu</DialogDescription>
         <div class="slot-list">
           <For each={slots()}>
             {(meta, index) => {
@@ -142,23 +141,19 @@ export const SaveMenu = (props: {
                 <div class="slot-card" data-current={meta !== null && state().clock.tick > 0}>
                   <div class="slot-main">
                     <strong>{slotName(slot)}</strong>
-                    <Show
-                      when={meta !== null}
-                      fallback={<span class="muted">{t("save.empty")}</span>}
-                    >
+                    <Show when={meta !== null} fallback={<span class="muted">Ô trống</span>}>
                       <span>
-                        {t("hud.date", { month: meta!.month, year: meta!.year })} ·{" "}
-                        {t("save.savedAt", { time: time(meta!.savedAt) })}
+                        {`Tháng ${meta!.month}/${meta!.year}`} · {`Lưu lúc ${time(meta!.savedAt)}`}
                       </span>
                       <span class="slot-stats">
-                        {t("hud.debt")} {Math.round(meta!.debt)} · {t("hud.trust")}{" "}
+                        Dư nợ {Math.round(meta!.debt)} · Tín nhiệm Chairman{" "}
                         {Math.round(meta!.trust)}%
                       </span>
                     </Show>
                   </div>
                   <div class="slot-actions">
                     <ActionButton size="sm" variant="gold" onClick={() => save(slot)}>
-                      {t("action.save")}
+                      Lưu
                     </ActionButton>
                     <ActionButton
                       size="sm"
@@ -166,14 +161,14 @@ export const SaveMenu = (props: {
                       disabled={meta === null}
                       onClick={() => load(slot)}
                     >
-                      {t("action.load")}
+                      Tải
                     </ActionButton>
                     <Show
                       when={confirmDelete() === slot}
                       fallback={
                         <IconButton
                           icon="lucide:trash"
-                          label={t("action.delete")}
+                          label="Xóa"
                           onClick={() => setConfirmDelete(slot)}
                           disabled={meta === null}
                         />
@@ -188,7 +183,7 @@ export const SaveMenu = (props: {
                           reload();
                         }}
                       >
-                        {t("action.confirm")}
+                        Xác nhận
                       </ActionButton>
                     </Show>
                   </div>
@@ -199,18 +194,18 @@ export const SaveMenu = (props: {
         </div>
         <Show when={autosave()}>
           <div class="autosave-row">
-            <Badge tone="dark">{t("save.autosave")}</Badge>
-            <span>{t("hud.date", { month: autosave()!.month, year: autosave()!.year })}</span>
+            <Badge tone="dark">Tự động lưu</Badge>
+            <span>{`Tháng ${autosave()!.month}/${autosave()!.year}`}</span>
             <ActionButton size="sm" variant="secondary" onClick={() => load("autosave")}>
-              {t("action.load")}
+              Tải
             </ActionButton>
           </div>
         </Show>
         <Divider />
         <div class="save-tools">
           <div>
-            <strong>{t("save.exportImport")}</strong>
-            <p class="muted">{t("save.exportHelp")}</p>
+            <strong>Xuất và nhập JSON</strong>
+            <p class="muted">Sao lưu toàn bộ trạng thái để chuyển máy.</p>
           </div>
           <div class="save-tool-actions">
             <ActionButton
@@ -219,11 +214,11 @@ export const SaveMenu = (props: {
               icon="lucide:download"
               onClick={() => download(actions.exportJson())}
             >
-              {t("action.export")}
+              Xuất JSON
             </ActionButton>
             <label class="file-button">
               <Icon icon="lucide:upload" size={16} />
-              <span>{t("action.importFile")}</span>
+              <span>Nhập JSON</span>
               <input
                 type="file"
                 accept="application/json,.json"
@@ -239,15 +234,15 @@ export const SaveMenu = (props: {
                 props.onLoaded();
               }}
             >
-              {t("action.new")}
+              Ván mới
             </ActionButton>
           </div>
         </div>
         <Divider />
         <div class="settings-row">
           <div>
-            <strong>{t("save.motion")}</strong>
-            <p class="muted">{t("save.motionHelp")}</p>
+            <strong>Giảm chuyển động</strong>
+            <p class="muted">Tắt hiệu ứng camera và chuyển mùa.</p>
           </div>
           <label class="switch-label">
             <Switch checked={reduced()} onCheckedChange={applyMotion}>
@@ -257,16 +252,16 @@ export const SaveMenu = (props: {
         </div>
         <div class="settings-row">
           <div>
-            <strong>{t("save.language")}</strong>
-            <p class="muted">{t("save.vietnamese")}</p>
+            <strong>Ngôn ngữ</strong>
+            <p class="muted">Tiếng Việt</p>
           </div>
           <Badge tone="gold">Tiếng Việt</Badge>
         </div>
         <Divider />
         <div class="settings-row">
           <div>
-            <strong>{t("save.reset")}</strong>
-            <p class="muted">{t("save.resetHelp")}</p>
+            <strong>Xóa toàn bộ dữ liệu</strong>
+            <p class="muted">Xóa ba ô lưu và bản tự động. Không thể hoàn tác.</p>
           </div>
           <ActionButton
             size="sm"
@@ -279,7 +274,7 @@ export const SaveMenu = (props: {
               props.onClose();
             }}
           >
-            {t("save.reset")}
+            Xóa toàn bộ dữ liệu
           </ActionButton>
         </div>
       </DialogContent>

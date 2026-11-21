@@ -3,7 +3,6 @@ import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { ActionButton, Badge, Bar, Panel, ProgressRing, Stat } from "../components/base";
 import { Icon } from "../components/icons";
-import { t } from "../localization";
 import { formatBillion, formatPercent } from "~/state/format";
 import { FLEET_MAX, ROAD_PROJECTS, investmentCost, type RoadGrade } from "~/domain";
 import { fleetCost } from "~/domain";
@@ -11,15 +10,15 @@ import { fleetCost } from "~/domain";
 const grades: readonly RoadGrade[] = ["dirt", "cobble", "asphalt"];
 
 const gradeLabels: Readonly<Record<RoadGrade, string>> = {
-  dirt: "action.buildDirt",
-  cobble: "action.buildCobble",
-  asphalt: "action.buildAsphalt",
+  dirt: "Đường đất",
+  cobble: "Đường đá",
+  asphalt: "Đường nhựa",
 };
 
 const gradeDescs: Readonly<Record<RoadGrade, string>> = {
-  dirt: "action.buildDirtDesc",
-  cobble: "action.buildCobbleDesc",
-  asphalt: "action.buildAsphaltDesc",
+  dirt: "+8 km, +3% bao phủ, +8% bản xa",
+  cobble: "+6 km, +5% bao phủ, +12% bản xa",
+  asphalt: "+4 km, +7% bao phủ, +16% bản xa",
 };
 
 export const InfrastructurePanel = (): JSX.Element => {
@@ -29,29 +28,25 @@ export const InfrastructurePanel = (): JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel
-        title={t("panel.infrastructure")}
-        kicker={t("pillar.infrastructureTag")}
-        icon="lucide:road"
-      >
+      <Panel title="Truyền tải" kicker="Truyền tải · Đường độc quyền" icon="lucide:road">
         <div class="coverage-row">
           <ProgressRing
             value={infra().coverage}
-            label={t("infra.coverage")}
+            label="Bao phủ hộ dân"
             tone={infra().coverage >= 90 ? "good" : "warn"}
           />
           <div class="coverage-copy">
-            <strong>{t("infra.coverage")}</strong>
+            <strong>Bao phủ hộ dân</strong>
             <span>{formatPercent(infra().coverage)}</span>
             <Bar value={infra().coverage} tone={infra().coverage >= 90 ? "good" : "warn"} />
           </div>
           <ProgressRing
             value={infra().remoteCoverage}
-            label={t("infra.remote")}
+            label="Bao phủ bản xa"
             tone={infra().remoteCoverage >= 90 ? "good" : "warn"}
           />
           <div class="coverage-copy">
-            <strong>{t("infra.remote")}</strong>
+            <strong>Bao phủ bản xa</strong>
             <span>{formatPercent(infra().remoteCoverage)}</span>
             <Bar
               value={infra().remoteCoverage}
@@ -60,36 +55,33 @@ export const InfrastructurePanel = (): JSX.Element => {
           </div>
         </div>
         <div class="stat-grid">
+          <Stat label="Đường đất" value={`${Math.round(infra().dirtKm)} km`} icon="lucide:road" />
+          <Stat label="Đường đá" value={`${Math.round(infra().cobbleKm)} km`} icon="lucide:road" />
           <Stat
-            label={t("infra.dirt")}
-            value={`${Math.round(infra().dirtKm)} km`}
-            icon="lucide:road"
-          />
-          <Stat
-            label={t("infra.cobble")}
-            value={`${Math.round(infra().cobbleKm)} km`}
-            icon="lucide:road"
-          />
-          <Stat
-            label={t("infra.asphalt")}
+            label="Đường nhựa"
             value={`${Math.round(infra().asphaltKm)} km`}
             icon="lucide:road"
           />
           <Stat
-            label={t("infra.fleet")}
-            value={t("pillar.trucksValue", { count: infra().fleet })}
+            label="Đội xe tải"
+            value={`${infra().fleet} xe`}
             hint={formatBillion(fleetCost(infra().fleet, state().market))}
             icon="lucide:truck"
           />
         </div>
         <div class="callout">
           <Icon icon="lucide:map-pin" size={16} />
-          <span>{t("infra.universalDesc")}</span>
+          <span>
+            Mọi hộ dân, kể cả bản xa, phải được nối vào mạng gạo chung. Đây là điều kiện để có kết
+            thúc tốt nhất.
+          </span>
         </div>
       </Panel>
 
-      <Panel title={t("infra.buildTitle")} kicker={t("action.build")} icon="lucide:road">
-        <p class="muted">{t("infra.buildHelp")}</p>
+      <Panel title="Mở rộng mạng đường" kicker="Mở đường" icon="lucide:road">
+        <p class="muted">
+          Đường nhựa nhanh hơn nhưng đắt. Bản xa cần đường kiên cố để đạt 100% bao phủ.
+        </p>
         <div class="build-list">
           <For each={grades}>
             {(grade) => {
@@ -102,8 +94,8 @@ export const InfrastructurePanel = (): JSX.Element => {
                       <Icon icon="lucide:road" size={20} />
                     </span>
                     <div>
-                      <strong>{t(gradeLabels[grade])}</strong>
-                      <p>{t(gradeDescs[grade])}</p>
+                      <strong>{gradeLabels[grade]}</strong>
+                      <p>{gradeDescs[grade]}</p>
                     </div>
                   </div>
                   <div class="build-side">
@@ -113,7 +105,7 @@ export const InfrastructurePanel = (): JSX.Element => {
                       variant={grade === "asphalt" ? "gold" : "secondary"}
                       onClick={() => actions.buildRoad(grade)}
                     >
-                      {t("action.build")}
+                      Mở đường
                     </ActionButton>
                   </div>
                 </div>
@@ -123,18 +115,20 @@ export const InfrastructurePanel = (): JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("infra.fleet")} kicker={t("pillar.infrastructureTag")} icon="lucide:truck">
+      <Panel title="Đội xe tải" kicker="Truyền tải · Đường độc quyền" icon="lucide:truck">
         <div class="fleet-row">
           <div>
-            <strong>{t("pillar.trucksValue", { count: infra().fleet })}</strong>
-            <p class="muted">{t("infra.fleetHelp")}</p>
+            <strong>{`${infra().fleet} xe`}</strong>
+            <p class="muted">
+              Đội xe giúp vận chuyển gạo đến các bản xa và giảm chi phí logistics.
+            </p>
           </div>
-          <Badge tone="gold">{t("pillar.fleet")}</Badge>
+          <Badge tone="gold">Đội xe</Badge>
         </div>
         <Bar
           value={Math.min(100, (infra().fleet / FLEET_MAX) * 100)}
           tone="gold"
-          label={t("infra.fleet")}
+          label="Đội xe tải"
         />
         <div class="inline-actions">
           <ActionButton
@@ -143,7 +137,7 @@ export const InfrastructurePanel = (): JSX.Element => {
             icon="lucide:truck"
             onClick={() => actions.invest("fleet")}
           >
-            {t("action.fleet")}
+            Mua thêm xe
           </ActionButton>
           <span class="muted">{formatBillion(investmentCost(state(), "fleet"))}</span>
         </div>

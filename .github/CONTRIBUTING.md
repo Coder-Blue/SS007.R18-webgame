@@ -99,9 +99,11 @@ Files stay under 500 lines and preferably under 250.
 
 ## Vietnamese copy
 
-Every in-game string lives in `src/ui/localization/`. Code, identifiers,
-comments, tests, docs and commits are English. The UI must render correctly with
-Be Vietnam Pro. Do not add emoji; use the icon component instead.
+Every in-game string is Vietnamese written inline in the Solid component that
+renders it. Domain events keep their keys, and the event modal resolves them
+through a component-local copy map in `src/ui/modals/event-modal.tsx`. Code,
+identifiers, comments, tests, docs and commits are English. The UI must render
+correctly with Be Vietnam Pro. Do not add emoji; use the icon component instead.
 
 ## Commit messages
 

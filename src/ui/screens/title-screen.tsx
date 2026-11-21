@@ -2,7 +2,6 @@ import type { JSX } from "@solidjs/web";
 import { Show } from "solid-js";
 import { ActionButton } from "../components/base";
 import { Icon } from "../components/icons";
-import { t } from "../localization";
 import { GAME_VERSION } from "~/domain";
 
 export const TitleScreen = (props: {
@@ -15,49 +14,60 @@ export const TitleScreen = (props: {
   <div class="title-screen">
     <div class="title-vignette" />
     <div class="title-content">
-      <h1 class="title-main">{t("app.title")}</h1>
-      <p class="title-sub">{t("app.subtitle")}</p>
-      <p class="title-tagline">{t("app.tagline")}</p>
+      <h1 class="title-main">Độc Quyền Kinh Tế</h1>
+      <p class="title-sub">The Rice Monopoly</p>
+      <p class="title-tagline">
+        Một làng, một mạng đường, một giỏ gạo. Giữ cho dân no, xưởng chạy và ngân sách không sụp.
+      </p>
       <div class="title-role">
         <Icon icon="lucide:landmark" size={16} />
-        <span>{t("app.role")}</span>
+        <span>Chủ tịch Tổng công ty Gạo làng</span>
       </div>
-      <p class="title-prompt">{t("app.pressStart")}</p>
+      <p class="title-prompt">Nhấn Bắt đầu nhiệm kỳ để vào làng</p>
       <div class="title-actions">
         <ActionButton variant="gold" size="lg" icon="lucide:play" onClick={props.onStart}>
-          {t("app.newGame")}
+          Bắt đầu nhiệm kỳ
         </ActionButton>
         <Show when={props.hasSave}>
           <ActionButton variant="primary" size="lg" icon="lucide:clock" onClick={props.onContinue}>
-            {t("app.continue")}
+            Tiếp tục ván đang lưu
           </ActionButton>
         </Show>
         <ActionButton variant="secondary" size="lg" icon="lucide:save" onClick={props.onOpenLoad}>
-          {t("app.loadGame")}
+          Mở kho lưu
         </ActionButton>
         <ActionButton variant="ghost" size="lg" icon="lucide:book-open" onClick={props.onTutorial}>
-          {t("app.howTo")}
+          Luật chơi
         </ActionButton>
       </div>
       <div class="title-acts">
         <div class="title-act">
           <span>I</span>
-          <strong>{t("app.act1")}</strong>
-          <p>{t("tutorial.step1Body")}</p>
+          <strong>Hồi I · Bao phủ phổ quát</strong>
+          <p>
+            Sản xuất tạo gạo, truyền tải đưa gạo đến mọi hộ, bán lẻ thu tiền dưới trần giá. Bạn phải
+            giữ cả ba cùng chạy.
+          </p>
         </div>
         <div class="title-act">
           <span>II</span>
-          <strong>{t("app.act2")}</strong>
-          <p>{t("tutorial.step2Body")}</p>
+          <strong>Hồi II · Tranh luận tư nhân hóa</strong>
+          <p>
+            Bấm Kết thúc tháng để chạy mô phỏng. Bạn có thể mở đường, đầu tư ruộng, nhập gạo và đổi
+            giá trước khi kết thúc.
+          </p>
         </div>
         <div class="title-act">
           <span>III</span>
-          <strong>{t("app.act3")}</strong>
-          <p>{t("tutorial.step4Body")}</p>
+          <strong>Hồi III · Phục hồi và hiện đại hóa</strong>
+          <p>
+            Từ 2024, Decision 05/2024 cho phép đưa lỗ kiểm toán N-2 vào trần giá. Hãy chọn tỷ lệ thu
+            hồi đủ để trả nợ mà không làm lạm phát bùng nổ.
+          </p>
         </div>
       </div>
       <p class="title-footer">
-        {t("app.yearSpan")} · {t("app.footer")} · v{GAME_VERSION}
+        Hành trình 2022 – 2026 · Bản mô phỏng kinh tế chính trị · v{GAME_VERSION}
       </p>
     </div>
   </div>

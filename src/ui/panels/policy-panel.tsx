@@ -10,7 +10,6 @@ import {
 import { useGame } from "../game-context";
 import { ActionButton, Badge, Bar, Panel, Stat } from "../components/base";
 import { Icon } from "../components/icons";
-import { t } from "../localization";
 import { formatBillion, formatPercent } from "~/state/format";
 import { N2_RATE_MAX, N2_RATE_MIN, recoveryFor } from "~/domain";
 
@@ -27,8 +26,8 @@ export const PolicyPanel = (): JSX.Element => {
   const reforms = [
     {
       key: "nsmo" as const,
-      label: "policy.nsmo",
-      desc: "policy.nsmoDesc",
+      label: "Tách NSMO",
+      desc: "Tách điều độ khỏi công ty để tăng tính trung lập.",
       enabled: () => state().policy.nsmo,
       action: () => actions.enableNsmo(),
       cost: 250,
@@ -36,8 +35,8 @@ export const PolicyPanel = (): JSX.Element => {
     },
     {
       key: "dppa" as const,
-      label: "policy.dppa",
-      desc: "policy.dppaDesc",
+      label: "DPPA",
+      desc: "Cho xưởng mua trực tiếp từ nông trại, trả phí đường.",
       enabled: () => state().policy.dppa,
       action: () => actions.enableDppa(),
       cost: 400,
@@ -45,8 +44,8 @@ export const PolicyPanel = (): JSX.Element => {
     },
     {
       key: "vrem" as const,
-      label: "policy.vrem",
-      desc: "policy.vremDesc",
+      label: "VREM",
+      desc: "Thí điểm bán lẻ cạnh tranh trên hạ tầng chung.",
       enabled: () => state().policy.vrem,
       action: () => actions.enableVrem(),
       cost: 350,
@@ -56,33 +55,48 @@ export const PolicyPanel = (): JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel title={t("policy.title")} kicker={t("panel.policyDesc")} icon="lucide:landmark">
+      <Panel
+        title="Quyết định 05/2024 và cải cách"
+        kicker="Quyết định 05/2024, NSMO, DPPA và VREM."
+        icon="lucide:landmark"
+      >
         <div class="policy-hero">
           <div>
-            <p class="eyebrow">{t("policy.debateScore")}</p>
+            <p class="eyebrow">Điểm tranh luận công khai</p>
             <strong class="big-number">{Math.round(state().metrics.debateScore)}</strong>
-            <Bar value={state().metrics.debateScore} tone="gold" label={t("policy.debateScore")} />
-            <p class="muted">{t("policy.debateHelp")}</p>
+            <Bar
+              value={state().metrics.debateScore}
+              tone="gold"
+              label="Điểm tranh luận công khai"
+            />
+            <p class="muted">
+              Điểm cao giúp giữ được mô hình độc quyền tự nhiên trước áp lực tư nhân hóa.
+            </p>
           </div>
           <div class="policy-role-card">
             <Icon icon="lucide:landmark" size={26} />
-            <strong>{t("policy.roles")}</strong>
-            <p>{t("policy.rolesText")}</p>
+            <strong>Vai trò và trách nhiệm</strong>
+            <p>
+              Bạn là EVN của làng: vừa phải giữ an sinh, vừa phải trả nợ, vừa phải chuẩn bị cho thị
+              trường cạnh tranh.
+            </p>
           </div>
         </div>
       </Panel>
 
       <Panel
-        title={t("policy.n2")}
-        kicker={canN2() ? t("policy.enact") : t("finance.auditPending")}
+        title="Thu hồi chi phí N-2"
+        kicker={canN2() ? "Ban hành" : "Chưa đủ dữ liệu N-2"}
         icon="lucide:scale"
       >
         <div class="policy-row">
           <div>
-            <h4>{t("policy.n2")}</h4>
-            <p class="muted">{t("policy.n2Desc")}</p>
+            <h4>Thu hồi chi phí N-2</h4>
+            <p class="muted">
+              Đưa khoản lỗ kiểm toán của hai năm trước vào trần giá hiện tại. Chỉ mở từ 2024.
+            </p>
             <Show when={!canN2()}>
-              <Badge tone="warn">{t("error.policy.too-early")}</Badge>
+              <Badge tone="warn">Chính sách này chỉ mở từ năm 2024.</Badge>
             </Show>
           </div>
           <ActionButton
@@ -90,13 +104,13 @@ export const PolicyPanel = (): JSX.Element => {
             disabled={!canN2() || state().policy.n2Enabled}
             onClick={() => actions.enactRecovery()}
           >
-            {state().policy.n2Enabled ? t("policy.enabled") : t("policy.enact")}
+            {state().policy.n2Enabled ? "Đang áp dụng" : "Ban hành"}
           </ActionButton>
         </div>
         <Show when={state().policy.n2Enabled}>
           <div class="slider-row">
             <div class="slider-head">
-              <span>{t("policy.n2Rate")}</span>
+              <span>Tỷ lệ thu hồi</span>
               <strong>{formatPercent(rate() * 100)}</strong>
             </div>
             <Slider
@@ -105,12 +119,12 @@ export const PolicyPanel = (): JSX.Element => {
               max={N2_RATE_MAX}
               step={0.01}
               onValueChange={(value) => setRate(Number(value))}
-              aria-label={t("policy.n2Rate")}
+              aria-label="Tỷ lệ thu hồi"
             >
               <SliderControl>
                 <SliderTrack>
                   <SliderIndicator />
-                  <SliderThumb aria-label={t("policy.n2Rate")} />
+                  <SliderThumb aria-label="Tỷ lệ thu hồi" />
                 </SliderTrack>
               </SliderControl>
             </Slider>
@@ -118,39 +132,41 @@ export const PolicyPanel = (): JSX.Element => {
               <span>{formatPercent(N2_RATE_MIN * 100)}</span>
               <span>{formatPercent(N2_RATE_MAX * 100)}</span>
             </div>
-            <p class="muted">{t("policy.n2RateHelp")}</p>
+            <p class="muted">
+              Tỷ lệ cao giúp giảm nợ nhanh nhưng làm lạm phát và tín nhiệm xấu đi.
+            </p>
           </div>
           <div class="stat-grid">
             <Stat
-              label={t("finance.eligible")}
+              label="Lỗ N-2 đủ điều kiện"
               value={formatBillion(preview().eligibleLoss)}
               icon="lucide:scale"
             />
             <Stat
-              label={t("finance.monthlyCredit")}
+              label="Thu hồi tháng này"
               value={formatBillion(preview().monthlyCredit)}
               tone="good"
               icon="lucide:coins"
             />
             <Stat
-              label={t("finance.remaining")}
+              label="Còn lại có thể thu hồi"
               value={formatBillion(preview().remaining)}
               icon="lucide:clock"
             />
             <Stat
-              label={t("policy.inflation")}
+              label="Lạm phát"
               value={formatPercent(state().metrics.inflation)}
               tone={state().metrics.inflation > 8 ? "bad" : "warn"}
               icon="lucide:trending-up"
             />
           </div>
           <ActionButton variant="secondary" onClick={() => actions.setRecoveryRate(rate())}>
-            {t("action.apply")}
+            Áp dụng
           </ActionButton>
         </Show>
       </Panel>
 
-      <Panel title={t("policy.roles")} kicker={t("panel.policy")} icon="lucide:zap">
+      <Panel title="Vai trò và trách nhiệm" kicker="Chính sách" icon="lucide:zap">
         <div class="reform-list">
           {reforms.map((reform) => (
             <div class="reform-card" data-enabled={reform.enabled()}>
@@ -159,12 +175,12 @@ export const PolicyPanel = (): JSX.Element => {
               </span>
               <div class="reform-main">
                 <div class="reform-head">
-                  <strong>{t(reform.label)}</strong>
+                  <strong>{reform.label}</strong>
                   <Badge tone={reform.enabled() ? "good" : "neutral"}>
-                    {reform.enabled() ? t("policy.enabled") : t("policy.notEnabled")}
+                    {reform.enabled() ? "Đang áp dụng" : "Chưa áp dụng"}
                   </Badge>
                 </div>
-                <p class="muted">{t(reform.desc)}</p>
+                <p class="muted">{reform.desc}</p>
               </div>
               <div class="reform-side">
                 <span>{formatBillion(reform.cost)}</span>
@@ -174,7 +190,7 @@ export const PolicyPanel = (): JSX.Element => {
                   disabled={reform.enabled()}
                   onClick={reform.action}
                 >
-                  {reform.enabled() ? t("policy.enabled") : t("policy.enact")}
+                  {reform.enabled() ? "Đang áp dụng" : "Ban hành"}
                 </ActionButton>
               </div>
             </div>
@@ -185,29 +201,29 @@ export const PolicyPanel = (): JSX.Element => {
             </span>
             <div class="reform-main">
               <div class="reform-head">
-                <strong>{t("policy.twoPart")}</strong>
+                <strong>Biểu giá hai thành phần</strong>
                 <Badge tone={state().policy.twoPartTariff ? "good" : "neutral"}>
-                  {state().policy.twoPartTariff ? t("policy.enabled") : t("policy.notEnabled")}
+                  {state().policy.twoPartTariff ? "Đang áp dụng" : "Chưa áp dụng"}
                 </Badge>
               </div>
-              <p class="muted">{t("policy.twoPartDesc")}</p>
+              <p class="muted">Tách phí công suất và phí sử dụng để minh bạch hơn.</p>
             </div>
             <div class="reform-side">
-              <span>{t("action.free")}</span>
+              <span>Miễn phí</span>
               <ActionButton
                 size="sm"
                 variant="secondary"
                 disabled={state().policy.twoPartTariff || !state().policy.vrem}
                 onClick={() => actions.enableTwoPart()}
               >
-                {state().policy.vrem ? t("policy.enact") : t("policy.requiresVrem")}
+                {state().policy.vrem ? "Ban hành" : "Cần VREM trước."}
               </ActionButton>
             </div>
           </div>
         </div>
       </Panel>
 
-      <Panel title={t("panel.policy")} kicker={t("pillar.retail")} icon="lucide:shield">
+      <Panel title="Chính sách" kicker="Phân phối" icon="lucide:shield">
         <div class="policy-actions">
           <ActionButton
             variant="secondary"
@@ -215,7 +231,7 @@ export const PolicyPanel = (): JSX.Element => {
             disabled={state().policy.campaignCooldown > 0}
             onClick={() => actions.invest("campaign")}
           >
-            {t("action.campaign")}
+            Chiến dịch truyền thông
           </ActionButton>
           <ActionButton
             variant="secondary"
@@ -223,14 +239,13 @@ export const PolicyPanel = (): JSX.Element => {
             disabled={state().policy.antiSmuggling}
             onClick={() => actions.invest("crackdown")}
           >
-            {t("action.crackdown")}
+            Kiểm tra buôn lậu
           </ActionButton>
         </div>
-        <p class="muted">{t("action.campaignDesc")}</p>
+        <p class="muted">Tăng tín nhiệm và hài lòng, nghỉ 6 tháng giữa các chiến dịch.</p>
         <div class="tag-row">
           <Badge tone={state().policy.antiSmuggling ? "good" : "warn"}>
-            {t("policy.antiSmuggling")}:{" "}
-            {state().policy.antiSmuggling ? t("policy.enabled") : t("policy.notEnabled")}
+            Chống buôn lậu: {state().policy.antiSmuggling ? "Đang áp dụng" : "Chưa áp dụng"}
           </Badge>
           <Badge tone={state().policy.nsmo ? "good" : "neutral"}>NSMO</Badge>
           <Badge tone={state().policy.dppa ? "good" : "neutral"}>DPPA</Badge>

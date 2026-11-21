@@ -66,7 +66,9 @@ tweens are factory closures, never classes.
 
 ### `src/ui/`
 
-Presentational Solid components. Localization dictionaries are Vietnamese.
+Presentational Solid components with Vietnamese copy written inline at each use
+site. Domain events still carry title, body and outcome keys; the event modal
+owns a component-local Vietnamese copy map that resolves them.
 The HUD is desktop-persistent and mobile-compact. Bottom tabs open accessible
 drawers built on UI SDK primitives. Charts are dependency-free SVG components.
 All iconography comes from Lucide and Tabler through
