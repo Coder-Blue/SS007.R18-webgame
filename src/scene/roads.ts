@@ -30,10 +30,12 @@ const addSegment = (
   const dx = to[0] - from[0];
   const dz = to[1] - from[1];
   const length = Math.hypot(dx, dz);
+
   const mesh = new THREE.Mesh(
     new THREE.BoxGeometry(length, 0.08, remote ? 0.42 : 0.68),
     roadMaterial(PALETTE.roadDirt),
   );
+
   mesh.position.set((from[0] + to[0]) / 2, 0.69, (from[1] + to[1]) / 2);
   mesh.rotation.y = -Math.atan2(dz, dx);
   mesh.receiveShadow = true;
@@ -46,10 +48,14 @@ const addSegment = (
 const roadColor = (state: GameState): number => {
   const total =
     state.infrastructure.dirtKm + state.infrastructure.cobbleKm + state.infrastructure.asphaltKm;
+
   if (total <= 0) return PALETTE.roadDirt;
   const asphaltShare = state.infrastructure.asphaltKm / total;
+
   if (asphaltShare > 0.42) return PALETTE.roadAsphalt;
+
   if (state.infrastructure.cobbleKm / total > 0.22) return PALETTE.roadCobble;
+
   return PALETTE.roadDirt;
 };
 
@@ -76,16 +82,21 @@ export const createRoads = (): RoadsBuild => {
 
   const update = (state: GameState, animate: boolean): void => {
     const color = roadColor(state);
+
     for (const segment of segments) {
       const materialInstance = segment.mesh.material;
+
       if (materialInstance instanceof THREE.MeshStandardMaterial) {
         materialInstance.color.setHex(color);
       }
+
       const visible = segment.remote
         ? state.infrastructure.remoteCoverage >= segment.threshold
         : true;
+
       if (segment.mesh.visible === visible) continue;
       segment.mesh.visible = visible;
+
       if (visible && animate) {
         gsap.fromTo(
           segment.mesh.scale,
@@ -96,6 +107,7 @@ export const createRoads = (): RoadsBuild => {
         segment.mesh.scale.set(1, 1, 1);
       }
     }
+
     if (selectables.length === 0) {
       for (const segment of segments) selectables.push(segment.mesh);
     }

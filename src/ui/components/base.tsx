@@ -3,7 +3,10 @@ import { Icon, type IconName } from "./icons";
 
 export const cx = (...values: readonly (string | false | null | undefined)[]): string =>
   values
-    .filter((value): value is string => typeof value === "string" && value.length > 0)
+    .filter(
+      (value): value is string =>
+        value !== false && value !== null && value !== undefined && value !== "",
+    )
     .join(" ");
 
 export const Panel = (props: {
@@ -61,6 +64,7 @@ export const Bar = (props: {
 }): JSX.Element => {
   const max = props.max ?? 100;
   const ratio = () => (max <= 0 ? 0 : Math.max(0, Math.min(1, props.value / max)));
+
   return (
     <div
       class={cx("bar", props.class)}
@@ -174,6 +178,7 @@ export const ProgressRing = (props: {
   const ratio = () => (max <= 0 ? 0 : Math.max(0, Math.min(1, props.value / max)));
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
+
   return (
     <span class="ring" data-tone={props.tone ?? "good"} aria-label={props.label}>
       <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} aria-hidden="true">

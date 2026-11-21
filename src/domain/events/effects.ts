@@ -8,6 +8,7 @@ export const applyCashDebt = (
 ): GameState => {
   const cash = state.finance.cash + cashDelta;
   const borrowed = cash < 0 ? -cash : 0;
+
   return {
     ...state,
     finance: {
@@ -23,9 +24,11 @@ export const appendFlags = (
   additions: readonly string[],
 ): readonly string[] => {
   const merged = [...flags];
+
   for (const flag of additions) {
     if (!merged.includes(flag)) merged.push(flag);
   }
+
   return merged;
 };
 
@@ -42,6 +45,7 @@ export const applyUnlocks = (
     antiSmuggling: policy.antiSmuggling || unlocks.includes("antiSmuggling"),
     n2Enabled: policy.n2Enabled || n2Unlock,
   };
+
   return next;
 };
 

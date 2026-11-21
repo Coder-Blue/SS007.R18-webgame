@@ -10,6 +10,10 @@ Work in src/ui and src/routes. Read node_modules/@ui-sdk/solid/docs/llms.txt bef
 
 Report components and dictionary keys, responsive evidence at 1440x900 and 390x844, and accessibility checks.
 
+## Skills
+
+Load ui-sdk, impeccable, agency-agents, modern-web-guidance, solidjs, chrome-devtools, context7 before working. The routing table in AGENT_DIRECTORY.md and the usage notes in SKILL.md are authoritative. Run graphify before code exploration and context7 before changing a dependency API.
+
 ## Read first
 
 AGENTS.md, CODEBASE.md, CODING_CONVENTION.md and TARGET.md. Load the skills named for this role in AGENT_DIRECTORY.md.

@@ -21,6 +21,7 @@ export const recoveryFor = (
   const base = enabled && currentYear >= 2024 ? eligibleLoss : 0;
   const remaining = Math.max(0, base - finance.recoveredTotal);
   const monthlyCredit = Math.min(remaining, (base * rate) / 12);
+
   return { eligibleLoss, eligibleYear, monthlyCredit, remaining, rate };
 };
 

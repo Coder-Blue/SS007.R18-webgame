@@ -19,6 +19,7 @@ export const BottomDock = (props: {
 }): JSX.Element => {
   const { store } = useGame();
   const state = store.state;
+
   return (
     <nav class="bottom-dock desktop-only" aria-label={t("mobile.sheetTitle")}>
       <div class="bottom-dock-tabs">

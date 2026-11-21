@@ -190,23 +190,40 @@ export interface SaveFile {
   readonly state: GameState;
 }
 
-export const parseGameState = (value: unknown): Result<GameState> => {
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | readonly JsonValue[]
+  | { readonly [key: string]: JsonValue };
+
+export const parseGameState = (value: JsonValue): Result<GameState> => {
   const parsed = v.safeParse(GameStateSchema, value);
+
   if (!parsed.success) {
     return err("save.invalid-state");
   }
+
+  // SAFETY: GameStateSchema checks every field before this cast; readonly
+  // modifiers only differ from the schema's inferred output type.
   return ok(parsed.output as GameState);
 };
 
 export const decodeSaveFile = (text: string): Result<SaveFile> => {
   let value: unknown;
+
   try {
     value = JSON.parse(text);
   } catch {
     return err("save.invalid-json");
   }
+
   const parsed = v.safeParse(SaveFileSchema, value);
+
   if (!parsed.success) return err("save.invalid-format");
+
+  // SAFETY: SaveFileSchema validated the format tag, version and state above.
   return ok(parsed.output as SaveFile);
 };
 

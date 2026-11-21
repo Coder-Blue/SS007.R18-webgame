@@ -19,6 +19,7 @@ export const TopBar = (props: {
   const runAdvance = () => advance.mutate();
   useAutoPlay(store, runAdvance, 4_200);
   const debtRatio = () => (state().finance.debt / state().finance.debtLimit) * 100;
+
   return (
     <header class="top-bar">
       <div class="brand-block">

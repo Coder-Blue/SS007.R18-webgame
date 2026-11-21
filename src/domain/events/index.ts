@@ -16,12 +16,14 @@ export const eventById = (id: string): GameEventDefinition | undefined =>
 
 export const dueEventIds = (state: GameState): readonly string[] => {
   const index = monthIndex(state.clock);
-  const ids = EVENT_SCHEDULE.filter((entry) => entry.tick <= index).map(
-    (entry) => entry.definition.id,
-  );
+
+  const ids = EVENT_SCHEDULE.flatMap((entry) => (entry.tick <= index ? [entry.definition.id] : []));
+
   const debtPressure =
     state.finance.debt >= state.finance.debtLimit * 0.78 && state.clock.tick >= 6;
+
   if (debtPressure) ids.push(DEBT_WARNING_EVENT.id);
+
   return ids.filter(
     (id) =>
       id !== state.events.activeId &&
@@ -33,6 +35,7 @@ export const dueEventIds = (state: GameState): readonly string[] => {
 export const scheduleEvents = (state: GameState): GameState => {
   const queue = [...state.events.queue, ...dueEventIds(state)];
   const activeId = state.events.activeId ?? queue[0] ?? null;
+
   return {
     ...state,
     events: {
@@ -45,5 +48,6 @@ export const scheduleEvents = (state: GameState): GameState => {
 
 export const activeEvent = (state: GameState): GameEventDefinition | null => {
   const id = state.events.activeId;
+
   return id === null ? null : (eventById(id) ?? null);
 };

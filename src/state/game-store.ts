@@ -30,6 +30,7 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
 
   const commit = (next: GameState): void => {
     setState(next);
+
     if (next.ending !== null) setAutoPlaySignal(false);
   };
 
@@ -37,39 +38,52 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
     if (action.ok) {
       commit(action.value);
       setLastError(null);
+
       return true;
     }
+
     setLastError(action.error.code);
+
     return false;
   };
 
   const advance = (): Result<TickOutcome> => {
     const outcome = advanceMonth(state());
+
     if (!outcome.ok) {
       setLastError(outcome.error);
+
       return outcome;
     }
+
     setLastOutcome(outcome.value);
     commit(outcome.value.state);
     setLastError(null);
     saveToSlot("autosave", outcome.value.state);
+
     if (outcome.value.notices.length > 0) {
       setNotice(outcome.value.notices[outcome.value.notices.length - 1] ?? null);
     }
+
     if (outcome.value.state.events.activeId !== null) {
       setAutoPlaySignal(false);
     }
+
     return outcome;
   };
 
   const resolve = (choiceId: string): boolean => {
     const resolved = resolveEvent(state(), choiceId);
+
     if (!resolved.ok) {
       setLastError(resolved.error);
+
       return false;
     }
+
     commit(resolved.value);
     setLastError(null);
+
     return true;
   };
 

@@ -5,6 +5,7 @@
 .claude/** linguist-vendored linguist-detectable=false
 .codex/** linguist-vendored linguist-detectable=false
 .opencode/** linguist-vendored linguist-detectable=false
+tools/oxlint/anti-slop/** linguist-vendored linguist-detectable=false
 docs/** linguist-documentation linguist-detectable=false
 *.md linguist-documentation linguist-detectable=false
 *.js linguist-detectable=false

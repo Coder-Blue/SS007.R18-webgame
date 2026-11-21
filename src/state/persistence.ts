@@ -1,9 +1,11 @@
+import * as v from "valibot";
 import type { GameState, Result, SaveFile } from "~/domain";
 import { SAVE_VERSION, decodeSaveFile, err, ok } from "~/domain";
 
 export type SlotId = "slot1" | "slot2" | "slot3" | "autosave";
 
-export const SLOT_IDS: readonly SlotId[] = ["slot1", "slot2", "slot3"];
+export const SLOT_IDS = ["slot1", "slot2", "slot3"] as const satisfies readonly SlotId[];
+export const ALL_SLOT_IDS = ["autosave", ...SLOT_IDS] as const satisfies readonly SlotId[];
 
 const PREFIX = "dqkt:";
 const SESSION_KEY = `${PREFIX}session`;
@@ -14,6 +16,13 @@ export interface SessionPrefs {
   readonly tutorialDone: boolean;
   readonly reducedMotion: boolean;
 }
+
+const SessionPrefsSchema = v.object({
+  activeSlot: v.optional(v.nullable(v.picklist(ALL_SLOT_IDS)), null),
+  panel: v.optional(v.string(), "overview"),
+  tutorialDone: v.optional(v.boolean(), false),
+  reducedMotion: v.optional(v.boolean(), false),
+});
 
 export const DEFAULT_PREFS: SessionPrefs = {
   activeSlot: null,
@@ -51,8 +60,10 @@ export const makeSaveFile = (state: GameState): SaveFile => ({
 export const saveToSlot = (slot: SlotId, state: GameState): Result<SaveFile> => {
   if (!hasStorage()) return err("save.storage-unavailable");
   const file = makeSaveFile(state);
+
   try {
     window.localStorage.setItem(keyFor(slot), JSON.stringify(file));
+
     return ok(file);
   } catch {
     return err("save.write-failed");
@@ -62,9 +73,12 @@ export const saveToSlot = (slot: SlotId, state: GameState): Result<SaveFile> => 
 export const loadFromSlot = (slot: SlotId): Result<GameState> => {
   if (!hasStorage()) return err("save.storage-unavailable");
   const raw = window.localStorage.getItem(keyFor(slot));
+
   if (raw === null) return err("save.empty");
   const decoded = decodeSaveFile(raw);
+
   if (!decoded.ok) return decoded;
+
   return ok(decoded.value.state);
 };
 
@@ -76,10 +90,13 @@ export const deleteSlot = (slot: SlotId): void => {
 export const slotMeta = (slot: SlotId): SaveMeta | null => {
   if (!hasStorage()) return null;
   const raw = window.localStorage.getItem(keyFor(slot));
+
   if (raw === null) return null;
   const decoded = decodeSaveFile(raw);
+
   if (!decoded.ok) return null;
   const state = decoded.value.state;
+
   return {
     slot,
     savedAt: decoded.value.savedAt,
@@ -93,8 +110,7 @@ export const slotMeta = (slot: SlotId): SaveMeta | null => {
   };
 };
 
-export const listSaves = (): readonly (SaveMeta | null)[] =>
-  ["slot1", "slot2", "slot3"].map((slot) => slotMeta(slot as SlotId));
+export const listSaves = (): readonly (SaveMeta | null)[] => SLOT_IDS.map((slot) => slotMeta(slot));
 
 export const latestSave = (): {
   readonly slot: SlotId;
@@ -103,16 +119,21 @@ export const latestSave = (): {
 } | null => {
   if (!hasStorage()) return null;
   const candidates: { slot: SlotId; state: GameState; savedAt: string }[] = [];
-  for (const slot of ["autosave", "slot1", "slot2", "slot3"] as SlotId[]) {
+
+  for (const slot of ALL_SLOT_IDS) {
     const loaded = loadFromSlot(slot);
+
     if (loaded.ok) {
       const meta = slotMeta(slot);
+
       if (meta !== null) {
         candidates.push({ slot, state: loaded.value, savedAt: meta.savedAt });
       }
     }
   }
+
   if (candidates.length === 0) return null;
+
   return candidates.toSorted((a, b) => b.savedAt.localeCompare(a.savedAt))[0] ?? null;
 };
 
@@ -124,21 +145,14 @@ export const importSave = (text: string): Result<SaveFile> => decodeSaveFile(tex
 export const readSession = (): SessionPrefs => {
   if (typeof window === "undefined" || !window.sessionStorage) return DEFAULT_PREFS;
   const raw = window.sessionStorage.getItem(SESSION_KEY);
+
   if (raw === null) return DEFAULT_PREFS;
+
   try {
-    const parsed = JSON.parse(raw) as Partial<SessionPrefs>;
-    return {
-      activeSlot:
-        parsed.activeSlot === "slot1" ||
-        parsed.activeSlot === "slot2" ||
-        parsed.activeSlot === "slot3" ||
-        parsed.activeSlot === "autosave"
-          ? parsed.activeSlot
-          : null,
-      panel: typeof parsed.panel === "string" ? parsed.panel : "overview",
-      tutorialDone: parsed.tutorialDone === true,
-      reducedMotion: parsed.reducedMotion === true,
-    };
+    const parsed = v.safeParse(SessionPrefsSchema, JSON.parse(raw));
+
+    // Fail closed: one malformed preference must not keep stale UI state alive.
+    return parsed.success ? parsed.output : DEFAULT_PREFS;
   } catch {
     return DEFAULT_PREFS;
   }
@@ -150,7 +164,7 @@ export const writeSession = (prefs: SessionPrefs): void => {
 };
 
 export const clearAllSaves = (): void => {
-  for (const slot of ["autosave", "slot1", "slot2", "slot3"] as SlotId[]) {
+  for (const slot of ALL_SLOT_IDS) {
     deleteSlot(slot);
   }
 };

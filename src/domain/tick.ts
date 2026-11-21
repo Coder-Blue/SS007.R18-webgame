@@ -14,9 +14,11 @@ import { withEndingCheck, withFinalCheck } from "./endings";
 
 export const advanceMonth = (state: GameState): Result<TickOutcome> => {
   if (state.phase !== "playing") return err("tick.not-playing");
+
   if (state.events.activeId !== null) return err("tick.event-pending");
   const marketStep = advanceMarket(state.market, state.clock, state.metrics.inflation, state.seed);
   const market = marketStep.market;
+
   const demand = computeDemand(
     state.village,
     state.infrastructure,
@@ -24,6 +26,7 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
     state.metrics,
     state.clock,
   );
+
   const production = computeProduction(state.production, market, state.metrics);
   const availableRice = state.production.riceInventory + production.ownProduction;
   const purchaseNeed = Math.max(0, demand.total - availableRice);
@@ -34,32 +37,40 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
   const inventoryEnd = Math.min(600, Math.max(0, available - supplied));
   const servedRatio = demand.total > 0 ? supplied / demand.total : 1;
   const revenue = computeRevenue(demand.household, demand.workshop, state.tariffs, servedRatio);
+
   const recovery = recoveryFor(
     state.finance,
     state.clock.year,
     state.policy.n2Rate,
     state.policy.n2Enabled,
   );
+
   const revenueRecovery = recovery.monthlyCredit;
   const wheeling = reformRevenue(state.policy, state.village);
   const costProduction = production.productionCost;
+
   const costProcurement =
     externalPurchase * market.ricePrice * (1 + 0.02 * (market.exchangeRate - 1));
+
   const costRoads = roadMaintenanceCost(
     state.infrastructure.dirtKm,
     state.infrastructure.cobbleKm,
     state.infrastructure.asphaltKm,
   );
+
   const costFleet = fleetCost(state.infrastructure.fleet, market);
   const costStaff = staffCost(state.village.workshopsThousand);
   const costInterest = interestForMonth(state.finance.debt, state.finance.interestRate);
+
   const costTotal =
     costProduction + costProcurement + costRoads + costFleet + costStaff + costInterest;
+
   const revenueTotal = revenue.total + revenueRecovery + wheeling.total;
   const netResult = revenueTotal - costTotal;
   const settled = settleDebt(state.finance.cash, state.finance.debt, netResult);
   const reliability = demand.total > 0 ? clamp((supplied / demand.total) * 100, 0, 100) : 100;
   const last = state.finance.monthlyHistory[state.finance.monthlyHistory.length - 1];
+
   const metricStep = advanceMetrics(
     {
       previous: state.metrics,
@@ -74,6 +85,7 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
     last?.tariffAverage ?? 11,
     last?.ricePrice ?? 12,
   );
+
   const ledger: MonthlyLedger = {
     year: state.clock.year,
     month: state.clock.month,
@@ -109,13 +121,16 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
     inflation: metricStep.metrics.inflation,
     coverage: state.infrastructure.coverage,
   };
+
   const monthlyHistory = pushLedger(state.finance.monthlyHistory, ledger);
+
   const annualHistory = addAnnual(
     state.finance.annualHistory,
     state.clock.year,
     state.clock.month,
     monthlyHistory,
   );
+
   const nextState: GameState = {
     ...state,
     seed: marketStep.seed,
@@ -143,16 +158,22 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
       flags: state.events.flags,
     },
   };
+
   const notices = buildNotices(nextState, shortage, revenueRecovery);
   const endedEarly = withEndingCheck(nextState);
+
   if (endedEarly.ending !== null) {
     return ok({ state: endedEarly, ledger, notices });
   }
+
   const final = withFinalCheck(endedEarly);
+
   if (final.ending !== null) {
     return ok({ state: final, ledger, notices });
   }
+
   const next = nextClock(state.clock);
+
   const scheduled = scheduleEvents({
     ...endedEarly,
     clock: next,
@@ -167,6 +188,7 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
       campaignCooldown: Math.max(0, endedEarly.policy.campaignCooldown - 1),
     },
   });
+
   return ok({
     state: scheduled,
     ledger,
@@ -191,13 +213,20 @@ export const buildNotices = (
   recovery: number,
 ): readonly string[] => {
   const notices: string[] = [];
+
   if (shortage > 0.5) notices.push("notice.shortage");
+
   if (state.finance.debt > state.finance.debtLimit * 0.8) {
     notices.push("notice.debt");
   }
+
   if (state.metrics.inflation > 8) notices.push("notice.inflation");
+
   if (state.infrastructure.coverage >= 100) notices.push("notice.coverage");
+
   if (recovery > 0) notices.push("notice.recovery");
+
   if (state.metrics.satisfaction < 30) notices.push("notice.unrest");
+
   return notices;
 };

@@ -4,16 +4,22 @@ import type { GameState } from "../../src/domain/types";
 import { addAnnual, advanceMonth, buildNotices } from "../../src/domain/tick";
 
 const initial = createInitialState();
+
 const months = (count: number): GameState => {
   let state = initial;
+
   for (let index = 0; index < count; index += 1) {
     const result = advanceMonth(state);
+
     if (!result.ok) return state;
+
     if (result.value.state.events.activeId !== null) {
       return { ...result.value.state, events: { ...result.value.state.events, activeId: null } };
     }
+
     state = result.value.state;
   }
+
   return state;
 };
 
@@ -34,6 +40,7 @@ describe("tick", () => {
   it("advances one month and records a ledger", () => {
     const result = advanceMonth(initial);
     expect(result.ok).toBe(true);
+
     if (result.ok) {
       const { state, ledger, notices } = result.value;
       expect(ledger.month).toBe(1);
@@ -50,6 +57,7 @@ describe("tick", () => {
     const may = months(4);
     const result = advanceMonth(may);
     expect(result.ok).toBe(true);
+
     if (result.ok) {
       expect(result.value.state.clock.month).toBe(6);
       expect(result.value.state.events.activeId).toBe("drought_2022");
@@ -63,8 +71,10 @@ describe("tick", () => {
       clock: { year: 2022, month: 12, tick: 11 },
       finance: { ...initial.finance, monthlyHistory: [] },
     };
+
     const result = advanceMonth(december);
     expect(result.ok).toBe(true);
+
     if (result.ok) {
       expect(result.value.state.finance.annualHistory).toHaveLength(1);
       expect(result.value.state.finance.annualHistory[0]?.year).toBe(2022);
@@ -76,8 +86,10 @@ describe("tick", () => {
       ...initial,
       clock: { year: 2023, month: 12, tick: 23 },
     };
+
     const result = advanceMonth(december);
     expect(result.ok).toBe(true);
+
     if (result.ok) {
       expect(result.value.state.clock.year).toBe(2024);
       expect(result.value.state.village.householdsThousand).toBeGreaterThan(
@@ -93,8 +105,10 @@ describe("tick", () => {
       clock: { year: 2022, month: 2, tick: 1 },
       finance: { ...initial.finance, debt: 65_000, cash: 1_000 },
     };
+
     const result = advanceMonth(state);
     expect(result.ok).toBe(true);
+
     if (result.ok) {
       expect(result.value.state.phase).toBe("ended");
       expect(result.value.state.ending?.reason).toBe("debt");
@@ -108,8 +122,10 @@ describe("tick", () => {
       clock: { year: 2026, month: 12, tick: 59 },
       finance: { ...initial.finance, debt: 40_000 },
     };
+
     const result = advanceMonth(state);
     expect(result.ok).toBe(true);
+
     if (result.ok) {
       expect(result.value.state.phase).toBe("ended");
       expect(result.value.state.ending?.reason).toBe("final");
@@ -146,6 +162,7 @@ describe("tick", () => {
         ],
       },
     };
+
     expect(buildNotices(recovery, 10, 100)).toEqual(
       expect.arrayContaining([
         "notice.shortage",
@@ -184,8 +201,10 @@ describe("zero-demand tick", () => {
       production: { ...initial.production, riceInventory: 0 },
       infrastructure: { ...initial.infrastructure, coverage: 0, fleet: 0 },
     };
+
     const result = advanceMonth(state);
     expect(result.ok).toBe(true);
+
     if (result.ok) {
       expect(result.value.ledger.totalDemand).toBe(0);
       expect(result.value.ledger.reliability).toBe(100);

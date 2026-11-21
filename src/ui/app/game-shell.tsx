@@ -43,19 +43,24 @@ export const GameShell = (): JSX.Element => {
 
   const showToast = (next: ToastState): void => {
     setToast(next);
+
     if (toastTimer !== undefined) clearTimeout(toastTimer);
     toastTimer = setTimeout(() => setToast(null), 4_200);
   };
 
   onSettled(() => {
     const prefs = readSession();
+
     if (typeof document !== "undefined") {
       document.documentElement.dataset.motion = prefs.reducedMotion ? "reduced" : "full";
     }
+
     setHasSave(latestSave() !== null);
+
     if (!prefs.tutorialDone) {
       setTutorialOpen(false);
     }
+
     return () => {
       if (toastTimer !== undefined) clearTimeout(toastTimer);
     };
@@ -63,10 +68,12 @@ export const GameShell = (): JSX.Element => {
 
   createTrackedEffect(() => {
     const error = store.lastError();
+
     if (error !== null) showToast({ kind: "error", text: errorText(error) });
   });
   createTrackedEffect(() => {
     const notice = store.notice();
+
     if (notice !== null) {
       showToast({ kind: "notice", text: noticeText(notice) });
       store.clearNotice();
@@ -80,24 +87,31 @@ export const GameShell = (): JSX.Element => {
     setTutorialOpen(true);
     showToast({ kind: "notice", text: t("notice.newGame") });
   };
+
   const continueGame = (): void => {
     const latest = latestSave();
+
     if (latest !== null) {
       store.setState(latest.state);
       setScreen("game");
       showToast({ kind: "notice", text: t("notice.loaded") });
+
       return;
     }
+
     startGame();
   };
+
   const onLoaded = (): void => {
     setScreen("game");
     setHasSave(true);
   };
+
   const openPanel = (panel: PanelId): void => {
     setWorkspacePanel(panel);
     setWorkspaceOpen(true);
   };
+
   const sceneSelect = (selection: SceneSelection): void => {
     setSelected(selection);
     showToast({ kind: "notice", text: t("scene.select", { name: t(`scene.${selection}`) }) });

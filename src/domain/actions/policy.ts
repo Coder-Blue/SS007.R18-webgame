@@ -13,9 +13,13 @@ const already = (code: string): Result<never, { code: string }> => err({ code })
 
 export const enactRecoveryAction = (state: GameState): ActionResult => {
   const blocked = requirePlaying(state);
+
   if (blocked !== null) return blocked;
+
   if (state.clock.year < 2024) return already("policy.too-early");
+
   if (state.policy.n2Enabled) return already("policy.already-enabled");
+
   return finishAction({
     ...state,
     policy: { ...state.policy, n2Enabled: true },
@@ -29,9 +33,13 @@ export const enactRecoveryAction = (state: GameState): ActionResult => {
 
 export const setRecoveryRateAction = (state: GameState, rate: number): ActionResult => {
   const blocked = requirePlaying(state);
+
   if (blocked !== null) return blocked;
+
   if (!state.policy.n2Enabled) return already("policy.not-enabled");
+
   if (rate < N2_RATE_MIN || rate > N2_RATE_MAX) return already("policy.rate-out-of-range");
+
   return finishAction({
     ...state,
     policy: { ...state.policy, n2Rate: rate },
@@ -44,13 +52,18 @@ const enablePolicy = (
   cost: number,
 ): ActionResult => {
   const blocked = requirePlaying(state);
+
   if (blocked !== null) return blocked;
+
   if (state.policy[field]) return already("policy.already-enabled");
+
   if (state.finance.cash + (state.finance.debtLimit - state.finance.debt) < cost) {
     return already("finance.insufficient");
   }
+
   const cash = state.finance.cash - cost;
   const borrowed = cash < 0 ? -cash : 0;
+
   return finishAction({
     ...state,
     finance: {
@@ -77,9 +90,13 @@ export const enableVremAction = (state: GameState): ActionResult =>
 
 export const enableTwoPartAction = (state: GameState): ActionResult => {
   const blocked = requirePlaying(state);
+
   if (blocked !== null) return blocked;
+
   if (!state.policy.vrem) return already("policy.requires-vrem");
+
   if (state.policy.twoPartTariff) return already("policy.already-enabled");
+
   return finishAction({
     ...state,
     policy: { ...state.policy, twoPartTariff: true },
@@ -93,8 +110,11 @@ export const enableTwoPartAction = (state: GameState): ActionResult => {
 
 export const requestBailoutAction = (state: GameState): ActionResult => {
   const blocked = requirePlaying(state);
+
   if (blocked !== null) return blocked;
+
   if (state.policy.bailoutUsed) return already("policy.bailout-used");
+
   return finishAction({
     ...state,
     finance: {

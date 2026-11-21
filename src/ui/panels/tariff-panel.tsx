@@ -33,29 +33,37 @@ const asTierTuple = (values: readonly number[]): readonly [number, number, numbe
 export const TariffPanel = (): JSX.Element => {
   const { store, actions } = useGame();
   const state = store.state;
+
   const [draft, setDraft] = createSignal<readonly [number, number, number, number]>(
     asTierTuple(state().tariffs.tiers),
   );
+
   const [workshop, setWorkshop] = createSignal(state().tariffs.workshop);
   createTrackedEffect(() => {
     const tariffs = state().tariffs;
     setDraft(asTierTuple(tariffs.tiers));
     setWorkshop(tariffs.workshop);
   });
+
   const average = () =>
     averageHouseholdTariff({
       tiers: draft(),
       workshop: workshop(),
       ceiling: state().tariffs.ceiling,
     } satisfies TariffTiers);
+
   const overCeiling = () => average() > state().tariffs.ceiling + 1e-9;
+
   const update = (index: number, value: number): void => {
-    const next = [...draft()] as [number, number, number, number];
+    const current = draft();
+    const next: [number, number, number, number] = [current[0], current[1], current[2], current[3]];
     next[index] = value;
     setDraft(next);
   };
+
   const last = () => state().finance.monthlyHistory[state().finance.monthlyHistory.length - 1];
   const householdRevenue = last()?.revenueHousehold ?? 0;
+
   return (
     <div class="stack-lg">
       <Panel title={t("panel.tariffs")} kicker={t("pillar.retailTag")} icon="scale">
@@ -95,6 +103,7 @@ export const TariffPanel = (): JSX.Element => {
           <For each={tierLabels}>
             {(label, index) => {
               const band = TARIFF_BANDS[index()] ?? [7, 20];
+
               return (
                 <div class="slider-row" data-over={overCeiling()}>
                   <div class="slider-head">

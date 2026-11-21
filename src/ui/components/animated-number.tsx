@@ -3,7 +3,7 @@ import type { JSX } from "@solidjs/web";
 import { gsap } from "gsap";
 
 export const AnimatedNumber = (props: {
-  readonly value: number | (() => number);
+  readonly value: () => number;
   readonly format: (value: number) => string;
   readonly class?: string;
 }): JSX.Element => {
@@ -11,14 +11,18 @@ export const AnimatedNumber = (props: {
   let current = 0;
   let tween: gsap.core.Tween | undefined;
   createTrackedEffect(() => {
-    const target = typeof props.value === "function" ? props.value() : props.value;
+    const target = props.value();
+
     const reduced =
-      typeof document !== "undefined" && document.documentElement.dataset.motion === "reduced";
+      "document" in globalThis && document.documentElement.dataset.motion === "reduced";
+
     if (reduced) {
       current = target;
       setDisplay(target);
+
       return;
     }
+
     const state = { value: current };
     tween?.kill();
     tween = gsap.to(state, {
@@ -31,7 +35,9 @@ export const AnimatedNumber = (props: {
       },
       overwrite: "auto",
     });
+
     return () => tween?.kill();
   });
+
   return <span class={props.class}>{props.format(display())}</span>;
 };

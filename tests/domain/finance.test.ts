@@ -13,6 +13,7 @@ import { createInitialState } from "../../src/domain/constants";
 import type { AnnualReport, MonthlyLedger } from "../../src/domain/types";
 
 const initial = createInitialState();
+
 const ledger = (overrides: Partial<MonthlyLedger> = {}): MonthlyLedger => ({
   year: 2022,
   month: 1,
@@ -98,6 +99,7 @@ describe("finance", () => {
     const rows = Array.from({ length: 120 }, (_value, index) =>
       ledger({ month: (index % 12) + 1 }),
     );
+
     const next = pushLedger(rows, ledger({ month: 12 }));
     expect(next).toHaveLength(120);
     expect(next[next.length - 1]?.month).toBe(12);
@@ -132,6 +134,7 @@ describe("finance", () => {
       reliability: 0,
       inflationAverage: 0,
     }));
+
     const replaced = pushAnnual(reports, { ...reports[0]!, revenue: 99 });
     expect(replaced.find((row) => row.year === 2022)?.revenue).toBe(99);
     const eleven = pushAnnual(replaced, { ...reports[0]!, year: 2032 });

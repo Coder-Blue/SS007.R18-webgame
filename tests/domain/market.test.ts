@@ -26,6 +26,7 @@ describe("market", () => {
       initial.metrics,
       initial.clock,
     );
+
     expect(demand.household).toBeCloseTo(191.5, 1);
     expect(demand.workshop).toBeCloseTo(216, 1);
     expect(demand.total).toBeCloseTo(demand.household + demand.workshop);
@@ -43,6 +44,7 @@ describe("market", () => {
       initial.metrics,
       initial.clock,
     );
+
     const high = computeDemand(
       initial.village,
       { ...initial.infrastructure, coverage: 100 },
@@ -50,6 +52,7 @@ describe("market", () => {
       initial.metrics,
       initial.clock,
     );
+
     expect(high.household).toBeGreaterThan(low.household);
   });
 
@@ -85,6 +88,7 @@ describe("market", () => {
       20,
       5,
     );
+
     expect(stressed.market.ricePrice).toBeLessThanOrEqual(28);
     expect(stressed.market.fertilizerPrice).toBeLessThanOrEqual(16);
     expect(stressed.market.fuelPrice).toBeLessThanOrEqual(38);

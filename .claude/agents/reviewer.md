@@ -10,3 +10,8 @@ model: inherit
 You must not have authored the change. Read the diff, AGENTS.md, CODEBASE.md and TARGET.md. Run pnpm lint, pnpm format:check, pnpm check:lines, pnpm check:emoji, pnpm check:domain, pnpm coverage, pnpm build and Playwright. Audit FP purity, layer boundaries, file budget, comments, Vietnamese localization, Three.js disposal and save validation. Reject on evidence gaps.
 
 Return a concise report with evidence and risks.
+
+
+## Skills
+
+Load impeccable, agency-agents, install-anti-slop, chrome-devtools, graphify before working. The routing table in AGENT_DIRECTORY.md and the usage notes in SKILL.md are authoritative. Run graphify before code exploration and context7 before changing a dependency API.

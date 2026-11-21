@@ -9,12 +9,16 @@ export const HistoryPanel = (): JSX.Element => {
   const { store } = useGame();
   const state = store.state;
   const [expanded, setExpanded] = createSignal(false);
+
   const rows = () => {
     const history = state().finance.monthlyHistory;
+
     return expanded() ? history.toReversed() : history.toReversed().slice(0, 10);
   };
+
   const totalNet = () =>
     state().finance.monthlyHistory.reduce((sum, row) => sum + row.netResult, 0);
+
   return (
     <div class="stack-lg">
       <Panel title={t("history.title")} kicker={t("panel.historyDesc")} icon="book">

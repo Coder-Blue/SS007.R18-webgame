@@ -35,10 +35,13 @@ export const ProductionPanel = (): JSX.Element => {
   const market = () => state().market;
   const own = () => last()?.ownProduction ?? 0;
   const external = () => last()?.externalPurchase ?? 0;
+
   const selfSufficiency = () => {
     const total = own() + external();
+
     return total <= 0 ? 0 : (own() / total) * 100;
   };
+
   return (
     <div class="stack-lg">
       <Panel title={t("panel.production")} kicker={t("pillar.productionTag")} icon="rice">

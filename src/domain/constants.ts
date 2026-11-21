@@ -20,19 +20,25 @@ export const BAILOUT_TRUST_COST = 9;
 export const BAILOUT_SATISFACTION_COST = 4;
 
 export const TARIFF_WEIGHTS = [0.45, 0.28, 0.18, 0.09] as const;
+
 export const TARIFF_BANDS = [
   [7.2, 11.0],
   [9.0, 14.5],
   [11.5, 21.0],
   [14.0, 32.0],
 ] as const;
+
 export const WORKSHOP_TARIFF_MIN = 6.8;
 export const WORKSHOP_TARIFF_MAX = 9.2;
 export const N2_RATE_MIN = 0.3;
 export const N2_RATE_MAX = 0.8;
 export const N2_RATE_DEFAULT = 0.55;
 
-export const CEILINGS: Readonly<Record<number, number>> = {
+export interface CeilingByYear {
+  readonly [year: number]: number;
+}
+
+export const CEILINGS: CeilingByYear = {
   2022: 13.8,
   2023: 13.8,
   2024: 14.2,

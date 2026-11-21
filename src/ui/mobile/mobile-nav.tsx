@@ -26,6 +26,16 @@ export type PanelId =
   | "policy"
   | "history";
 
+export const PANEL_IDS = [
+  "overview",
+  "production",
+  "infrastructure",
+  "tariffs",
+  "finance",
+  "policy",
+  "history",
+] as const satisfies readonly PanelId[];
+
 const tabs: readonly { readonly id: PanelId; readonly label: string; readonly icon: IconName }[] = [
   { id: "overview", label: "mobile.overview", icon: "gauge" },
   { id: "production", label: "mobile.production", icon: "rice" },
@@ -36,21 +46,29 @@ const tabs: readonly { readonly id: PanelId; readonly label: string; readonly ic
 
 const PanelView = (props: { readonly panel: PanelId }): JSX.Element => {
   if (props.panel === "production") return <ProductionPanel />;
+
   if (props.panel === "infrastructure") return <InfrastructurePanel />;
+
   if (props.panel === "tariffs") return <TariffPanel />;
+
   if (props.panel === "finance") return <FinancePanel />;
+
   if (props.panel === "policy") return <PolicyPanel />;
+
   if (props.panel === "history") return <HistoryPanel />;
+
   return <OverviewPanel />;
 };
 
 export const MobileNav = (): JSX.Element => {
   const [open, setOpen] = createSignal(false);
   const [panel, setPanel] = createSignal<PanelId>("overview");
+
   const openPanel = (id: PanelId): void => {
     setPanel(id);
     setOpen(true);
   };
+
   return (
     <>
       <nav class="mobile-nav" aria-label={t("mobile.sheetTitle")}>

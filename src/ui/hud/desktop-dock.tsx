@@ -54,6 +54,7 @@ export const LeftDock = (props: {
   const { store, actions } = useGame();
   const state = store.state;
   const recovery = () => recoveryOf(state());
+
   return (
     <aside class="dock dock-left desktop-only" aria-label={t("panel.valueChain")}>
       <Panel
@@ -153,6 +154,7 @@ export const RightDock = (props: {
   const last = () => state().finance.monthlyHistory[state().finance.monthlyHistory.length - 1];
   const projection = () => projectFinance(state());
   const average = () => averageHouseholdTariff(state().tariffs);
+
   return (
     <aside class="dock dock-right desktop-only" aria-label={t("panel.finance")}>
       <Panel title={t("panel.finance")} kicker={t("finance.pnl")} icon="wallet" class="dock-panel">

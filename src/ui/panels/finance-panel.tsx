@@ -16,6 +16,7 @@ export const FinancePanel = (): JSX.Element => {
   const last = () => state().finance.monthlyHistory[state().finance.monthlyHistory.length - 1];
   const recovery = () => recoveryOf(state());
   const projection = () => projectFinance(state());
+
   const series = (): readonly Series[] => [
     {
       label: t("finance.revenue"),
@@ -25,6 +26,7 @@ export const FinancePanel = (): JSX.Element => {
     { label: t("finance.costs"), color: "#b34833", values: history().map((row) => row.costTotal) },
     { label: t("finance.net"), color: "#d8a94b", values: history().map((row) => row.netResult) },
   ];
+
   const debtSeries = (): readonly Series[] => [
     { label: t("finance.debt"), color: "#5b4b8a", values: history().map((row) => row.debt) },
     {
@@ -33,6 +35,7 @@ export const FinancePanel = (): JSX.Element => {
       values: history().map((row) => row.tariffAverage * 1000),
     },
   ];
+
   return (
     <div class="stack-lg">
       <Panel

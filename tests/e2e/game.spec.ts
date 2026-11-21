@@ -14,6 +14,7 @@ const expectNoOverflow = async (page: Page): Promise<void> => {
     scroll: document.documentElement.scrollWidth,
     viewport: window.innerWidth,
   }));
+
   expect(widths.scroll).toBeLessThanOrEqual(widths.viewport + 1);
 };
 
@@ -42,23 +43,23 @@ test("mobile navigation opens the tariff sheet with large touch targets", async 
   await page.locator(".mobile-tab").filter({ hasText: "Giá" }).click();
   await expect(page.locator(".mobile-sheet")).toBeVisible();
   await expect(page.locator(".slider-row").first()).toBeVisible();
+
   const sizes = await page.evaluate(() => {
     const controls = [
       ...document.querySelectorAll<HTMLElement>('button, [data-slot="slider-control"]'),
     ];
-    return controls
-      .filter((element) => {
-        const rect = element.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0;
-      })
-      .map((element) => {
-        const rect = element.getBoundingClientRect();
-        return { height: rect.height, width: rect.width };
-      });
+
+    return controls.flatMap((element) => {
+      const rect = element.getBoundingClientRect();
+
+      return rect.width > 0 && rect.height > 0 ? [{ height: rect.height, width: rect.width }] : [];
+    });
   });
+
   for (const size of sizes) {
     expect(size.height).toBeGreaterThanOrEqual(43.5);
   }
+
   await expectNoOverflow(page);
 });
 
@@ -84,10 +85,12 @@ test("tariff ceiling rejects an over-priced basket", async ({ page }) => {
   const sliders = page.locator('[data-slot="slider"]');
   await expect(sliders).toHaveCount(5);
   const inputs = page.locator('[data-slot="slider-thumb"] input');
+
   for (let index = 0; index < 4; index += 1) {
     await inputs.nth(index).focus();
     await page.keyboard.press("End");
   }
+
   await expect(page.getByText("Vượt trần")).toBeVisible();
   await expect(page.getByRole("button", { name: /Áp dụng biểu giá/i })).toBeDisabled();
 });
@@ -110,10 +113,12 @@ test("save, reload, and continue restore the player state", async ({ page }) => 
 
 test("event decision appears in June and resolves into a consequence", async ({ page }) => {
   await startGame(page);
+
   for (let index = 0; index < 5; index += 1) {
     await page.getByRole("button", { name: /Kết thúc tháng/i }).click();
     await page.waitForTimeout(250);
   }
+
   await expect(page.locator(".event-modal")).toBeVisible();
   await expect(page.getByRole("heading", { name: /El Niño/i })).toBeVisible();
   await page.locator(".event-choice").first().click();

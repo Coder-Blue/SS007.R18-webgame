@@ -29,6 +29,7 @@ describe("infrastructure", () => {
       { ...initial.infrastructure, coverage: 99, remoteCoverage: 99 },
       "asphalt",
     );
+
     expect(result.infrastructure.coverage).toBe(100);
     expect(result.infrastructure.remoteCoverage).toBe(100);
   });

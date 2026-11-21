@@ -17,10 +17,12 @@ import {
 import { finishAction, pay, requirePlaying } from "../../src/domain/actions/helpers";
 
 const initial = createInitialState();
+
 const rich: GameState = {
   ...initial,
   finance: { ...initial.finance, cash: 50_000, debt: 0 },
 };
+
 const ended: GameState = {
   ...rich,
   phase: "ended",
@@ -58,6 +60,7 @@ describe("actions", () => {
     const tight = { ...initial, finance: { ...initial.finance, cash: 100, debt: 0 } };
     const result = enableDppaAction(tight);
     expect(result.ok).toBe(true);
+
     if (result.ok) {
       expect(result.value.finance.cash).toBe(0);
       expect(result.value.finance.debt).toBe(300);
@@ -77,6 +80,7 @@ describe("actions", () => {
   it.each(["dirt", "cobble", "asphalt"] as const)("builds a %s road", (grade) => {
     const result = buildRoadAction(rich, grade);
     expect(result.ok).toBe(true);
+
     if (result.ok) {
       expect(result.value.infrastructure.coverage).toBeGreaterThan(rich.infrastructure.coverage);
       expect(result.value.finance.cash).toBeLessThan(rich.finance.cash);
@@ -104,12 +108,15 @@ describe("actions", () => {
   it("runs a campaign and anti-smuggling crackdown", () => {
     const campaign = investAction(rich, "campaign");
     expect(campaign.ok).toBe(true);
+
     if (campaign.ok) {
       expect(campaign.value.policy.campaignCooldown).toBe(6);
       expect(campaign.value.metrics.trust).toBeGreaterThan(rich.metrics.trust);
     }
+
     const crackdown = investAction(rich, "crackdown");
     expect(crackdown.ok).toBe(true);
+
     if (crackdown.ok) {
       expect(crackdown.value.policy.antiSmuggling).toBe(true);
       expect(crackdown.value.events.flags).toContain("smuggling_cracked");
@@ -129,6 +136,7 @@ describe("actions", () => {
       infrastructure: { ...rich.infrastructure, fleet: 320 },
       policy: { ...rich.policy, campaignCooldown: 2, antiSmuggling: true },
     };
+
     for (const kind of [
       "hydro",
       "mechanized",
@@ -158,9 +166,11 @@ describe("actions", () => {
   it("imports rice and rejects a full or unaffordable store", () => {
     const imported = importRiceAction(rich);
     expect(imported.ok).toBe(true);
+
     if (imported.ok) {
       expect(imported.value.production.riceInventory).toBe(rich.production.riceInventory + 100);
     }
+
     expect(
       importRiceAction({ ...rich, production: { ...rich.production, riceInventory: 600 } }),
     ).toEqual({ ok: false, error: { code: "action.stock-full" } });
@@ -186,6 +196,7 @@ describe("actions", () => {
     const ready = { ...rich, clock: { year: 2024, month: 1, tick: 24 } };
     const enacted = enactRecoveryAction(ready);
     expect(enacted.ok).toBe(true);
+
     if (enacted.ok) expect(enacted.value.policy.n2Enabled).toBe(true);
     expect(enactRecoveryAction({ ...ready, policy: { ...ready.policy, n2Enabled: true } })).toEqual(
       {
@@ -208,18 +219,22 @@ describe("actions", () => {
     expect(enableDppaAction(rich).ok).toBe(true);
     const vrem = enableVremAction(rich);
     expect(vrem.ok).toBe(true);
+
     const twoPart = enableTwoPartAction(
       vrem.ok ? vrem.value : { ...rich, policy: { ...rich.policy, vrem: true } },
     );
+
     expect(twoPart.ok).toBe(true);
     expect(enableTwoPartAction(rich)).toEqual({
       ok: false,
       error: { code: "policy.requires-vrem" },
     });
+
     const enabled = {
       ...rich,
       policy: { ...rich.policy, nsmo: true, dppa: true, vrem: true, twoPartTariff: true },
     };
+
     expect(enableNsmoAction(enabled).ok).toBe(false);
     expect(enableDppaAction(enabled).ok).toBe(false);
     expect(enableVremAction(enabled).ok).toBe(false);
@@ -235,10 +250,12 @@ describe("actions", () => {
   it("requests the one-time bailout", () => {
     const bailout = requestBailoutAction(rich);
     expect(bailout.ok).toBe(true);
+
     if (bailout.ok) {
       expect(bailout.value.policy.bailoutUsed).toBe(true);
       expect(bailout.value.finance.debt).toBe(0);
     }
+
     expect(requestBailoutAction(rich).ok).toBe(true);
     const used = { ...rich, policy: { ...rich.policy, bailoutUsed: true } };
     expect(requestBailoutAction(used)).toEqual({

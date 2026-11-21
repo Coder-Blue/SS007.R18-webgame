@@ -3,6 +3,7 @@ import { createInitialState } from "../../src/domain/constants";
 import { recoveryFor, recoveryOf, recoveryRateCost } from "../../src/domain/recovery";
 
 const initial = createInitialState();
+
 const finance = {
   ...initial.finance,
   annualHistory: [
@@ -49,6 +50,7 @@ describe("recovery", () => {
       policy: { ...initial.policy, n2Enabled: true, n2Rate: 0.6 },
       finance: { ...initial.finance, annualHistory: finance.annualHistory },
     };
+
     expect(recoveryOf(state).rate).toBe(0.6);
     expect(recoveryOf(state).monthlyCredit).toBeCloseTo((20_000 * 0.6) / 12);
   });
@@ -60,6 +62,7 @@ describe("recovery", () => {
       policy: { ...initial.policy, n2Rate: 0, n2Enabled: true },
       finance: { ...initial.finance, annualHistory: finance.annualHistory },
     };
+
     expect(recoveryOf(state).rate).toBe(0.55);
   });
 

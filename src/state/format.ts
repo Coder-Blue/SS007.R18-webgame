@@ -1,6 +1,7 @@
 import type { Act, Season } from "~/domain";
 
 const integer = new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 });
+
 const oneDecimal = new Intl.NumberFormat("vi-VN", {
   maximumFractionDigits: 1,
   minimumFractionDigits: 1,
@@ -17,6 +18,7 @@ export const formatPercent = (value: number): string => `${oneDecimal.format(val
 
 export const formatDelta = (value: number, unit = "tỷ"): string => {
   const sign = value > 0 ? "+" : "";
+
   return `${sign}${oneDecimal.format(value)} ${unit}`;
 };
 
@@ -24,14 +26,19 @@ export const formatDate = (year: number, month: number): string => `Tháng ${mon
 
 export const seasonLabel = (season: Season): string => {
   if (season === "spring") return "Xuân";
+
   if (season === "summer") return "Hạ";
+
   if (season === "autumn") return "Thu";
+
   return "Đông";
 };
 
 export const actLabel = (act: Act): string => {
   if (act === 1) return "Hồi I · Bao phủ và tích lũy lỗ";
+
   if (act === 2) return "Hồi II · Tranh luận tư nhân hóa";
+
   return "Hồi III · Phục hồi và hiện đại hóa";
 };
 
@@ -43,8 +50,12 @@ export const formatSignedPercent = (value: number): string =>
 
 export const riskLabel = (value: number, inverse = false): string => {
   const score = inverse ? 100 - value : value;
+
   if (score >= 75) return "An toàn";
+
   if (score >= 50) return "Cần chú ý";
+
   if (score >= 25) return "Rủi ro cao";
+
   return "Nguy hiểm";
 };
