@@ -3,6 +3,7 @@ import { Show } from "solid-js";
 import { ActionButton, Badge } from "../components/base";
 import { Icon } from "../components/icons";
 import { t } from "../localization";
+import { GAME_VERSION } from "~/domain";
 
 export const TitleScreen = (props: {
   readonly hasSave: boolean;
@@ -61,7 +62,9 @@ export const TitleScreen = (props: {
           <p>{t("tutorial.step4Body")}</p>
         </div>
       </div>
-      <p class="title-footer">{t("app.footer")}</p>
+      <p class="title-footer">
+        {t("app.footer")} · v{GAME_VERSION}
+      </p>
     </div>
   </div>
 );

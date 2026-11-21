@@ -1,5 +1,6 @@
 import type { GameState, RoadGrade, TariffTiers } from "./types";
 
+export const GAME_VERSION = "1.0.0" as const;
 export const SAVE_VERSION = 1 as const;
 export const START_YEAR = 2022;
 export const START_MONTH = 1;
