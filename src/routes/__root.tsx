@@ -33,7 +33,7 @@ export const Route = createRootRoute({
   }),
   shellComponent: RootDocument,
   errorComponent: () => <ErrorScreen />,
-  notFoundComponent: () => <ErrorScreen />,
+  notFoundComponent: () => <ErrorScreen notFound />,
 });
 
 function RootDocument(props: { readonly children: JSX.Element }): JSX.Element {
