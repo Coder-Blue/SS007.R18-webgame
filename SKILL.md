@@ -1,6 +1,6 @@
 # SKILL.md
 
-The 18 target skill families are installed in `.agents/skills/` and linked into
+The managed skill families are installed in `.agents/skills/` and linked into
 the four supported runtimes: `.opencode/`, `.codex/`, `.claude/`, and
 `.agents/`. `skills-lock.json` pins the managed packages. Use
 `npx skills list` to inspect the live set.
