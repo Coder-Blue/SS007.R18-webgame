@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const roots = ["src", "tests", "scripts", "tools"];
+const roots = ["src", "tests", "scripts", "routes", "tools"];
 const vendored = ["tools/oxlint/anti-slop/"];
 const extensions = new Set([".ts", ".tsx", ".css", ".json"]);
 const generated = new Set(["routeTree.gen.ts"]);

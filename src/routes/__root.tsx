@@ -6,6 +6,11 @@ import appCss from "~/styles/app.css?url";
 import { GameProvider } from "~/ui/game-context";
 import { ErrorScreen } from "~/ui/screens/error-screen";
 
+const SITE_URL = (import.meta.env.VITE_SITE_URL ?? "https://ss007-r18-webgame.vercel.app").replace(
+  /\/$/,
+  "",
+);
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -22,6 +27,23 @@ export const Route = createRootRoute({
         content:
           "Trò chơi mô phỏng kinh tế chính trị: vận hành mạng lưới gạo của làng qua ba hồi, giữ an sinh và cân bằng ngân sách.",
       },
+      { property: "og:type", content: "website" },
+      { property: "og:title", content: "Độc Quyền Kinh Tế · The Rice Monopoly" },
+      {
+        property: "og:description",
+        content:
+          "Một làng. Một mạng đường. Một giỏ gạo. Điều hành tập đoàn gạo nhà nước qua năm năm.",
+      },
+      { property: "og:image", content: `${SITE_URL}/og.png` },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      {
+        property: "og:image:alt",
+        content: "Độc Quyền Kinh Tế, trò chơi quản lý gạo làng Việt Nam",
+      },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Độc Quyền Kinh Tế · The Rice Monopoly" },
+      { name: "twitter:image", content: `${SITE_URL}/og.png` },
       { name: "color-scheme", content: "light" },
     ],
     links: [

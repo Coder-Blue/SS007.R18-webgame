@@ -13,15 +13,15 @@
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "prepare": "lefthook install",
-    "lint": "oxlint src tests scripts",
-    "lint:fix": "oxlint --fix src tests scripts",
-    "format": "oxfmt --write \"src/**/*.{ts,tsx,css}\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"scripts/**/*.ts\" \"*.{ts,json}\"",
-    "format:check": "oxfmt --check \"src/**/*.{ts,tsx,css}\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"scripts/**/*.ts\" \"*.{ts,json}\"",
+    "lint": "oxlint src tests scripts routes",
+    "format": "oxfmt --write \"src/**/*.{ts,tsx,css}\" \"routes/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"scripts/**/*.ts\" \"*.{ts,json}\"",
+    "format:check": "oxfmt --check \"src/**/*.{ts,tsx,css}\" \"routes/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"scripts/**/*.ts\" \"*.{ts,json}\"",
     "check:lines": "node scripts/check-lines.mjs",
     "check:emoji": "node scripts/check-emoji.mjs",
     "check:domain": "node scripts/check-domain.mjs",
     "quality": "pnpm lint && pnpm format:check && pnpm check:lines && pnpm check:emoji && pnpm check:domain && pnpm coverage && pnpm build",
-    "build:vercel": "NITRO_PRESET=vercel pnpm build"
+    "build:vercel": "NITRO_PRESET=vercel pnpm build",
+    "lint:fix": "oxlint --fix src tests scripts routes"
   },
   "dependencies": {
     "@iconify-icon/solid": "3.0.6",
@@ -33,6 +33,7 @@
     "@ui-sdk/solid": "^0.1.0-beta.13",
     "gsap": "^3.15.1",
     "solid-js": "^2.0.3",
+    "takumi-js": "2.22.1",
     "three": "^0.187.0",
     "valibot": "^1.5.0"
   },

@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const roots = ["src", "tests", "scripts", "docs", "public", ".github"];
+const roots = ["src", "tests", "scripts", "routes", "docs", "public", ".github"];
 const skip = new Set(["node_modules", ".output", ".git", "coverage", "test-results", "fonts"]);
 const emoji = /(?:[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]|\u{FE0F})/u;
 const files = [];
