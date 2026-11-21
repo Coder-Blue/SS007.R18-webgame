@@ -43,6 +43,7 @@ checked-in `lefthook.yml` defines the local gates:
 Run the hooks manually with `pnpm exec lefthook run pre-commit`. Use
 `LEFTHOOK=0` or `git commit --no-verify` only for an emergency, and state why in
 the pull request. CI repeats every gate, so a bypass cannot merge unreviewed.
+
 `@iconify-icon/solid@3.0.6` targets Solid 1's removed `attr:` namespace and
 imports Solid 1 JSX types. A checked-in pnpm patch removes the `attr:` prefix
 and gives the custom element a local attribute contract so the wrapper compiles

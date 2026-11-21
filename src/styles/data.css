@@ -10,7 +10,7 @@
   @apply flex flex-col gap-1 rounded-[11px] bg-forest-800 p-[10px] text-paper;
 }
 
-.policy-role-card svg {
+.policy-role-card iconify-icon {
   @apply text-gold-light;
 }
 

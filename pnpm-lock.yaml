@@ -163,7 +163,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  '@iconify-icon/solid@3.0.6': 52eaaa59b313bd35ab64b5c7eec59b398cefadb6215009a4e618807866469ac6
+  '@iconify-icon/solid@3.0.6': 6303207c95eaded4df9afe7d562b0af83596f694fbd9c705ec2a051f8c06a993
   '@tanstack/start-server-core@1.169.45': 3a9dd64dbb9483cc311db58a9dfd765da961e029a4d35553a28ac617541a9645
   oxfmt@0.79.0: 76630bb62ac894303e53dd86707d4d3a326fd021c82ac68fa6e4df27c42a7d67
   oxlint@1.94.0: 7389ac008af4d90dbdc3460cecb7f2713b60f5e736bc10ee546dab25b6611290
@@ -176,7 +176,7 @@ importers:
     dependencies:
       '@iconify-icon/solid':
         specifier: 3.0.6
-        version: 3.0.6(patch_hash=52eaaa59b313bd35ab64b5c7eec59b398cefadb6215009a4e618807866469ac6)(solid-js@2.0.3)
+        version: 3.0.6(patch_hash=6303207c95eaded4df9afe7d562b0af83596f694fbd9c705ec2a051f8c06a993)(solid-js@2.0.3)
       '@solidjs/web':
         specifier: ^2.0.3
         version: 2.0.3(solid-js@2.0.3)
@@ -2471,7 +2471,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@iconify-icon/solid@3.0.6(patch_hash=52eaaa59b313bd35ab64b5c7eec59b398cefadb6215009a4e618807866469ac6)(solid-js@2.0.3)':
+  '@iconify-icon/solid@3.0.6(patch_hash=6303207c95eaded4df9afe7d562b0af83596f694fbd9c705ec2a051f8c06a993)(solid-js@2.0.3)':
     dependencies:
       iconify-icon: 3.0.5
       solid-js: 2.0.3

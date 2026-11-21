@@ -23,11 +23,31 @@ const expectMonth = async (page: Page, label: string): Promise<void> => {
   await expect(page.locator(".mobile-date")).toContainText(label);
 };
 
-test("registers the Iconify custom element for the rendered icons", async ({ page }) => {
+test("renders Iconify icons without API calls or untracked reads", async ({ page }) => {
+  const diagnostics: string[] = [];
+  page.on("console", (message) => {
+    if (message.text().includes("STRICT_READ_UNTRACKED")) diagnostics.push(message.text());
+  });
+
+  await page.route(/api\.iconify\.design/, (route) => route.abort());
   await page.goto("/");
-  await expect(page.locator("iconify-icon").first()).toHaveCount(1);
+
+  const icon = page.locator("iconify-icon").first();
+  await expect(icon).toHaveCount(1);
+
   const registered = await page.evaluate(() => customElements.get("iconify-icon") !== undefined);
   expect(registered).toBe(true);
+
+  const hasSvg = await icon.evaluate(
+    (element) => element.shadowRoot?.querySelector("svg") !== null,
+  );
+
+  expect(hasSvg).toBe(true);
+
+  await startGame(page);
+  await page.waitForTimeout(300);
+
+  expect(diagnostics).toEqual([]);
 });
 
 test("serves the generated Open Graph image and advertises absolute URLs", async ({
