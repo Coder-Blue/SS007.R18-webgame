@@ -87,6 +87,36 @@ consult `process.report` first, and
 `supportedArchitectures` so the matching native package is present in a fresh
 install. `pnpm dev` now starts in the direnv shell.
 
+## Independent review
+
+A separate OpenCode reviewer instance was started in a Herdr pane and asked to
+audit without editing. Its first pass found five issues: oxlint/oxfmt native
+bindings, domain branch coverage below 100 percent, Vietnamese season
+identifiers, GSAP tweens surviving disposal, and UI literals duplicating domain
+constants. All five were fixed on the branch. The follow-up pass returned:
+
+```
+pnpm lint        0
+pnpm format      0
+pnpm check:lines 0
+pnpm check:emoji 0
+pnpm check:domain 0
+pnpm coverage    0
+pnpm build       0
+Verdict: APPROVED
+```
+
+The reviewer's scope caveat is recorded: it did not rerun Playwright in the
+follow-up. The separate Playwright evidence in this file was rerun on `main`
+after the merge.
+
+## Fresh checkout
+
+A detached worktree of the final branch was created, `pnpm install
+--frozen-lockfile` exited 0, `pnpm lint` and `pnpm format:check` exited 0, and
+`pnpm dev` served HTTP 200. This proves the patches and optional bindings work
+without the author's pre-existing node_modules.
+
 ## Residual risks
 
 - TanStack Start's Solid 2 line is an RC. The `request-scope` export patch is
