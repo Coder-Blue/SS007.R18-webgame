@@ -145,6 +145,7 @@ kết quả build, trạng thái lint/format, kiểm tra viewport hoặc ảnh c
 - `docs/GAME_DESIGN.md`: cơ chế và cân bằng chi tiết.
 - `docs/DEVELOPMENT.md`: quy trình địa phương, bản lưu và kiểm chứng.
 - `docs/VERIFICATION.md`: bằng chứng cổng và rủi ro còn lại.
+- `docs/PERFORMANCE.md`: baseline, tối ưu hiệu năng và kết quả Lighthouse.
 - `docs/adr/0001-solid2-tanstack-start.md`: lý do tồn tại bản vá Solid 2.
 - `SKILL.md`: ma trận kỹ năng, Graphify và ghi chú ui-sdk.
 - `CODING_CONVENTION.md`, `CI_CD_PIPELINE.md`.
