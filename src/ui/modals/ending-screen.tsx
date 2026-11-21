@@ -3,32 +3,54 @@ import { Show } from "solid-js";
 import { useGame } from "../game-context";
 import { ActionButton, Badge, Divider, Stat } from "../components/base";
 import { Icon } from "../components/icons";
-import { t } from "../localization";
 import { formatBillion, formatPercent } from "~/state/format";
-import { ARCHITECT_DEBT_MAX, type EndingId } from "~/domain";
+import { ARCHITECT_DEBT_MAX, type EndingId, type EndingReason } from "~/domain";
 
 const endingCopy = (id: EndingId): string => {
-  if (id === "architect") return "ending.architect.body";
+  if (id === "architect") {
+    return "Bạn giữ được mạng đường chung, phủ tới từng bản xa, đưa lỗ N-2 trở lại trần giá mà không gây sốc, và biến công ty thành trụ cột của một nền kinh tế làng hiện đại. Chairman ghi nhận bạn là người xây nền an ninh quốc gia từ hạ tầng.";
+  }
 
-  if (id === "predator") return "ending.predator.body";
+  if (id === "predator") {
+    return "Ngân quỹ phình ra nhờ giá cao và những thỏa thuận mờ ám. Xưởng vẫn chạy, nhưng hộ nghèo và bản xa ngày càng tụt lại. Bạn thắng về tiền, thua về chính danh.";
+  }
 
-  return "ending.collapse.body";
+  return "Không thể vừa mua đắt, vừa bán dưới trần, vừa giữ lòng dân. Hệ thống mất cân bằng và Chairman buộc phải cách chức bạn để ổn định làng.";
 };
 
 const endingTitle = (id: EndingId): string => {
-  if (id === "architect") return "ending.architect.title";
+  if (id === "architect") return "Kiến Trúc Sư An Ninh Quốc Gia";
 
-  if (id === "predator") return "ending.predator.title";
+  if (id === "predator") return "Tư Bản Đỏ Độc Quyền";
 
-  return "ending.collapse.title";
+  return "Vỡ Trận Thị Trường";
 };
 
-const gradeKey = (id: EndingId): string => {
-  if (id === "architect") return "ending.gradeArchitect";
+const gradeLabel = (id: EndingId): string => {
+  if (id === "architect") return "Xuất sắc";
 
-  if (id === "predator") return "ending.gradePredator";
+  if (id === "predator") return "Tiêu cực";
 
-  return "ending.gradeCollapse";
+  return "Thất bại";
+};
+
+const reasonText = (reason: EndingReason): string => {
+  switch (reason) {
+    case "debt":
+      return "Dư nợ vượt trần cho phép.";
+    case "unrest":
+      return "Bất ổn lan rộng, dân làng nổi giận.";
+    case "deposed":
+      return "Tín nhiệm của Chairman về 0.";
+    case "privatization":
+      return "Tư nhân hóa sớm chia cắt mạng đường và làm sụp hệ thống.";
+    case "california":
+      return "Mô phỏng California 2001 kết thúc bằng vỡ thị trường.";
+    case "texas":
+      return "Mô phỏng Texas 2021 kết thúc bằng khủng hoảng mùa đông.";
+    case "final":
+      return "Nhiệm kỳ kết thúc mà chưa đạt mục tiêu phục hồi.";
+  }
 };
 
 const download = (content: string): void => {
@@ -53,7 +75,7 @@ export const EndingScreen = (): JSX.Element => {
           class="ending-screen"
           role="dialog"
           aria-modal="true"
-          aria-label={t(endingTitle(ending().id))}
+          aria-label={endingTitle(ending().id)}
         >
           <div class="ending-glow" />
           <div class="ending-card">
@@ -63,49 +85,49 @@ export const EndingScreen = (): JSX.Element => {
                   ending().id === "architect" ? "good" : ending().id === "predator" ? "gold" : "bad"
                 }
               >
-                {t("ending.ending")} · {t(gradeKey(ending().id))}
+                Kết thúc · {gradeLabel(ending().id)}
               </Badge>
               <span class="ending-date">
                 {ending().month}/{ending().year}
               </span>
             </div>
-            <h1>{t(endingTitle(ending().id))}</h1>
-            <p class="ending-body">{t(endingCopy(ending().id))}</p>
-            <p class="ending-reason">{t(`ending.reason.${ending().reason}`)}</p>
+            <h1>{endingTitle(ending().id)}</h1>
+            <p class="ending-body">{endingCopy(ending().id)}</p>
+            <p class="ending-reason">{reasonText(ending().reason)}</p>
             <Divider />
             <div class="stat-grid">
               <Stat
-                label={t("ending.finalDebt")}
+                label="Dư nợ cuối kỳ"
                 value={formatBillion(state().finance.debt)}
                 tone={state().finance.debt <= ARCHITECT_DEBT_MAX ? "good" : "bad"}
                 icon="lucide:landmark"
               />
               <Stat
-                label={t("ending.finalCash")}
+                label="Ngân quỹ cuối kỳ"
                 value={formatBillion(state().finance.cash)}
                 tone="gold"
                 icon="lucide:wallet"
               />
               <Stat
-                label={t("ending.finalCoverage")}
+                label="Bao phủ cuối kỳ"
                 value={formatPercent(state().infrastructure.coverage)}
                 tone={state().infrastructure.coverage >= 100 ? "good" : "warn"}
                 icon="lucide:road"
               />
               <Stat
-                label={t("ending.finalTrust")}
+                label="Tín nhiệm cuối kỳ"
                 value={formatPercent(state().metrics.trust)}
                 tone={state().metrics.trust >= 55 ? "good" : "bad"}
                 icon="lucide:shield"
               />
               <Stat
-                label={t("ending.finalSatisfaction")}
+                label="Hài lòng cuối kỳ"
                 value={formatPercent(state().metrics.satisfaction)}
                 tone={state().metrics.satisfaction >= 55 ? "good" : "bad"}
                 icon="lucide:users"
               />
               <Stat
-                label={t("hud.inflation")}
+                label="Lạm phát"
                 value={formatPercent(state().metrics.inflation)}
                 tone={state().metrics.inflation <= 8 ? "good" : "bad"}
                 icon="lucide:trending-up"
@@ -113,18 +135,18 @@ export const EndingScreen = (): JSX.Element => {
             </div>
             <div class="ending-actions">
               <ActionButton variant="gold" icon="lucide:play" onClick={() => actions.newGame()}>
-                {t("ending.replay")}
+                Chơi lại từ đầu
               </ActionButton>
               <ActionButton
                 variant="secondary"
                 icon="lucide:download"
                 onClick={() => download(actions.exportJson())}
               >
-                {t("ending.export")}
+                Xuất dữ liệu ván chơi
               </ActionButton>
             </div>
             <p class="modal-hint">
-              <Icon icon="lucide:info" size={14} /> {t("ending.summary")}
+              <Icon icon="lucide:info" size={14} /> Tổng kết nhiệm kỳ
             </p>
           </div>
         </div>

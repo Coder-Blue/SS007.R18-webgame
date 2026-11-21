@@ -5,7 +5,6 @@ import { useAdvanceMonth, useAutoPlay } from "~/state/queries";
 import { ActionButton, Badge, Bar, IconButton } from "../components/base";
 import { AnimatedNumber } from "../components/animated-number";
 import { Icon } from "../components/icons";
-import { t } from "../localization";
 import { formatBillion, formatDate, formatPercent, seasonLabel } from "~/state/format";
 import { recoveryOf, seasonOf } from "~/domain";
 
@@ -27,16 +26,15 @@ export const TopBar = (props: {
           <Icon icon="tabler:wheat" size={22} />
         </div>
         <div class="brand-copy">
-          <strong>{t("app.title")}</strong>
-          <span>{t("app.subtitle")}</span>
+          <strong>Độc Quyền Kinh Tế</strong>
+          <span>The Rice Monopoly</span>
         </div>
       </div>
 
       <div class="date-block">
         <span class="date-main">{formatDate(state().clock.year, state().clock.month)}</span>
         <span class="date-sub">
-          {t("hud.season", { season: seasonLabel(seasonOf(state().clock.month)) })} ·{" "}
-          {t("hud.act", { act: state().act })}
+          {`Mùa ${seasonLabel(seasonOf(state().clock.month))}`} · {`Hồi ${state().act}`}
         </span>
       </div>
 
@@ -44,7 +42,7 @@ export const TopBar = (props: {
         <div class="top-gauge" data-tone="gold">
           <div class="top-gauge-label">
             <Icon icon="lucide:wallet" size={15} />
-            <span>{t("hud.cash")}</span>
+            <span>Ngân quỹ</span>
           </div>
           <strong>
             <AnimatedNumber value={() => state().finance.cash} format={formatBillion} />
@@ -57,7 +55,7 @@ export const TopBar = (props: {
         <div class="top-gauge" data-tone={debtRatio() > 80 ? "bad" : "warn"}>
           <div class="top-gauge-label">
             <Icon icon="lucide:landmark" size={15} />
-            <span>{t("hud.debt")}</span>
+            <span>Dư nợ</span>
           </div>
           <strong>
             <AnimatedNumber value={() => state().finance.debt} format={formatBillion} />
@@ -67,7 +65,7 @@ export const TopBar = (props: {
         <div class="top-gauge" data-tone="green">
           <div class="top-gauge-label">
             <Icon icon="lucide:users" size={15} />
-            <span>{t("hud.satisfaction")}</span>
+            <span>Hài lòng dân làng</span>
           </div>
           <strong>
             <AnimatedNumber value={() => state().metrics.satisfaction} format={formatPercent} />
@@ -80,7 +78,7 @@ export const TopBar = (props: {
         <div class="top-gauge" data-tone="green">
           <div class="top-gauge-label">
             <Icon icon="lucide:shield" size={15} />
-            <span>{t("hud.trust")}</span>
+            <span>Tín nhiệm Chairman</span>
           </div>
           <strong>
             <AnimatedNumber value={() => state().metrics.trust} format={formatPercent} />
@@ -96,9 +94,9 @@ export const TopBar = (props: {
             variant="secondary"
             icon={store.autoPlay() ? "lucide:pause" : "lucide:play"}
             onClick={() => store.setAutoPlay(!store.autoPlay())}
-            ariaLabel={store.autoPlay() ? t("hud.stopAuto") : t("hud.autoPlay")}
+            ariaLabel={store.autoPlay() ? "Dừng tự động" : "Chạy tự động"}
           >
-            {store.autoPlay() ? t("hud.stopAuto") : t("hud.autoPlay")}
+            {store.autoPlay() ? "Dừng tự động" : "Chạy tự động"}
           </ActionButton>
           <ActionButton
             class="advance-btn"
@@ -106,17 +104,13 @@ export const TopBar = (props: {
             icon="lucide:calendar"
             disabled={advance.isPending}
             onClick={runAdvance}
-            ariaLabel={t("hud.endMonth")}
+            ariaLabel="Kết thúc tháng"
           >
-            {t("hud.endMonth")}
+            Kết thúc tháng
           </ActionButton>
         </Show>
-        <IconButton
-          icon="lucide:book-open"
-          label={t("hud.tutorial")}
-          onClick={props.onOpenTutorial}
-        />
-        <IconButton icon="lucide:save" label={t("save.title")} onClick={props.onOpenMenu} />
+        <IconButton icon="lucide:book-open" label="Hướng dẫn" onClick={props.onOpenTutorial} />
+        <IconButton icon="lucide:save" label="Kho lưu và cài đặt" onClick={props.onOpenMenu} />
       </div>
 
       <div class="mobile-status">

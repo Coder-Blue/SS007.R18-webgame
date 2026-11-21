@@ -4,7 +4,6 @@ import { useGame } from "../game-context";
 import { ActionButton, Badge, Bar, Divider, Panel, Stat } from "../components/base";
 import { LineChart, type Series } from "../components/charts";
 import { Icon } from "../components/icons";
-import { t } from "../localization";
 import { formatBillion, formatDate, formatPercent, formatPrice } from "~/state/format";
 import { recoveryOf } from "~/domain";
 import { projectFinance } from "~/state/selectors";
@@ -19,18 +18,18 @@ export const FinancePanel = (): JSX.Element => {
 
   const series = (): readonly Series[] => [
     {
-      label: t("finance.revenue"),
+      label: "Doanh thu",
       color: "#2f7d5b",
       values: history().map((row) => row.revenueTotal),
     },
-    { label: t("finance.costs"), color: "#b34833", values: history().map((row) => row.costTotal) },
-    { label: t("finance.net"), color: "#d8a94b", values: history().map((row) => row.netResult) },
+    { label: "Chi phí", color: "#b34833", values: history().map((row) => row.costTotal) },
+    { label: "Kết quả tháng", color: "#d8a94b", values: history().map((row) => row.netResult) },
   ];
 
   const debtSeries = (): readonly Series[] => [
-    { label: t("finance.debt"), color: "#5b4b8a", values: history().map((row) => row.debt) },
+    { label: "Dư nợ cuối tháng", color: "#5b4b8a", values: history().map((row) => row.debt) },
     {
-      label: t("finance.legendTariff"),
+      label: "Giá bình quân",
       color: "#2f7d5b",
       values: history().map((row) => row.tariffAverage * 1000),
     },
@@ -39,31 +38,31 @@ export const FinancePanel = (): JSX.Element => {
   return (
     <div class="stack-lg">
       <Panel
-        title={t("finance.pnl")}
+        title="Báo cáo lãi lỗ tháng"
         kicker={formatDate(state().clock.year, state().clock.month)}
         icon="lucide:wallet"
       >
         <div class="stat-grid">
           <Stat
-            label={t("finance.revenue")}
+            label="Doanh thu"
             value={formatBillion(last()?.revenueTotal ?? 0)}
             tone="good"
             icon="lucide:trending-up"
           />
           <Stat
-            label={t("finance.costs")}
+            label="Chi phí"
             value={formatBillion(last()?.costTotal ?? 0)}
             tone="bad"
             icon="lucide:trending-down"
           />
           <Stat
-            label={t("finance.net")}
+            label="Kết quả tháng"
             value={formatBillion(last()?.netResult ?? 0)}
             tone={(last()?.netResult ?? 0) >= 0 ? "good" : "bad"}
             icon="lucide:chart-column"
           />
           <Stat
-            label={t("finance.debt")}
+            label="Dư nợ cuối tháng"
             value={formatBillion(state().finance.debt)}
             tone={projection().isDanger ? "bad" : "warn"}
             icon="lucide:landmark"
@@ -71,44 +70,44 @@ export const FinancePanel = (): JSX.Element => {
         </div>
         <div class="report-split">
           <div>
-            <h4>{t("finance.revenue")}</h4>
+            <h4>Doanh thu</h4>
             <div class="report-line">
-              <span>{t("finance.revenueHousehold")}</span>
+              <span>Bán lẻ hộ dân</span>
               <strong>{formatBillion(last()?.revenueHousehold ?? 0)}</strong>
             </div>
             <div class="report-line">
-              <span>{t("finance.revenueWorkshop")}</span>
+              <span>Bán lẻ xưởng</span>
               <strong>{formatBillion(last()?.revenueWorkshop ?? 0)}</strong>
             </div>
             <div class="report-line">
-              <span>{t("finance.revenueRecovery")}</span>
+              <span>Thu hồi N-2</span>
               <strong>{formatBillion(last()?.revenueRecovery ?? 0)}</strong>
             </div>
           </div>
           <div>
-            <h4>{t("finance.costs")}</h4>
+            <h4>Chi phí</h4>
             <div class="report-line">
-              <span>{t("finance.costProduction")}</span>
+              <span>Sản xuất</span>
               <strong>{formatBillion(last()?.costProduction ?? 0)}</strong>
             </div>
             <div class="report-line">
-              <span>{t("finance.costProcurement")}</span>
+              <span>Mua gạo ngoài</span>
               <strong>{formatBillion(last()?.costProcurement ?? 0)}</strong>
             </div>
             <div class="report-line">
-              <span>{t("finance.costRoads")}</span>
+              <span>Bảo trì đường</span>
               <strong>{formatBillion(last()?.costRoads ?? 0)}</strong>
             </div>
             <div class="report-line">
-              <span>{t("finance.costFleet")}</span>
+              <span>Vận chuyển</span>
               <strong>{formatBillion(last()?.costFleet ?? 0)}</strong>
             </div>
             <div class="report-line">
-              <span>{t("finance.costStaff")}</span>
+              <span>Nhân sự</span>
               <strong>{formatBillion(last()?.costStaff ?? 0)}</strong>
             </div>
             <div class="report-line">
-              <span>{t("finance.costInterest")}</span>
+              <span>Lãi vay</span>
               <strong>{formatBillion(last()?.costInterest ?? 0)}</strong>
             </div>
           </div>
@@ -116,20 +115,20 @@ export const FinancePanel = (): JSX.Element => {
         <Divider />
         <div class="meter-block">
           <div class="meter-row">
-            <span>{t("finance.debtRatio")}</span>
+            <span>Tỷ lệ nợ / trần</span>
             <strong>{formatPercent(projection().debtRatio * 100)}</strong>
           </div>
           <Bar
             value={projection().debtRatio * 100}
             tone={projection().isDanger ? "bad" : "warn"}
-            label={t("finance.debtRatio")}
+            label="Tỷ lệ nợ / trần"
           />
         </div>
       </Panel>
 
       <Panel
-        title={t("finance.chart")}
-        kicker={t("chart.months", { count: history().length })}
+        title="Lịch sử tài chính"
+        kicker={`${history().length} tháng gần nhất`}
         icon="lucide:chart-column"
       >
         <Show
@@ -137,80 +136,80 @@ export const FinancePanel = (): JSX.Element => {
           fallback={
             <div class="empty-state">
               <Icon icon="lucide:chart-column" size={24} />
-              <span>{t("finance.noHistory")}</span>
+              <span>Chưa có dữ liệu. Hãy kết thúc tháng đầu tiên.</span>
             </div>
           }
         >
-          <LineChart series={series()} ariaLabel={t("finance.chart")} />
-          <LineChart series={debtSeries()} ariaLabel={t("finance.legendDebt")} grid={2} />
+          <LineChart series={series()} ariaLabel="Lịch sử tài chính" />
+          <LineChart series={debtSeries()} ariaLabel="Dư nợ" grid={2} />
         </Show>
       </Panel>
 
       <Panel
-        title={t("policy.n2")}
-        kicker={t("finance.auditYear", { year: recovery().eligibleYear })}
+        title="Thu hồi chi phí N-2"
+        kicker={`Năm kiểm toán ${recovery().eligibleYear}`}
         icon="lucide:landmark"
       >
         <div class="stat-grid">
           <Stat
-            label={t("finance.eligible")}
+            label="Lỗ N-2 đủ điều kiện"
             value={formatBillion(recovery().eligibleLoss)}
             tone={recovery().eligibleLoss > 0 ? "warn" : "neutral"}
             icon="lucide:scale"
           />
           <Stat
-            label={t("finance.monthlyCredit")}
+            label="Thu hồi tháng này"
             value={formatBillion(recovery().monthlyCredit)}
             tone={recovery().monthlyCredit > 0 ? "good" : "neutral"}
             icon="lucide:coins"
           />
           <Stat
-            label={t("finance.recovered")}
+            label="Đã thu hồi N-2"
             value={formatBillion(state().finance.recoveredTotal)}
             icon="lucide:check"
           />
           <Stat
-            label={t("finance.remaining")}
+            label="Còn lại có thể thu hồi"
             value={formatBillion(recovery().remaining)}
             icon="lucide:clock"
           />
         </div>
         <Badge tone={state().policy.n2Enabled ? "good" : "warn"}>
-          {state().policy.n2Enabled ? t("policy.enabled") : t("policy.notEnabled")}
+          {state().policy.n2Enabled ? "Đang áp dụng" : "Chưa áp dụng"}
         </Badge>
         <p class="muted">
           {recovery().eligibleYear >= 2022
-            ? t("finance.auditYear", { year: recovery().eligibleYear })
-            : t("finance.auditPending")}{" "}
-          · {t("policy.n2Rate")}: {formatPercent(state().policy.n2Rate * 100)}
+            ? `Năm kiểm toán ${recovery().eligibleYear}`
+            : "Chưa đủ dữ liệu N-2"}
+          {" · "}Tỷ lệ thu hồi: {formatPercent(state().policy.n2Rate * 100)}
         </p>
       </Panel>
 
-      <Panel title={t("finance.projection")} kicker={t("hud.status")} icon="lucide:gauge">
+      <Panel title="Dự phóng" kicker="Trạng thái làng" icon="lucide:gauge">
         <div class="stat-grid">
           <Stat
-            label={t("finance.fixedCost")}
+            label="Chi phí cố định tháng trước"
             value={formatBillion(projection().monthlyFixed)}
             icon="lucide:coins"
           />
           <Stat
-            label={t("finance.runway")}
+            label="Số tháng còn lại trước trần nợ"
             value={
               projection().runwayMonths >= 99
                 ? "—"
-                : t("finance.runwayValue", { months: Math.round(projection().runwayMonths) })
+                : `${Math.round(projection().runwayMonths)} tháng`
             }
             tone={projection().isDanger ? "bad" : "good"}
             icon="lucide:clock"
           />
           <Stat
-            label={t("finance.debt")}
+            label="Dư nợ cuối tháng"
             value={formatBillion(state().finance.debt)}
-            hint={`${t("hud.debtLimit")} ${formatBillion(state().finance.debtLimit)}`}
+            hint={`Trần nợ ${formatBillion(state().finance.debtLimit)}`}
             icon="lucide:landmark"
           />
           <Stat
-            label={t("finance.accumulated")}
+            label="Lỗ lũy kế"
             value={formatBillion(state().finance.accumulatedLoss)}
             tone="bad"
             icon="lucide:trending-down"
@@ -224,22 +223,18 @@ export const FinancePanel = (): JSX.Element => {
             disabled={state().policy.bailoutUsed}
             onClick={() => actions.requestBailout()}
           >
-            {state().policy.bailoutUsed ? t("policy.bailoutUsed") : t("action.bailout")}
+            {state().policy.bailoutUsed ? "Đã dùng cứu trợ" : "Xin cứu trợ"}
           </ActionButton>
-          <span class="muted">{t("action.bailoutDesc")}</span>
+          <span class="muted">Giảm 8.000 tỷ nợ, đổi lại mất tín nhiệm và hài lòng.</span>
         </div>
       </Panel>
 
-      <Panel
-        title={t("finance.reportYear", { year: state().clock.year })}
-        kicker={t("panel.history")}
-        icon="lucide:book-open"
-      >
+      <Panel title={`Báo cáo năm ${state().clock.year}`} kicker="Lịch sử" icon="lucide:book-open">
         <Show
           when={state().finance.annualHistory.length > 0}
           fallback={
             <div class="empty-state">
-              <span>{t("finance.noHistory")}</span>
+              <span>Chưa có dữ liệu. Hãy kết thúc tháng đầu tiên.</span>
             </div>
           }
         >
@@ -247,11 +242,11 @@ export const FinancePanel = (): JSX.Element => {
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>{t("finance.year")}</th>
-                  <th>{t("finance.reportRevenue")}</th>
-                  <th>{t("finance.reportNet")}</th>
-                  <th>{t("finance.reportDebt")}</th>
-                  <th>{t("finance.reportReliability")}</th>
+                  <th>Năm</th>
+                  <th>Doanh thu năm</th>
+                  <th>Kết quả năm</th>
+                  <th>Nợ cuối năm</th>
+                  <th>Độ ổn định TB</th>
                 </tr>
               </thead>
               <tbody>
@@ -272,9 +267,7 @@ export const FinancePanel = (): JSX.Element => {
             </table>
           </div>
         </Show>
-        <p class="muted">
-          {t("finance.legendRice")}: {formatPrice(state().market.ricePrice)}
-        </p>
+        <p class="muted">Giá gạo thị trường: {formatPrice(state().market.ricePrice)}</p>
       </Panel>
     </div>
   );

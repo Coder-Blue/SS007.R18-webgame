@@ -2,7 +2,6 @@ import { For, Show } from "solid-js";
 import { useGame } from "../game-context";
 import { Panel, Stat, Bar, Badge, cx } from "../components/base";
 import { Icon, type IconName } from "../components/icons";
-import { t } from "../localization";
 import { formatBillion, formatPercent, formatTonne, actLabel } from "~/state/format";
 import { ARCHITECT_DEBT_MAX, recoveryOf } from "~/domain";
 import { projectFinance } from "~/state/selectors";
@@ -51,23 +50,23 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
 
     return [
       {
-        label: t("overview.goalCoverage"),
+        label: "Phủ 100% đường đến hộ dân và bản xa",
         done:
           current.infrastructure.coverage >= 100 && current.infrastructure.remoteCoverage >= 100,
         detail: `${formatPercent(current.infrastructure.coverage)} / ${formatPercent(current.infrastructure.remoteCoverage)}`,
       },
       {
-        label: t("overview.goalDebt"),
+        label: "Đưa dư nợ về dưới 25.000 tỷ",
         done: current.finance.debt <= ARCHITECT_DEBT_MAX,
         detail: formatBillion(current.finance.debt),
       },
       {
-        label: t("overview.goalReform"),
+        label: "Ban hành N-2, DPPA và VREM",
         done: current.policy.n2Enabled && current.policy.dppa && current.policy.vrem,
-        detail: `${current.policy.n2Enabled ? t("policy.enabled") : t("policy.notEnabled")} · ${current.policy.vrem ? "VREM" : "—"}`,
+        detail: `${current.policy.n2Enabled ? "Đang áp dụng" : "Chưa áp dụng"} · ${current.policy.vrem ? "VREM" : "—"}`,
       },
       {
-        label: t("overview.goalTrust"),
+        label: "Giữ tín nhiệm và hài lòng trên 55%",
         done: current.metrics.trust >= 55 && current.metrics.satisfaction >= 55,
         detail: `${formatPercent(current.metrics.trust)} / ${formatPercent(current.metrics.satisfaction)}`,
       },
@@ -76,41 +75,40 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel
-        title={t("overview.situation")}
-        kicker={actLabel(state().act)}
-        icon="lucide:chart-column"
-      >
+      <Panel title="Tình hình tháng này" kicker={actLabel(state().act)} icon="lucide:chart-column">
         <div class="overview-hero">
           <div class="overview-copy">
-            <p class="eyebrow">
-              {t("hud.date", { month: state().clock.month, year: state().clock.year })}
-            </p>
-            <h3>{t("overview.supplyChain")}</h3>
+            <p class="eyebrow">{`Tháng ${state().clock.month}/${state().clock.year}`}</p>
+            <h3>Chuỗi giá trị của làng</h3>
             <p class="muted">
-              {t("app.tagline")} {t("overview.guide1")}
+              Một làng, một mạng đường, một giỏ gạo. Giữ cho dân no, xưởng chạy và ngân sách không
+              sụp. Mở đường và giữ giá xưởng thấp để xưởng mở rộng.
             </p>
             <div class="hero-chips">
-              <Badge tone="gold">{t("pillar.production")}</Badge>
-              <Badge tone="dark">{t("pillar.infrastructure")}</Badge>
-              <Badge tone="good">{t("pillar.retail")}</Badge>
+              <Badge tone="gold">Sản xuất</Badge>
+              <Badge tone="dark">Truyền tải</Badge>
+              <Badge tone="good">Phân phối</Badge>
             </div>
           </div>
           <div class="overview-score">
-            <span class="score-label">{t("policy.debateScore")}</span>
+            <span class="score-label">Điểm tranh luận công khai</span>
             <strong>{Math.round(state().metrics.debateScore)}</strong>
-            <Bar value={state().metrics.debateScore} tone="gold" label={t("policy.debateScore")} />
+            <Bar
+              value={state().metrics.debateScore}
+              tone="gold"
+              label="Điểm tranh luận công khai"
+            />
           </div>
         </div>
         <div class="stat-grid">
           <Stat
-            label={t("overview.demand")}
+            label="Nhu cầu"
             value={formatTonne(last()?.totalDemand ?? 0)}
-            hint={t("overview.shortage")}
+            hint="Thiếu hụt"
             icon="tabler:wheat"
           />
           <Stat
-            label={t("overview.reliability")}
+            label="Độ ổn định"
             value={formatPercent(state().metrics.reliability)}
             tone={
               state().metrics.reliability >= 95
@@ -122,17 +120,17 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
             icon="lucide:shield"
           />
           <Stat
-            label={t("overview.profit")}
+            label="Kết quả tháng trước"
             value={last() === undefined ? "—" : formatBillion(last()?.netResult ?? 0)}
             tone={(last()?.netResult ?? 0) >= 0 ? "good" : "bad"}
             icon="lucide:wallet"
           />
           <Stat
-            label={t("finance.runway")}
+            label="Số tháng còn lại trước trần nợ"
             value={
               projection().runwayMonths >= 99
                 ? "—"
-                : t("finance.runwayValue", { months: Math.round(projection().runwayMonths) })
+                : `${Math.round(projection().runwayMonths)} tháng`
             }
             tone={
               projection().runwayMonths >= 12
@@ -146,26 +144,26 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("overview.pillars")} kicker={t("hud.status")} icon="lucide:landmark">
+      <Panel title="Sức khỏe ba trụ cột" kicker="Trạng thái làng" icon="lucide:landmark">
         <div class="pillar-grid">
           {pillar(
-            t("pillar.production"),
-            t("pillar.productionTag"),
+            "Sản xuất",
+            "Phát điện · Ruộng và nông trại",
             "tabler:wheat",
             Math.min(
               100,
               (last()?.reliability ?? 100) * 0.55 +
                 Math.min(100, state().production.riceInventory) * 0.1,
             ),
-            `${formatTonne(last()?.ownProduction ?? 0)} · ${t("pillar.stock")}: ${formatTonne(state().production.riceInventory)}`,
+            `${formatTonne(last()?.ownProduction ?? 0)} · Tồn kho gạo: ${formatTonne(state().production.riceInventory)}`,
             "good",
           )}
           {pillar(
-            t("pillar.infrastructure"),
-            t("pillar.infrastructureTag"),
+            "Truyền tải",
+            "Truyền tải · Đường độc quyền",
             "lucide:road",
             state().infrastructure.coverage,
-            `${t("infra.remote")}: ${formatPercent(state().infrastructure.remoteCoverage)} · ${t("pillar.fleet")}: ${state().infrastructure.fleet}`,
+            `Bao phủ bản xa: ${formatPercent(state().infrastructure.remoteCoverage)} · Đội xe: ${state().infrastructure.fleet}`,
             state().infrastructure.coverage >= 90
               ? "good"
               : state().infrastructure.coverage >= 70
@@ -173,8 +171,8 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
                 : "bad",
           )}
           {pillar(
-            t("pillar.retail"),
-            t("pillar.retailTag"),
+            "Phân phối",
+            "Bán lẻ · Giá trần và trợ giá",
             "lucide:scale",
             Math.max(
               0,
@@ -182,18 +180,18 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
                 Math.abs(recovery().monthlyCredit > 0 ? 20 : 35) -
                 state().metrics.inflation * 2,
             ),
-            `${t("pillar.tariff")}: ${state()
+            `Giá bình quân: ${state()
               .tariffs.tiers.reduce(
                 (sum, value, index) => sum + value * [0.45, 0.28, 0.18, 0.09][index]!,
                 0,
               )
-              .toFixed(2)} · ${t("pillar.ceiling")}: ${state().tariffs.ceiling}`,
+              .toFixed(2)} · Trần giá: ${state().tariffs.ceiling}`,
             "gold",
           )}
         </div>
       </Panel>
 
-      <Panel title={t("overview.goals")} kicker={t("hud.status")} icon="lucide:shield">
+      <Panel title="Mục tiêu nhiệm kỳ" kicker="Trạng thái làng" icon="lucide:shield">
         <div class="goal-list">
           <For each={goals()}>
             {(goal) => (
@@ -211,19 +209,19 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("overview.guide")} kicker={t("hud.tutorial")} icon="lucide:book-open">
+      <Panel title="Gợi ý điều hành" kicker="Hướng dẫn" icon="lucide:book-open">
         <ul class="guide-list">
-          <li>{t("overview.guide1")}</li>
-          <li>{t("overview.guide2")}</li>
-          <li>{t("overview.guide3")}</li>
-          <li>{t("overview.guide4")}</li>
+          <li>Mở đường và giữ giá xưởng thấp để xưởng mở rộng.</li>
+          <li>Dùng kho gạo khi hạn hán đẩy giá mua ngoài lên cao.</li>
+          <li>Đừng để nợ vượt 80% trần trước năm 2024.</li>
+          <li>Sau 2024, ban hành N-2 và chọn tỷ lệ thu hồi vừa phải.</li>
         </ul>
         <Show when={recovery().eligibleLoss > 0}>
           <div class="callout">
             <Icon icon="lucide:info" size={16} />
             <span>
-              {t("finance.auditYear", { year: recovery().eligibleYear })}:{" "}
-              {formatBillion(recovery().eligibleLoss)} · {t("finance.monthlyCredit")}:{" "}
+              {`Năm kiểm toán ${recovery().eligibleYear}`}: {formatBillion(recovery().eligibleLoss)}{" "}
+              {"· Thu hồi tháng này: "}
               {formatBillion(recovery().monthlyCredit)}
             </span>
           </div>

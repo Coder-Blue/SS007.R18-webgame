@@ -11,7 +11,6 @@ import {
 import { useGame } from "../game-context";
 import { ActionButton, Badge, Bar, Panel, Stat } from "../components/base";
 import { Icon } from "../components/icons";
-import { t } from "../localization";
 import {
   averageHouseholdTariff,
   TARIFF_BANDS,
@@ -21,7 +20,12 @@ import {
 } from "~/domain";
 import { formatBillion, formatPercent, formatPrice } from "~/state/format";
 
-const tierLabels = ["tariff.tier1", "tariff.tier2", "tariff.tier3", "tariff.tier4"] as const;
+const tierLabels = [
+  "Bậc 1 · Hộ nhỏ, hộ nghèo",
+  "Bậc 2 · Hộ tiêu dùng vừa",
+  "Bậc 3 · Hộ tiêu dùng cao",
+  "Bậc 4 · Hộ tiêu dùng rất cao",
+] as const;
 
 const asTierTuple = (values: readonly number[]): readonly [number, number, number, number] => [
   values[0] ?? 8,
@@ -66,39 +70,41 @@ export const TariffPanel = (): JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel title={t("panel.tariffs")} kicker={t("pillar.retailTag")} icon="lucide:scale">
-        <p class="muted">{t("tariff.help")}</p>
+      <Panel title="Bán lẻ & giá" kicker="Bán lẻ · Giá trần và trợ giá" icon="lucide:scale">
+        <p class="muted">
+          Bậc thấp bảo vệ hộ nghèo và bản xa. Bậc cao buộc hộ tiêu dùng nhiều trả nhiều hơn.
+        </p>
         <div class="tariff-summary">
           <Stat
-            label={t("tariff.average")}
+            label="Giá bình quân có trọng số"
             value={formatPrice(average())}
             tone={overCeiling() ? "bad" : "good"}
             icon="lucide:scale"
           />
           <Stat
-            label={t("tariff.ceiling")}
+            label="Trần của Chairman"
             value={formatPrice(state().tariffs.ceiling)}
             icon="lucide:shield"
           />
           <Stat
-            label={t("finance.revenueHousehold")}
+            label="Bán lẻ hộ dân"
             value={formatBillion(householdRevenue)}
-            hint={t("finance.pnl")}
+            hint="Báo cáo lãi lỗ tháng"
             icon="lucide:wallet"
           />
           <Stat
-            label={t("hud.inflation")}
+            label="Lạm phát"
             value={formatPercent(state().metrics.inflation)}
             tone={state().metrics.inflation > 8 ? "bad" : "warn"}
             icon="lucide:trending-up"
           />
         </div>
         <Badge tone={overCeiling() ? "bad" : "good"}>
-          {overCeiling() ? t("tariff.over") : t("tariff.within")}
+          {overCeiling() ? "Vượt trần" : "Trong trần cho phép"}
         </Badge>
       </Panel>
 
-      <Panel title={t("tariff.title")} kicker={t("policy.roles")} icon="lucide:coins">
+      <Panel title="Bậc thang hộ dân" kicker="Vai trò và trách nhiệm" icon="lucide:coins">
         <div class="slider-list">
           <For each={tierLabels}>
             {(label, index) => {
@@ -107,7 +113,7 @@ export const TariffPanel = (): JSX.Element => {
               return (
                 <div class="slider-row" data-over={overCeiling()}>
                   <div class="slider-head">
-                    <span>{t(label)}</span>
+                    <span>{label}</span>
                     <strong>{formatPrice(draft()[index()] ?? band[0])}</strong>
                   </div>
                   <Slider
@@ -116,12 +122,12 @@ export const TariffPanel = (): JSX.Element => {
                     max={band[1]}
                     step={0.1}
                     onValueChange={(value) => update(index(), Number(value))}
-                    aria-label={t(label)}
+                    aria-label={label}
                   >
                     <SliderControl>
                       <SliderTrack>
                         <SliderIndicator />
-                        <SliderThumb aria-label={t(label)} />
+                        <SliderThumb aria-label={label} />
                       </SliderTrack>
                     </SliderControl>
                   </Slider>
@@ -136,11 +142,13 @@ export const TariffPanel = (): JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("tariff.workshop")} kicker={t("pillar.retail")} icon="lucide:factory">
-        <p class="muted">{t("tariff.workshopHelp")}</p>
+      <Panel title="Giá xưởng & thợ thủ công" kicker="Phân phối" icon="lucide:factory">
+        <p class="muted">
+          Giá trợ cấp cho xưởng. Giá thấp thúc đẩy công nghiệp hóa nhưng làm tăng lỗ.
+        </p>
         <div class="slider-row">
           <div class="slider-head">
-            <span>{t("tariff.workshop")}</span>
+            <span>Giá xưởng & thợ thủ công</span>
             <strong>{formatPrice(workshop())}</strong>
           </div>
           <Slider
@@ -149,12 +157,12 @@ export const TariffPanel = (): JSX.Element => {
             max={WORKSHOP_TARIFF_MAX}
             step={0.1}
             onValueChange={(value) => setWorkshop(Number(value))}
-            aria-label={t("tariff.workshop")}
+            aria-label="Giá xưởng & thợ thủ công"
           >
             <SliderControl>
               <SliderTrack>
                 <SliderIndicator />
-                <SliderThumb aria-label={t("tariff.workshop")} />
+                <SliderThumb aria-label="Giá xưởng & thợ thủ công" />
               </SliderTrack>
             </SliderControl>
           </Slider>
@@ -165,7 +173,7 @@ export const TariffPanel = (): JSX.Element => {
         </div>
         <div class="meter-block">
           <div class="meter-row">
-            <span>{t("tariff.ceiling")}</span>
+            <span>Trần của Chairman</span>
             <strong>{formatPrice(state().tariffs.ceiling)}</strong>
           </div>
           <Bar
@@ -180,7 +188,7 @@ export const TariffPanel = (): JSX.Element => {
             disabled={overCeiling()}
             onClick={() => actions.setTariffs(draft(), workshop())}
           >
-            {t("tariff.save")}
+            Áp dụng biểu giá
           </ActionButton>
           <ActionButton
             variant="ghost"
@@ -189,12 +197,12 @@ export const TariffPanel = (): JSX.Element => {
               setWorkshop(state().tariffs.workshop);
             }}
           >
-            {t("tariff.reset")}
+            Khôi phục
           </ActionButton>
         </div>
         <div class="callout">
           <Icon icon="lucide:info" size={16} />
-          <span>{t("policy.debateHelp")}</span>
+          <span>Điểm cao giúp giữ được mô hình độc quyền tự nhiên trước áp lực tư nhân hóa.</span>
         </div>
       </Panel>
     </div>

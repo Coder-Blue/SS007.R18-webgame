@@ -51,7 +51,7 @@ src/
   domain/   pure types, economics, events, actions, endings; no DOM or UI
   state/    signals, TanStack Query orchestration, storage adapters
   scene/    Three.js isometric renderer and GSAP timeline factories
-  ui/       Solid components, hooks, Vietnamese dictionaries, icons
+  ui/       Solid components, hooks, inline Vietnamese copy, icons
   routes/   TanStack Start file routes and the document shell
 ```
 
@@ -78,8 +78,10 @@ Valibot.
 - **Minimal comments.** Explain a non-obvious economic edge case, a Three.js
   workaround, or a platform constraint. Never narrate code.
 - **Vietnamese first.** Every in-game string, tutorial, event, and ending is
-  Vietnamese and lives in `src/ui/localization/`. Code, identifiers, docs, and
-  commits are English. The UI must render correctly with Be Vietnam Pro.
+  Vietnamese written inline in the Solid component that renders it. Domain
+  events keep their keys, and the event modal resolves them through a
+  component-local Vietnamese copy map. Code, identifiers, docs, and commits are
+  English. The UI must render correctly with Be Vietnam Pro.
 - **Responsive parity.** Verify `390x844` and `1440x900` and a `360px` narrow
   viewport. Touch targets are at least 44x44 px. The 3D canvas uses
   `touch-action: none` and both mouse and touch camera controls.

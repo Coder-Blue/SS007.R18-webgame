@@ -2,7 +2,6 @@ import { createSignal, createTrackedEffect, onSettled, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { Icon } from "../components/icons";
-import { t } from "../localization";
 import {
   createVillageScene,
   type SceneSelection,
@@ -47,14 +46,14 @@ export const VillageCanvas = (props: {
   });
 
   const weatherLabel = (): string => {
-    if (state().market.drought > 0.6) return t("scene.weatherDrought");
+    if (state().market.drought > 0.6) return "Hạn hán";
     const season = seasonOf(state().clock.month);
 
-    if (season === "summer") return t("scene.weatherMonsoon");
+    if (season === "summer") return "Mùa mưa";
 
-    if (season === "winter") return t("scene.weatherWinter");
+    if (season === "winter") return "Rét đậm";
 
-    return t("scene.weatherClear");
+    return "Trời quang";
   };
 
   return (
@@ -69,7 +68,7 @@ export const VillageCanvas = (props: {
           canvas = element;
         }}
         class="village-canvas"
-        aria-label={t("app.title")}
+        aria-label="Độc Quyền Kinh Tế"
         role="img"
       />
       <div class="scene-vignette" />
@@ -91,15 +90,15 @@ export const VillageCanvas = (props: {
           type="button"
           class="scene-reset"
           onClick={() => controller?.resetView()}
-          aria-label={t("scene.resetView")}
+          aria-label="Căn lại góc nhìn"
         >
           <Icon icon="lucide:map-pin" size={16} />
-          <span>{t("scene.resetView")}</span>
+          <span>Căn lại góc nhìn</span>
         </button>
       </div>
-      <p class="scene-hint">{t("scene.hint")}</p>
+      <p class="scene-hint">Kéo để di chuyển · Lăn chuột để phóng · Chạm để xem</p>
       <Show when={!ready()}>
-        <div class="scene-loading">{t("scene.loading")}</div>
+        <div class="scene-loading">Đang dựng làng…</div>
       </Show>
     </div>
   );

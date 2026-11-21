@@ -19,7 +19,7 @@ Closes #
 - [ ] `src/domain/` stays pure and browser-free
 - [ ] No class, `this`, inheritance or prototype mutation
 - [ ] No new file over 500 lines
-- [ ] Vietnamese copy lives in `src/ui/localization/`
+- [ ] Vietnamese copy is inline in the Solid component that renders it
 - [ ] No emoji in code, docs, UI or commits
 - [ ] Save schema version is unchanged or migrated
 

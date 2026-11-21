@@ -2,7 +2,6 @@ import { createSignal } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { ActionButton, Divider, Panel, Stat } from "../components/base";
-import { t } from "../localization";
 import { formatBillion, formatDate, formatPercent, formatPrice } from "~/state/format";
 
 export const HistoryPanel = (): JSX.Element => {
@@ -21,29 +20,29 @@ export const HistoryPanel = (): JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel title={t("history.title")} kicker={t("panel.historyDesc")} icon="lucide:book-open">
+      <Panel
+        title="Nhật ký điều hành"
+        kicker="Nhật ký các tháng và báo cáo năm."
+        icon="lucide:book-open"
+      >
         <div class="stat-grid">
           <Stat
-            label={t("finance.revenue")}
+            label="Doanh thu"
             value={formatBillion(
               state().finance.monthlyHistory.reduce((sum, row) => sum + row.revenueTotal, 0),
             )}
             icon="lucide:wallet"
           />
           <Stat
-            label={t("finance.net")}
+            label="Kết quả tháng"
             value={formatBillion(totalNet())}
             tone={totalNet() >= 0 ? "good" : "bad"}
             icon="lucide:chart-column"
           />
+          <Stat label="Dư nợ" value={formatBillion(state().finance.debt)} icon="lucide:landmark" />
           <Stat
-            label={t("hud.debt")}
-            value={formatBillion(state().finance.debt)}
-            icon="lucide:landmark"
-          />
-          <Stat
-            label={t("panel.history")}
-            value={t("chart.months", { count: state().finance.monthlyHistory.length })}
+            label="Lịch sử"
+            value={`${state().finance.monthlyHistory.length} tháng gần nhất`}
             icon="lucide:calendar"
           />
         </div>
@@ -51,13 +50,13 @@ export const HistoryPanel = (): JSX.Element => {
           <table class="data-table">
             <thead>
               <tr>
-                <th>{t("history.month")}</th>
-                <th>{t("history.revenue")}</th>
-                <th>{t("history.net")}</th>
-                <th>{t("history.debt")}</th>
-                <th>{t("history.tariff")}</th>
-                <th>{t("history.rice")}</th>
-                <th>{t("history.reliability")}</th>
+                <th>Tháng</th>
+                <th>Doanh thu</th>
+                <th>Kết quả</th>
+                <th>Dư nợ</th>
+                <th>Giá BQ</th>
+                <th>Giá gạo</th>
+                <th>Ổn định</th>
               </tr>
             </thead>
             <tbody>
@@ -78,17 +77,13 @@ export const HistoryPanel = (): JSX.Element => {
           </table>
         </div>
         <ActionButton size="sm" variant="ghost" onClick={() => setExpanded(!expanded())}>
-          {expanded() ? t("history.showLess") : t("history.showMore")}
+          {expanded() ? "Thu gọn" : "Xem thêm"}
         </ActionButton>
       </Panel>
 
-      <Panel
-        title={t("panel.history")}
-        kicker={t("finance.reportYear", { year: state().clock.year })}
-        icon="lucide:calendar"
-      >
+      <Panel title="Lịch sử" kicker={`Báo cáo năm ${state().clock.year}`} icon="lucide:calendar">
         {state().finance.annualHistory.length === 0 ? (
-          <p class="muted">{t("finance.noHistory")}</p>
+          <p class="muted">Chưa có dữ liệu. Hãy kết thúc tháng đầu tiên.</p>
         ) : (
           state().finance.annualHistory.map((report) => (
             <div class="annual-card">
@@ -100,24 +95,12 @@ export const HistoryPanel = (): JSX.Element => {
               </div>
               <Divider />
               <div class="annual-grid">
-                <span>
-                  {t("finance.reportRevenue")}: {formatBillion(report.revenue)}
-                </span>
-                <span>
-                  {t("finance.reportDebt")}: {formatBillion(report.debtEnd)}
-                </span>
-                <span>
-                  {t("finance.reportReliability")}: {formatPercent(report.reliability)}
-                </span>
-                <span>
-                  {t("finance.reportInflation")}: {formatPercent(report.inflationAverage)}
-                </span>
-                <span>
-                  {t("finance.reportTrust")}: {formatPercent(report.trustAverage)}
-                </span>
-                <span>
-                  {t("hud.coverage")}: {formatPercent(report.coverage)}
-                </span>
+                <span>Doanh thu năm: {formatBillion(report.revenue)}</span>
+                <span>Nợ cuối năm: {formatBillion(report.debtEnd)}</span>
+                <span>Độ ổn định TB: {formatPercent(report.reliability)}</span>
+                <span>Lạm phát TB: {formatPercent(report.inflationAverage)}</span>
+                <span>Tín nhiệm TB: {formatPercent(report.trustAverage)}</span>
+                <span>Bao phủ đường: {formatPercent(report.coverage)}</span>
               </div>
             </div>
           ))

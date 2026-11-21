@@ -3,7 +3,6 @@ import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { ActionButton, Badge, Bar, Panel, SectionHeading, Stat } from "../components/base";
 import { Icon, type IconName } from "../components/icons";
-import { t } from "../localization";
 import { formatBillion, formatPercent, formatPrice, formatTonne } from "~/state/format";
 import { investmentCost, productionCostPerTonne, type InvestmentKind } from "~/domain";
 
@@ -15,21 +14,36 @@ interface InvestmentCard {
 }
 
 const investments: readonly InvestmentCard[] = [
-  { kind: "hydro", label: "action.hydro", desc: "action.hydroDesc", icon: "lucide:droplets" },
+  {
+    kind: "hydro",
+    label: "Mở ruộng nước",
+    desc: "Tăng công suất thủy lợi, chịu ảnh hưởng hạn hán.",
+    icon: "lucide:droplets",
+  },
   {
     kind: "mechanized",
-    label: "action.mechanized",
-    desc: "action.mechanizedDesc",
+    label: "Mở ruộng cơ giới",
+    desc: "Công suất ổn định hơn, cần phân bón và R&D.",
     icon: "lucide:factory",
   },
   {
     kind: "irrigation",
-    label: "action.irrigation",
-    desc: "action.irrigationDesc",
+    label: "Nâng thủy lợi",
+    desc: "Giảm tác động hạn hán lên ruộng nước.",
     icon: "lucide:cloud-rain",
   },
-  { kind: "rnd", label: "action.rnd", desc: "action.rndDesc", icon: "lucide:sparkles" },
-  { kind: "fleet", label: "action.fleet", desc: "action.fleetDesc", icon: "lucide:truck" },
+  {
+    kind: "rnd",
+    label: "Đầu tư R&D",
+    desc: "Tăng năng suất và giảm chi phí sản xuất.",
+    icon: "lucide:sparkles",
+  },
+  {
+    kind: "fleet",
+    label: "Mua thêm xe",
+    desc: "Tăng 20 xe, giảm chi phí vận chuyển.",
+    icon: "lucide:truck",
+  },
 ];
 
 export const ProductionPanel = (): JSX.Element => {
@@ -49,89 +63,86 @@ export const ProductionPanel = (): JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel title={t("panel.production")} kicker={t("pillar.productionTag")} icon="tabler:wheat">
+      <Panel title="Sản xuất" kicker="Phát điện · Ruộng và nông trại" icon="tabler:wheat">
         <div class="stat-grid">
           <Stat
-            label={t("prod.harvest")}
+            label="Sản lượng tự sản xuất"
             value={formatTonne(own())}
-            hint={t("prod.external")}
+            hint="Mua từ nông dân tư nhân"
             icon="tabler:wheat"
           />
           <Stat
-            label={t("prod.selfSufficiency")}
+            label="Tỷ lệ tự chủ"
             value={formatPercent(selfSufficiency())}
             tone={selfSufficiency() >= 40 ? "good" : "warn"}
             icon="lucide:gauge"
           />
           <Stat
-            label={t("prod.stock")}
+            label="Tồn kho"
             value={formatTonne(production().riceInventory)}
             tone={production().riceInventory > 60 ? "good" : "warn"}
             icon="lucide:warehouse"
           />
           <Stat
-            label={t("prod.demand")}
+            label="Nhu cầu tháng"
             value={formatTonne(last()?.totalDemand ?? 0)}
             icon="lucide:users"
           />
         </div>
         <div class="supply-mix">
-          <span class="muted">{t("pillar.supplyMix")}</span>
+          <span class="muted">Cơ cấu nguồn cung</span>
           <div class="supply-mix-bar">
             <span class="mix-self" style={{ width: `${selfSufficiency()}%` }} />
             <span class="mix-private" style={{ width: `${100 - selfSufficiency()}%` }} />
           </div>
           <div class="supply-mix-legend">
             <span>
-              <i class="dot dot-self" /> {t("pillar.state")} {Math.round(selfSufficiency())}%
+              <i class="dot dot-self" /> Nhà nước {Math.round(selfSufficiency())}%
             </span>
             <span>
-              <i class="dot dot-private" /> {t("pillar.private")}{" "}
-              {Math.round(100 - selfSufficiency())}%
+              <i class="dot dot-private" /> Tư nhân {Math.round(100 - selfSufficiency())}%
             </span>
           </div>
         </div>
       </Panel>
 
-      <Panel title={t("pillar.production")} kicker={t("action.invest")} icon="lucide:factory">
-        <SectionHeading title={t("prod.hydro")} hint={t("prod.droughtHelp")} />
+      <Panel title="Sản xuất" kicker="Đầu tư" icon="lucide:factory">
+        <SectionHeading title="Ruộng nước" hint="Hạn hán làm giảm mạnh sản lượng ruộng nước." />
         <div class="line-stats">
-          <span>{t("prod.unitsValue", { count: production().hydroPaddies })}</span>
+          <span>{`${production().hydroPaddies} đơn vị`}</span>
           <Badge tone={market().drought > 0.6 ? "bad" : "good"}>
-            {t("prod.drought")}: {formatPercent(market().drought * 100)}
+            Chỉ số hạn hán: {formatPercent(market().drought * 100)}
           </Badge>
         </div>
         <div class="line-stats">
-          <span>{t("prod.unitsValue", { count: production().mechanizedPaddies })}</span>
-          <Badge tone="gold">
-            {t("prod.irrigation")}: {production().irrigationLevel}
-          </Badge>
+          <span>{`${production().mechanizedPaddies} đơn vị`}</span>
+          <Badge tone="gold">Mức thủy lợi: {production().irrigationLevel}</Badge>
         </div>
         <div class="market-grid">
           <Stat
-            label={t("prod.fertilizer")}
+            label="Giá phân bón"
             value={formatPrice(market().fertilizerPrice)}
             icon="lucide:leaf"
           />
           <Stat
-            label={t("prod.fuel")}
+            label="Giá nhiên liệu"
             value={formatPrice(market().fuelPrice)}
             icon="lucide:truck"
           />
+          <Stat label="Tỷ giá" value={market().exchangeRate.toFixed(2)} icon="lucide:scale" />
           <Stat
-            label={t("prod.exchange")}
-            value={market().exchangeRate.toFixed(2)}
-            icon="lucide:scale"
-          />
-          <Stat
-            label={t("prod.costPerTonne")}
+            label="Chi phí sản xuất/tấn"
             value={formatPrice(productionCostPerTonne(market(), production().rndLevel))}
             icon="lucide:coins"
           />
         </div>
       </Panel>
 
-      <Panel title={t("action.invest")} kicker={t("panel.productionDesc")} icon="lucide:sparkles">
+      <Panel
+        title="Đầu tư"
+        kicker="Ruộng nước, ruộng cơ giới và nguồn cung tư nhân."
+        icon="lucide:sparkles"
+      >
         <div class="action-list">
           <For each={investments}>
             {(item) => (
@@ -141,14 +152,14 @@ export const ProductionPanel = (): JSX.Element => {
                     <Icon icon={item.icon} size={18} />
                   </span>
                   <div>
-                    <strong>{t(item.label)}</strong>
-                    <p>{t(item.desc)}</p>
+                    <strong>{item.label}</strong>
+                    <p>{item.desc}</p>
                   </div>
                 </div>
                 <div class="action-cost">
                   <span>{formatBillion(investmentCost(state(), item.kind))}</span>
                   <ActionButton size="sm" variant="gold" onClick={() => actions.invest(item.kind)}>
-                    {t("action.invest")}
+                    Đầu tư
                   </ActionButton>
                 </div>
               </div>
@@ -160,24 +171,24 @@ export const ProductionPanel = (): JSX.Element => {
                 <Icon icon="lucide:warehouse" size={18} />
               </span>
               <div>
-                <strong>{t("action.importRice")}</strong>
-                <p>{t("action.importRiceDesc")}</p>
+                <strong>Nhập gạo dự trữ</strong>
+                <p>Mua 100 nghìn tấn theo giá thị trường hiện tại.</p>
               </div>
             </div>
             <div class="action-cost">
               <span>{formatBillion(100 * market().ricePrice * 1.03)}</span>
               <ActionButton size="sm" variant="primary" onClick={() => actions.importRice()}>
-                {t("action.import")}
+                Nhập
               </ActionButton>
             </div>
           </div>
         </div>
       </Panel>
 
-      <Panel title={t("prod.demand")} kicker={t("overview.situation")} icon="lucide:users">
+      <Panel title="Nhu cầu tháng" kicker="Tình hình tháng này" icon="lucide:users">
         <div class="meter-block">
           <div class="meter-row">
-            <span>{t("hud.reliability")}</span>
+            <span>Độ ổn định cấp gạo</span>
             <strong>{formatPercent(state().metrics.reliability)}</strong>
           </div>
           <Bar
@@ -187,11 +198,11 @@ export const ProductionPanel = (): JSX.Element => {
         </div>
         <div class="meter-block">
           <div class="meter-row">
-            <span>{t("pillar.deficit")}</span>
+            <span>Thiếu hụt</span>
             <strong>
               {last()?.shortage && last()!.shortage > 0.5
                 ? formatTonne(last()!.shortage)
-                : t("pillar.zero")}
+                : "Không thiếu hụt"}
             </strong>
           </div>
           <Bar value={Math.min(100, (last()?.shortage ?? 0) * 2)} tone="bad" />

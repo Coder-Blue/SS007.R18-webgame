@@ -3,7 +3,9 @@
 ## Language and names
 
 - Source, identifiers, tests, comments, commits and docs are English.
-- In-game copy is Vietnamese and lives only in `src/ui/localization/`.
+- In-game copy is Vietnamese written directly in the Solid component that
+  renders it. Event copy is colocated in `src/ui/modals/event-modal.tsx` because
+  domain events carry keys; there is no shared dictionary or translation layer.
 - Files are `kebab-case.ts` / `kebab-case.tsx`. Types and components are
   `PascalCase`; values and functions are `camelCase`; constants are
   `SCREAMING_SNAKE_CASE` only for module-level balance constants.
