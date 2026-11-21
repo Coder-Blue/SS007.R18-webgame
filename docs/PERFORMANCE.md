@@ -1,5 +1,9 @@
 # Performance Optimization Report
 
+This is the durable record for the performance work. The temporary
+`WEBSITE_PERFORMANCE_SCALABILITY_MASTER_SPEC.md` was intentionally not
+committed and is no longer in the repository.
+
 ## 1. Architecture Detected
 
 - Frontend: SolidJS 2 with `@solidjs/web`, TanStack Start (Solid), TanStack Solid Query, Tailwind CSS 4, UI SDK for Solid, Iconify subset, Three.js and GSAP.
@@ -75,20 +79,26 @@ The local TBT is dominated by the 3D scene running under software rendering; the
 - Cache API responses: Not applicable. There are no API endpoints; static assets have an explicit cache policy.
 - Database indexes: Not applicable. There is no database.
 - Image compression: Implemented. WebP posters are 24 kB and 9.2 kB with explicit dimensions.
-- Loading skeletons: Implemented. The scene has status and retry states; existing panel loading states are preserved.
+- Loading skeletons: Implemented for the only async state. The scene has loading, status and retry states; panels render synchronously and need no skeleton.
 - Expensive query caching: Not applicable. There is no database or remote query.
 - N+1 prevention: Not applicable. There is no database.
 - Debounced inputs: Not applicable. All sliders and inputs are local and immediate.
 - Code splitting: Implemented. The scene is game-only plus Three.js/GSAP vendor chunks.
 - CDN: Already handled. Vercel's managed edge CDN was already present and is used.
 - Server-side caching: Not applicable. There are no expensive server reads; static-shell and asset caching cover the surface.
-- Lighthouse audit: Implemented. Mobile and desktop run against a production build.
+- Lighthouse audit: Implemented. At revision `a8a3d14`, mobile and desktop run against the live production deployment and the local production build.
 - API payload compression: Already handled. Vercel Brotli/gzip; there is no JSON API.
 - Reduced unnecessary re-renders: Implemented. Solid fine-grained updates and an rAF counter tween; no broad context additions.
 - JS/CSS minification: Implemented. Vite production build.
 - Lazy loading: Implemented. The 3D scene is dynamic; the title poster is eager because it is above the fold.
+- LCP asset priority: Implemented. The poster is eager with explicit dimensions; the 3D scene is deferred.
 - Deferred non-critical scripts: Implemented. There are no third-party scripts; the scene is dynamically imported.
-- Removed unused npm packages: Implemented. Dependency audit found none unused.
+- Static asset caching: Already handled. Vercel serves hashed `/assets/*` as one-year immutable; fonts and posters use thirty days.
+- Removed unused npm packages: Audited. Every runtime dependency is referenced; no package was removed.
+- Sensitive data in shared caches: Implemented. The app is localStorage-only and serves no user-specific HTML or JSON.
+- Unnecessary architecture: Avoided. No database, Redis, CDN provider or app-level load balancer was added.
+- Production build and gates: Implemented. Build, lint, typecheck, tests, coverage and the bundle gate pass.
+- Before/after evidence: Implemented. This report records both runs and the source revisions.
 - Database connection pooling: Not applicable. There is no database.
 - Load balancer assessed/configured: Already handled. Vercel-managed; no app-level balancer needed.
 
@@ -98,25 +108,32 @@ Local production build through the same gzip proxy:
 
 | Metric | Before | After | Change |
 |---|---:|---:|---:|
-| Lighthouse Performance, mobile | 47 | 93 | +46 |
+| Lighthouse Performance, mobile | 47 | 95 | +48 |
 | Lighthouse Performance, desktop | 67 | 100 | +33 |
-| LCP, mobile | 6.3 s | 3.2 s | -3.1 s |
+| LCP, mobile | 6.3 s | 2.9 s | -3.4 s |
 | LCP, desktop | 1.1 s | 0.7 s | -0.4 s |
 | TBT, mobile | 142,560 ms | 10 ms | eliminated |
 | TBT, desktop | 19,550 ms | 0 ms | eliminated |
 | CLS, mobile | 0.009 | 0.001 | -0.008 |
 | CLS, desktop | 0 | 0.001 | negligible |
-| Initial JS | 1,268.6 kB min / 384.3 kB gzip | 641.9 kB min / 214.1 kB gzip | -49.4% min / -44.3% gzip |
+| Initial JS | 1,268.6 kB min / 384.3 kB gzip | 642.0 kB min / 214.1 kB gzip | -49.4% min / -44.3% gzip |
 | Deferred game scene | in the initial chunk | 630.0 kB min / 169.9 kB gzip after start | moved off first load |
 | Initial transfer | 933 KiB | 419 KiB | -55% |
 | Slowest API | none | none | n/a |
 | Slowest DB query | none | none | n/a |
 
-Live production after the performance and CWV PRs: mobile 92 / accessibility 100 / best practices 100 / SEO 100, LCP 3.2 s, TBT 0 ms, CLS 0, total transfer 395 KiB; desktop 97 / 100 / 100 / 100, LCP 1.1 s, CLS 0.007. The unslop build keeps mobile 93 and desktop 100 in the local gzip harness.
+Live production at merge revision `a8a3d14` (`https://monopoly-nhom5.vercel.app`):
+
+| Strategy | Performance | Accessibility | Best Practices | SEO | LCP | TBT | CLS | Transfer |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Mobile | 98 | 100 | 100 | 100 | 2.2 s | 10 ms | 0 | 428 KiB |
+| Desktop | 100 | 100 | 100 | 100 | 0.7 s | 0 ms | 0.003 | 443 KiB |
+
+The baseline live run was `54` performance, `4.1 s` LCP, `7,100 ms` TBT and `628 KiB` transfer. Both final strategies are green in all four Lighthouse categories, and the mobile LCP now meets the 2.5 s target.
 
 ## 6. Remaining Bottlenecks
 
-- Mobile LCP is 3.2 s in the simulated slow-4G run, close to but above the 2.5 s target. The remaining cost is the 25 kB gzip render-blocking stylesheet and font startup; a critical-CSS split or a smaller title-only font subset is the next step.
+- Mobile LCP is 2.9 s in the local gzip harness and 2.2 s on the live Vercel deployment, inside the 2.5 s target. The remaining lab cost is the 25 kB gzip stylesheet and font startup; a critical-CSS split is the optional next step.
 - Starting a game still downloads Three.js and GSAP (about 170 kB gzip). This is after user intent and does not affect the title benchmark.
 - The initial route chunk still contains the game panels and HUD because `GameShell` imports them statically. Lighthouse reports unused JavaScript on the title; lazy-loading the game UI after Start is the next safe reduction.
 - Chrome UX Report has no field data for this project yet, so the scores are lab measurements.
@@ -142,13 +159,18 @@ Live production after the performance and CWV PRs: mobile 92 / accessibility 100
 ## Evidence Commands
 
 ```bash
+# Final revision: a8a3d14. Baseline revision: 8530282.
 pnpm quality
 pnpm check:bundle
-PLAYWRIGHT_SERVER=start PLAYWRIGHT_PORT=3108 \
+PLAYWRIGHT_SERVER=start PLAYWRIGHT_PORT=3123 \
   PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/nix/store/.../bin/chromium \
-  pnpm exec playwright test tests/e2e/game.spec.ts tests/e2e/font-loading.spec.ts --project=desktop
-CHROME_PATH=/nix/store/.../bin/chromium npx lighthouse@12.8.2 <url> \
+  pnpm exec playwright test --project=desktop --project=mobile
+CHROME_PATH=/nix/store/.../bin/chromium npx lighthouse@12.8.2 \
+  https://monopoly-nhom5.vercel.app/ \
+  --only-categories=performance,accessibility,best-practices,seo
+CHROME_PATH=/nix/store/.../bin/chromium npx lighthouse@12.8.2 \
+  https://monopoly-nhom5.vercel.app/ --preset=desktop \
   --only-categories=performance,accessibility,best-practices,seo
 ```
 
-`pnpm quality` final output: 22 test files / 173 tests passed, lint, format, line budget, emoji, domain boundary, coverage, production build and bundle budget all green.
+`pnpm quality` final output: 22 test files / 173 tests passed, lint, format, line budget, emoji, domain boundary, coverage, production build and bundle budget all green. The production Playwright run printed `31 passed`, `3 skipped` across the desktop and mobile projects. `pnpm check:bundle` printed 11 chunks, every chunk at or below 500 kB, and `Initial shell: 10 JavaScript preloads, no Three.js or GSAP`.
