@@ -133,7 +133,7 @@ The baseline live run was `54` performance, `4.1 s` LCP, `7,100 ms` TBT and `628
 
 ## 6. Remaining Bottlenecks
 
-- Mobile LCP is 2.9 s in the local gzip harness and 2.2 s on the live Vercel deployment, inside the 2.5 s target. The remaining lab cost is the 25 kB gzip stylesheet and font startup; a critical-CSS split is the optional next step.
+- Mobile LCP is 2.2 s on the live Vercel deployment, inside the 2.5 s target. The local gzip harness still measures 2.9 s, about 0.4 s above the target; the remaining lab cost is the 25 kB gzip stylesheet and font startup, so a critical-CSS split is the optional next step.
 - Starting a game still downloads Three.js and GSAP (about 170 kB gzip). This is after user intent and does not affect the title benchmark.
 - The initial route chunk still contains the game panels and HUD because `GameShell` imports them statically. Lighthouse reports unused JavaScript on the title; lazy-loading the game UI after Start is the next safe reduction.
 - Chrome UX Report has no field data for this project yet, so the scores are lab measurements.
