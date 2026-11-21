@@ -1,0 +1,30 @@
+# Local gates. CI repeats them on every pull request.
+min_version: 2.2.2
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: lint
+      glob: "*.{ts,tsx,js,mjs}"
+      run: pnpm exec oxlint {staged_files}
+
+    - name: format
+      glob: "*.{ts,tsx,css,json}"
+      run: pnpm exec oxfmt --check {staged_files}
+
+    - name: file-budget
+      run: pnpm check:lines
+
+    - name: emoji
+      run: pnpm check:emoji
+
+    - name: layer-boundary
+      run: pnpm check:domain
+
+    - name: tests
+      run: pnpm test
+
+pre-push:
+  jobs:
+    - name: quality
+      run: pnpm quality

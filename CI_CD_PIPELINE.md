@@ -15,6 +15,9 @@ The reviewer owns auto-merge. All six gates must pass with visible output:
    desktop `1440x900`, tablet `768x1024`, mobile `390x844` and narrow `360x740`.
 6. An independent reviewer applies `approved-by-thermo-nuclear-review`.
 
+Lefthook mirrors the fast gates on `pre-commit` and the full `pnpm quality`
+suite on `pre-push`. A hook bypass is not evidence; CI still runs every gate.
+
 Run everything locally with:
 
 ```bash

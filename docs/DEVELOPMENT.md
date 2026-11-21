@@ -31,6 +31,19 @@ reads `/usr/bin/ldd` before `process.report`, which misidentifies a glibc Node
 inside the Nix shell on Chimera. The patches consult the runtime report first
 and `pnpm-workspace.yaml` installs both glibc and musl native bindings.
 
+## Git hooks
+
+`pnpm install` runs `lefthook install` through the `prepare` script. The
+checked-in `lefthook.yml` defines the local gates:
+
+- `pre-commit`: oxlint on staged TypeScript, oxfmt check on staged source, the
+  file budget, emoji, layer-boundary audits, and the Vitest suite.
+- `pre-push`: the full `pnpm quality` gate.
+
+Run the hooks manually with `pnpm exec lefthook run pre-commit`. Use
+`LEFTHOOK=0` or `git commit --no-verify` only for an emergency, and state why in
+the pull request. CI repeats every gate, so a bypass cannot merge unreviewed.
+
 ## Source layout
 
 - `src/domain`: pure economy and state transitions.

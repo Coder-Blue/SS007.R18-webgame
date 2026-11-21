@@ -13,9 +13,10 @@ pnpm install
 pnpm dev
 ```
 
-`direnv` selects `.#default` on glibc and `.#musl` on musl hosts. Playwright
-uses the host browser cache by default; `nix develop .#playwright` provides a
-Nix Chromium and the required shared libraries.
+`direnv` selects `.#default` on glibc and `.#musl` on musl hosts. On Linux,
+`nix develop .#playwright` provides a Nix Chromium and the required shared
+libraries; macOS uses the host browser cache. `pnpm install` also installs the
+Lefthook pre-commit and pre-push gates.
 
 ## Before opening a change
 
