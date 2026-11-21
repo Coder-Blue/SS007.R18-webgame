@@ -13,12 +13,35 @@ const vercelSource = readSource("../vercel.json");
 const fontDirectory = fileURLToPath(new URL("../public/fonts", import.meta.url));
 
 const faces = [
-  { file: "be-vietnam-pro-regular.ttf", weight: 400 },
-  { file: "be-vietnam-pro-medium.ttf", weight: 500 },
-  { file: "be-vietnam-pro-semibold.ttf", weight: 600 },
-  { file: "be-vietnam-pro-bold.ttf", weight: 700 },
-  { file: "be-vietnam-pro-extrabold.ttf", weight: 800 },
+  { weight: 400, ttf: "be-vietnam-pro-regular.ttf" },
+  { weight: 500, ttf: "be-vietnam-pro-medium.ttf" },
+  { weight: 600, ttf: "be-vietnam-pro-semibold.ttf" },
+  { weight: 700, ttf: "be-vietnam-pro-bold.ttf" },
+  { weight: 800, ttf: "be-vietnam-pro-extrabold.ttf" },
 ] as const;
+
+const woff2File = (weight: number, subset: "latin" | "vietnamese"): string =>
+  `be-vietnam-pro-${weight}-${subset}.woff2`;
+
+const woff2Files = faces.flatMap((face) => [
+  woff2File(face.weight, "vietnamese"),
+  woff2File(face.weight, "latin"),
+]);
+
+const criticalPreloads = [
+  "be-vietnam-pro-400-vietnamese.woff2",
+  "be-vietnam-pro-400-latin.woff2",
+  "be-vietnam-pro-800-vietnamese.woff2",
+  "be-vietnam-pro-800-latin.woff2",
+];
+
+const vietnameseRange =
+  "U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, " +
+  "U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB";
+
+const latinRange =
+  "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, " +
+  "U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD";
 
 const tableOffset = (data: Buffer, tag: string): number => {
   const tableCount = data.readUInt16BE(4);
@@ -42,6 +65,16 @@ const readTtfWeight = (file: string): number => {
   );
 
   return data.readUInt16BE(tableOffset(data, "OS/2") + 4);
+};
+
+const readWoff2 = (file: string): void => {
+  const data = readFileSync(`${fontDirectory}/${file}`);
+
+  expect(data.subarray(0, 4), `${file} has a WOFF2 signature`).toEqual(
+    Buffer.from([0x77, 0x4f, 0x46, 0x32]),
+  );
+  expect(data.readUInt32BE(4), `${file} is TrueType flavored`).toBe(0x00010000);
+  expect(data.readUInt32BE(8), `${file} length header matches file size`).toBe(data.byteLength);
 };
 
 const readCmap = (data: Buffer): ReadonlySet<number> => {
@@ -124,6 +157,23 @@ const registrations = [
 
 const registeredWeights = new Set(registrations.map((entry) => entry.weight));
 
+const cssFaces = [...cssSource.matchAll(/@font-face\s*\{([\s\S]*?)\}/g)].map((match) => {
+  const block = capture(match, 1);
+  const weight = /font-weight:\s*(\d+);/.exec(block);
+  const file = /url\("([^"]+)"\)/.exec(block);
+  const range = /unicode-range:\s*([^;]+);/.exec(block);
+
+  if (weight === null || file === null || range === null) {
+    throw new Error(`Incomplete @font-face block: ${block}`);
+  }
+
+  return {
+    weight: Number(capture(weight, 1)),
+    file: capture(file, 1),
+    range: capture(range, 1).replace(/\s+/g, " ").trim(),
+  };
+});
+
 const fontFiles = readdirSync(fontDirectory).filter((entry) =>
   /\.(?:ttf|otf|woff2?)$/i.test(entry),
 );
@@ -139,70 +189,96 @@ describe("local font manifest", () => {
 
     const fileByWeight = new Map(registrations.map((entry) => [entry.weight, entry.file]));
 
-    for (const face of faces.filter((entry) => entry.weight >= 600)) {
-      expect(fileByWeight.get(face.weight), `weight ${face.weight} uses the right file`).toBe(
-        face.file,
-      );
+    for (const face of faces) {
+      if (registeredWeights.has(face.weight)) {
+        expect(fileByWeight.get(face.weight), `weight ${face.weight} uses the right file`).toBe(
+          face.ttf,
+        );
+      }
     }
   });
 
-  test("references only existing TTF files", () => {
+  test("references only existing TTF files from the OG route", () => {
     for (const entry of registrations) {
       expect(entry.file, "uses a TTF filename").toMatch(/^be-vietnam-pro-[a-z]+\.ttf$/);
       expect(existsSync(`${fontDirectory}/${entry.file}`), `${entry.file} exists`).toBe(true);
     }
   });
 
-  test("ships exactly one TTF for every UI weight and no WOFF2 files", () => {
-    expect(fontFiles.filter((file) => file.endsWith(".woff2"))).toEqual([]);
-    expect(fontFiles.toSorted()).toEqual(faces.map((face) => face.file).toSorted());
+  test("ships five TTF OG faces and ten WOFF2 UI faces", () => {
+    expect(fontFiles.filter((file) => file.endsWith(".ttf")).toSorted()).toEqual(
+      faces.map((face) => face.ttf).toSorted(),
+    );
+    expect(fontFiles.filter((file) => file.endsWith(".woff2")).toSorted()).toEqual(
+      woff2Files.toSorted(),
+    );
+    expect(fontFiles).toHaveLength(faces.length + woff2Files.length);
   });
 
   test("every TTF is valid and declares the expected weight", () => {
     for (const face of faces) {
-      expect(readTtfWeight(face.file), `${face.file} declares weight ${face.weight}`).toBe(
+      expect(readTtfWeight(face.ttf), `${face.ttf} declares weight ${face.weight}`).toBe(
         face.weight,
       );
     }
   });
 
-  test("every TTF covers the Vietnamese diacritics used by the UI", () => {
+  test("every WOFF2 pair carries the WOFF2 magic bytes", () => {
+    for (const file of woff2Files) {
+      expect(() => readWoff2(file), `${file} is a valid WOFF2 file`).not.toThrow();
+    }
+  });
+
+  test("every TTF covers the Vietnamese diacritics used by the OG image", () => {
     for (const face of faces) {
-      const covered = readCmap(readFileSync(`${fontDirectory}/${face.file}`));
+      const covered = readCmap(readFileSync(`${fontDirectory}/${face.ttf}`));
 
       for (const codepoint of vietnameseCodepoints) {
-        expect(covered.has(codepoint), `${face.file} covers U+${codepoint.toString(16)}`).toBe(
-          true,
-        );
+        expect(covered.has(codepoint), `${face.ttf} covers U+${codepoint.toString(16)}`).toBe(true);
       }
     }
   });
 
-  test("declares the TTF faces in CSS and preloads the critical weights", () => {
-    expect(cssSource).not.toMatch(/woff2?/);
-    expect(rootSource).not.toMatch(/woff2?/);
-    expect(cssSource.match(/format\("truetype"\)/g)).toHaveLength(5);
-
-    for (const face of faces) {
-      expect(cssSource).toMatch(
-        new RegExp(`font-weight: ${face.weight};[\\s\\S]*?url\\("/fonts/${face.file}"\\)`),
-      );
-    }
-
-    for (const file of ["be-vietnam-pro-regular.ttf", "be-vietnam-pro-extrabold.ttf"]) {
-      expect(rootSource).toContain(`/fonts/${file}`);
-      expect(rootSource).toContain('type: "font/ttf"');
-    }
+  test("declares ten WOFF2 faces with the exact latin and vietnamese ranges", () => {
+    expect(cssSource).not.toMatch(/format\("truetype"\)/);
+    expect(cssFaces).toEqual(
+      faces.flatMap((face) => [
+        {
+          weight: face.weight,
+          file: `/fonts/${woff2File(face.weight, "vietnamese")}`,
+          range: vietnameseRange,
+        },
+        {
+          weight: face.weight,
+          file: `/fonts/${woff2File(face.weight, "latin")}`,
+          range: latinRange,
+        },
+      ]),
+    );
   });
 
-  test("bundles OG fonts and caches public font assets", () => {
+  test("preloads only the four critical WOFF2 subsets", () => {
+    expect(rootSource).not.toContain(".ttf");
+
+    for (const file of criticalPreloads) {
+      expect(rootSource).toContain(`/fonts/${file}`);
+    }
+
+    expect(rootSource.match(/type: "font\/woff2"/g)).toHaveLength(criticalPreloads.length);
+  });
+
+  test("bundles TTF OG fonts and caches public font assets immutably", () => {
     expect(routeSource).not.toMatch(/woff2?/);
     expect(routeSource).toContain('font(origin, "be-vietnam-pro-regular.ttf", 400)');
+    expect(routeSource).toContain('font(origin, "be-vietnam-pro-semibold.ttf", 600)');
+    expect(routeSource).toContain('font(origin, "be-vietnam-pro-bold.ttf", 700)');
+    expect(routeSource).toContain('font(origin, "be-vietnam-pro-extrabold.ttf", 800)');
     expect(nitroSource).toContain('baseName: "fonts"');
     expect(nitroSource).toContain('dir: "./public/fonts"');
     expect(nitroSource).toContain('"/fonts/**"');
-    expect(nitroSource).toContain("public, max-age=604800");
+    expect(nitroSource).toContain("public, max-age=31536000, immutable");
     expect(vercelSource).toContain('"source": "/fonts/(.*)"');
     expect(vercelSource).toContain('"key": "Cache-Control"');
+    expect(vercelSource).toContain("public, max-age=31536000, immutable");
   });
 });
