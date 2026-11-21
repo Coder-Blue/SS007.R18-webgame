@@ -2,7 +2,7 @@ import { For } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { ActionButton, Badge, Bar, Panel, SectionHeading, Stat } from "../components/base";
-import { Icon } from "../components/icons";
+import { Icon, type IconName } from "../components/icons";
 import { t } from "../localization";
 import { formatBillion, formatPercent, formatPrice, formatTonne } from "~/state/format";
 import { investmentCost, productionCostPerTonne, type InvestmentKind } from "~/domain";
@@ -11,20 +11,25 @@ interface InvestmentCard {
   readonly kind: InvestmentKind;
   readonly label: string;
   readonly desc: string;
-  readonly icon: "droplets" | "factory" | "rain" | "spark" | "truck";
+  readonly icon: IconName;
 }
 
 const investments: readonly InvestmentCard[] = [
-  { kind: "hydro", label: "action.hydro", desc: "action.hydroDesc", icon: "droplets" },
+  { kind: "hydro", label: "action.hydro", desc: "action.hydroDesc", icon: "lucide:droplets" },
   {
     kind: "mechanized",
     label: "action.mechanized",
     desc: "action.mechanizedDesc",
-    icon: "factory",
+    icon: "lucide:factory",
   },
-  { kind: "irrigation", label: "action.irrigation", desc: "action.irrigationDesc", icon: "rain" },
-  { kind: "rnd", label: "action.rnd", desc: "action.rndDesc", icon: "spark" },
-  { kind: "fleet", label: "action.fleet", desc: "action.fleetDesc", icon: "truck" },
+  {
+    kind: "irrigation",
+    label: "action.irrigation",
+    desc: "action.irrigationDesc",
+    icon: "lucide:cloud-rain",
+  },
+  { kind: "rnd", label: "action.rnd", desc: "action.rndDesc", icon: "lucide:sparkles" },
+  { kind: "fleet", label: "action.fleet", desc: "action.fleetDesc", icon: "lucide:truck" },
 ];
 
 export const ProductionPanel = (): JSX.Element => {
@@ -44,30 +49,30 @@ export const ProductionPanel = (): JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel title={t("panel.production")} kicker={t("pillar.productionTag")} icon="rice">
+      <Panel title={t("panel.production")} kicker={t("pillar.productionTag")} icon="tabler:wheat">
         <div class="stat-grid">
           <Stat
             label={t("prod.harvest")}
             value={formatTonne(own())}
             hint={t("prod.external")}
-            icon="rice"
+            icon="tabler:wheat"
           />
           <Stat
             label={t("prod.selfSufficiency")}
             value={formatPercent(selfSufficiency())}
             tone={selfSufficiency() >= 40 ? "good" : "warn"}
-            icon="gauge"
+            icon="lucide:gauge"
           />
           <Stat
             label={t("prod.stock")}
             value={formatTonne(production().riceInventory)}
             tone={production().riceInventory > 60 ? "good" : "warn"}
-            icon="warehouse"
+            icon="lucide:warehouse"
           />
           <Stat
             label={t("prod.demand")}
             value={formatTonne(last()?.totalDemand ?? 0)}
-            icon="users"
+            icon="lucide:users"
           />
         </div>
         <div class="supply-mix">
@@ -88,7 +93,7 @@ export const ProductionPanel = (): JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("pillar.production")} kicker={t("action.invest")} icon="factory">
+      <Panel title={t("pillar.production")} kicker={t("action.invest")} icon="lucide:factory">
         <SectionHeading title={t("prod.hydro")} hint={t("prod.droughtHelp")} />
         <div class="line-stats">
           <span>{t("prod.unitsValue", { count: production().hydroPaddies })}</span>
@@ -106,26 +111,34 @@ export const ProductionPanel = (): JSX.Element => {
           <Stat
             label={t("prod.fertilizer")}
             value={formatPrice(market().fertilizerPrice)}
-            icon="leaf"
+            icon="lucide:leaf"
           />
-          <Stat label={t("prod.fuel")} value={formatPrice(market().fuelPrice)} icon="truck" />
-          <Stat label={t("prod.exchange")} value={market().exchangeRate.toFixed(2)} icon="scale" />
+          <Stat
+            label={t("prod.fuel")}
+            value={formatPrice(market().fuelPrice)}
+            icon="lucide:truck"
+          />
+          <Stat
+            label={t("prod.exchange")}
+            value={market().exchangeRate.toFixed(2)}
+            icon="lucide:scale"
+          />
           <Stat
             label={t("prod.costPerTonne")}
             value={formatPrice(productionCostPerTonne(market(), production().rndLevel))}
-            icon="coins"
+            icon="lucide:coins"
           />
         </div>
       </Panel>
 
-      <Panel title={t("action.invest")} kicker={t("panel.productionDesc")} icon="spark">
+      <Panel title={t("action.invest")} kicker={t("panel.productionDesc")} icon="lucide:sparkles">
         <div class="action-list">
           <For each={investments}>
             {(item) => (
               <div class="action-card">
                 <div class="action-card-main">
                   <span class="action-icon">
-                    <Icon name={item.icon} size={18} />
+                    <Icon icon={item.icon} size={18} />
                   </span>
                   <div>
                     <strong>{t(item.label)}</strong>
@@ -144,7 +157,7 @@ export const ProductionPanel = (): JSX.Element => {
           <div class="action-card">
             <div class="action-card-main">
               <span class="action-icon">
-                <Icon name="warehouse" size={18} />
+                <Icon icon="lucide:warehouse" size={18} />
               </span>
               <div>
                 <strong>{t("action.importRice")}</strong>
@@ -161,7 +174,7 @@ export const ProductionPanel = (): JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("prod.demand")} kicker={t("overview.situation")} icon="users">
+      <Panel title={t("prod.demand")} kicker={t("overview.situation")} icon="lucide:users">
         <div class="meter-block">
           <div class="meter-row">
             <span>{t("hud.reliability")}</span>

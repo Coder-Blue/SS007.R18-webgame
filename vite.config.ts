@@ -3,6 +3,7 @@ import { tanstackStart } from "@tanstack/solid-start/plugin/vite";
 import solid from "@solidjs/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
+import { iconifySubset } from "./build/iconify-subset";
 
 export default defineConfig({
   server: {
@@ -16,6 +17,7 @@ export default defineConfig({
     exclude: ["@ui-sdk/core"],
   },
   plugins: [
+    iconifySubset(),
     tailwindcss(),
     tanstackStart({ spa: { enabled: true } }),
     solid({ ssr: true }),

@@ -32,7 +32,7 @@ export const PolicyPanel = (): JSX.Element => {
       enabled: () => state().policy.nsmo,
       action: () => actions.enableNsmo(),
       cost: 250,
-      icon: "bolt" as const,
+      icon: "lucide:zap" as const,
     },
     {
       key: "dppa" as const,
@@ -41,7 +41,7 @@ export const PolicyPanel = (): JSX.Element => {
       enabled: () => state().policy.dppa,
       action: () => actions.enableDppa(),
       cost: 400,
-      icon: "leaf" as const,
+      icon: "lucide:leaf" as const,
     },
     {
       key: "vrem" as const,
@@ -50,13 +50,13 @@ export const PolicyPanel = (): JSX.Element => {
       enabled: () => state().policy.vrem,
       action: () => actions.enableVrem(),
       cost: 350,
-      icon: "scale" as const,
+      icon: "lucide:scale" as const,
     },
   ];
 
   return (
     <div class="stack-lg">
-      <Panel title={t("policy.title")} kicker={t("panel.policyDesc")} icon="landmark">
+      <Panel title={t("policy.title")} kicker={t("panel.policyDesc")} icon="lucide:landmark">
         <div class="policy-hero">
           <div>
             <p class="eyebrow">{t("policy.debateScore")}</p>
@@ -65,7 +65,7 @@ export const PolicyPanel = (): JSX.Element => {
             <p class="muted">{t("policy.debateHelp")}</p>
           </div>
           <div class="policy-role-card">
-            <Icon name="landmark" size={26} />
+            <Icon icon="lucide:landmark" size={26} />
             <strong>{t("policy.roles")}</strong>
             <p>{t("policy.rolesText")}</p>
           </div>
@@ -75,7 +75,7 @@ export const PolicyPanel = (): JSX.Element => {
       <Panel
         title={t("policy.n2")}
         kicker={canN2() ? t("policy.enact") : t("finance.auditPending")}
-        icon="scale"
+        icon="lucide:scale"
       >
         <div class="policy-row">
           <div>
@@ -124,24 +124,24 @@ export const PolicyPanel = (): JSX.Element => {
             <Stat
               label={t("finance.eligible")}
               value={formatBillion(preview().eligibleLoss)}
-              icon="scale"
+              icon="lucide:scale"
             />
             <Stat
               label={t("finance.monthlyCredit")}
               value={formatBillion(preview().monthlyCredit)}
               tone="good"
-              icon="coins"
+              icon="lucide:coins"
             />
             <Stat
               label={t("finance.remaining")}
               value={formatBillion(preview().remaining)}
-              icon="clock"
+              icon="lucide:clock"
             />
             <Stat
               label={t("policy.inflation")}
               value={formatPercent(state().metrics.inflation)}
               tone={state().metrics.inflation > 8 ? "bad" : "warn"}
-              icon="trend-up"
+              icon="lucide:trending-up"
             />
           </div>
           <ActionButton variant="secondary" onClick={() => actions.setRecoveryRate(rate())}>
@@ -150,12 +150,12 @@ export const PolicyPanel = (): JSX.Element => {
         </Show>
       </Panel>
 
-      <Panel title={t("policy.roles")} kicker={t("panel.policy")} icon="bolt">
+      <Panel title={t("policy.roles")} kicker={t("panel.policy")} icon="lucide:zap">
         <div class="reform-list">
           {reforms.map((reform) => (
             <div class="reform-card" data-enabled={reform.enabled()}>
               <span class="action-icon">
-                <Icon name={reform.icon} size={18} />
+                <Icon icon={reform.icon} size={18} />
               </span>
               <div class="reform-main">
                 <div class="reform-head">
@@ -181,7 +181,7 @@ export const PolicyPanel = (): JSX.Element => {
           ))}
           <div class="reform-card" data-enabled={state().policy.twoPartTariff}>
             <span class="action-icon">
-              <Icon name="gauge" size={18} />
+              <Icon icon="lucide:gauge" size={18} />
             </span>
             <div class="reform-main">
               <div class="reform-head">
@@ -207,11 +207,11 @@ export const PolicyPanel = (): JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("panel.policy")} kicker={t("pillar.retail")} icon="shield">
+      <Panel title={t("panel.policy")} kicker={t("pillar.retail")} icon="lucide:shield">
         <div class="policy-actions">
           <ActionButton
             variant="secondary"
-            icon="spark"
+            icon="lucide:sparkles"
             disabled={state().policy.campaignCooldown > 0}
             onClick={() => actions.invest("campaign")}
           >
@@ -219,7 +219,7 @@ export const PolicyPanel = (): JSX.Element => {
           </ActionButton>
           <ActionButton
             variant="secondary"
-            icon="shield"
+            icon="lucide:shield"
             disabled={state().policy.antiSmuggling}
             onClick={() => actions.invest("crackdown")}
           >

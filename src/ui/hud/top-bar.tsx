@@ -24,7 +24,7 @@ export const TopBar = (props: {
     <header class="top-bar">
       <div class="brand-block">
         <div class="brand-mark">
-          <Icon name="rice" size={22} />
+          <Icon icon="tabler:wheat" size={22} />
         </div>
         <div class="brand-copy">
           <strong>{t("app.title")}</strong>
@@ -43,7 +43,7 @@ export const TopBar = (props: {
       <div class="top-gauges desktop-only">
         <div class="top-gauge" data-tone="gold">
           <div class="top-gauge-label">
-            <Icon name="wallet" size={15} />
+            <Icon icon="lucide:wallet" size={15} />
             <span>{t("hud.cash")}</span>
           </div>
           <strong>
@@ -56,7 +56,7 @@ export const TopBar = (props: {
         </div>
         <div class="top-gauge" data-tone={debtRatio() > 80 ? "bad" : "warn"}>
           <div class="top-gauge-label">
-            <Icon name="landmark" size={15} />
+            <Icon icon="lucide:landmark" size={15} />
             <span>{t("hud.debt")}</span>
           </div>
           <strong>
@@ -66,7 +66,7 @@ export const TopBar = (props: {
         </div>
         <div class="top-gauge" data-tone="green">
           <div class="top-gauge-label">
-            <Icon name="users" size={15} />
+            <Icon icon="lucide:users" size={15} />
             <span>{t("hud.satisfaction")}</span>
           </div>
           <strong>
@@ -79,7 +79,7 @@ export const TopBar = (props: {
         </div>
         <div class="top-gauge" data-tone="green">
           <div class="top-gauge-label">
-            <Icon name="shield" size={15} />
+            <Icon icon="lucide:shield" size={15} />
             <span>{t("hud.trust")}</span>
           </div>
           <strong>
@@ -94,7 +94,7 @@ export const TopBar = (props: {
           <ActionButton
             class="advance-btn desktop-only"
             variant="gold"
-            icon={store.autoPlay() ? "pause" : "play"}
+            icon={store.autoPlay() ? "lucide:pause" : "lucide:play"}
             onClick={() => store.setAutoPlay(!store.autoPlay())}
             ariaLabel={store.autoPlay() ? t("hud.stopAuto") : t("hud.autoPlay")}
           >
@@ -103,7 +103,7 @@ export const TopBar = (props: {
           <ActionButton
             class="advance-btn"
             variant="primary"
-            icon="calendar"
+            icon="lucide:calendar"
             disabled={advance.isPending}
             onClick={runAdvance}
             ariaLabel={t("hud.endMonth")}
@@ -111,20 +111,24 @@ export const TopBar = (props: {
             {t("hud.endMonth")}
           </ActionButton>
         </Show>
-        <IconButton icon="book" label={t("hud.tutorial")} onClick={props.onOpenTutorial} />
-        <IconButton icon="save" label={t("save.title")} onClick={props.onOpenMenu} />
+        <IconButton
+          icon="lucide:book-open"
+          label={t("hud.tutorial")}
+          onClick={props.onOpenTutorial}
+        />
+        <IconButton icon="lucide:save" label={t("save.title")} onClick={props.onOpenMenu} />
       </div>
 
       <div class="mobile-status">
         <span class="mobile-date">{formatDate(state().clock.year, state().clock.month)}</span>
         <span>
-          <Icon name="wallet" size={14} /> {formatBillion(state().finance.cash)}
+          <Icon icon="lucide:wallet" size={14} /> {formatBillion(state().finance.cash)}
         </span>
         <span>
-          <Icon name="users" size={14} /> {formatPercent(state().metrics.satisfaction)}
+          <Icon icon="lucide:users" size={14} /> {formatPercent(state().metrics.satisfaction)}
         </span>
         <span>
-          <Icon name="shield" size={14} /> {formatPercent(state().metrics.trust)}
+          <Icon icon="lucide:shield" size={14} /> {formatPercent(state().metrics.trust)}
         </span>
         <Show when={recoveryOf(state()).monthlyCredit > 0}>
           <Badge tone="good">N-2</Badge>

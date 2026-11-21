@@ -78,53 +78,53 @@ export const EndingScreen = (): JSX.Element => {
                 label={t("ending.finalDebt")}
                 value={formatBillion(state().finance.debt)}
                 tone={state().finance.debt <= ARCHITECT_DEBT_MAX ? "good" : "bad"}
-                icon="landmark"
+                icon="lucide:landmark"
               />
               <Stat
                 label={t("ending.finalCash")}
                 value={formatBillion(state().finance.cash)}
                 tone="gold"
-                icon="wallet"
+                icon="lucide:wallet"
               />
               <Stat
                 label={t("ending.finalCoverage")}
                 value={formatPercent(state().infrastructure.coverage)}
                 tone={state().infrastructure.coverage >= 100 ? "good" : "warn"}
-                icon="road"
+                icon="lucide:road"
               />
               <Stat
                 label={t("ending.finalTrust")}
                 value={formatPercent(state().metrics.trust)}
                 tone={state().metrics.trust >= 55 ? "good" : "bad"}
-                icon="shield"
+                icon="lucide:shield"
               />
               <Stat
                 label={t("ending.finalSatisfaction")}
                 value={formatPercent(state().metrics.satisfaction)}
                 tone={state().metrics.satisfaction >= 55 ? "good" : "bad"}
-                icon="users"
+                icon="lucide:users"
               />
               <Stat
                 label={t("hud.inflation")}
                 value={formatPercent(state().metrics.inflation)}
                 tone={state().metrics.inflation <= 8 ? "good" : "bad"}
-                icon="trend-up"
+                icon="lucide:trending-up"
               />
             </div>
             <div class="ending-actions">
-              <ActionButton variant="gold" icon="play" onClick={() => actions.newGame()}>
+              <ActionButton variant="gold" icon="lucide:play" onClick={() => actions.newGame()}>
                 {t("ending.replay")}
               </ActionButton>
               <ActionButton
                 variant="secondary"
-                icon="download"
+                icon="lucide:download"
                 onClick={() => download(actions.exportJson())}
               >
                 {t("ending.export")}
               </ActionButton>
             </div>
             <p class="modal-hint">
-              <Icon name="info" size={14} /> {t("ending.summary")}
+              <Icon icon="lucide:info" size={14} /> {t("ending.summary")}
             </p>
           </div>
         </div>

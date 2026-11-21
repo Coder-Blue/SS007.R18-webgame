@@ -60,7 +60,7 @@ export const WorkspaceModal = (props: {
           <DialogTitle class="modal-title">{t("app.title")}</DialogTitle>
           <DialogDescription class="modal-desc">{t("panel.overviewDesc")}</DialogDescription>
         </div>
-        <IconButton icon="close" label={t("panel.close")} onClick={props.onClose} />
+        <IconButton icon="lucide:x" label={t("panel.close")} onClick={props.onClose} />
       </div>
       <Tabs
         value={props.panel}

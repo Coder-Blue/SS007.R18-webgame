@@ -66,31 +66,31 @@ export const TariffPanel = (): JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel title={t("panel.tariffs")} kicker={t("pillar.retailTag")} icon="scale">
+      <Panel title={t("panel.tariffs")} kicker={t("pillar.retailTag")} icon="lucide:scale">
         <p class="muted">{t("tariff.help")}</p>
         <div class="tariff-summary">
           <Stat
             label={t("tariff.average")}
             value={formatPrice(average())}
             tone={overCeiling() ? "bad" : "good"}
-            icon="scale"
+            icon="lucide:scale"
           />
           <Stat
             label={t("tariff.ceiling")}
             value={formatPrice(state().tariffs.ceiling)}
-            icon="shield"
+            icon="lucide:shield"
           />
           <Stat
             label={t("finance.revenueHousehold")}
             value={formatBillion(householdRevenue)}
             hint={t("finance.pnl")}
-            icon="wallet"
+            icon="lucide:wallet"
           />
           <Stat
             label={t("hud.inflation")}
             value={formatPercent(state().metrics.inflation)}
             tone={state().metrics.inflation > 8 ? "bad" : "warn"}
-            icon="trend-up"
+            icon="lucide:trending-up"
           />
         </div>
         <Badge tone={overCeiling() ? "bad" : "good"}>
@@ -98,7 +98,7 @@ export const TariffPanel = (): JSX.Element => {
         </Badge>
       </Panel>
 
-      <Panel title={t("tariff.title")} kicker={t("policy.roles")} icon="coins">
+      <Panel title={t("tariff.title")} kicker={t("policy.roles")} icon="lucide:coins">
         <div class="slider-list">
           <For each={tierLabels}>
             {(label, index) => {
@@ -136,7 +136,7 @@ export const TariffPanel = (): JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("tariff.workshop")} kicker={t("pillar.retail")} icon="factory">
+      <Panel title={t("tariff.workshop")} kicker={t("pillar.retail")} icon="lucide:factory">
         <p class="muted">{t("tariff.workshopHelp")}</p>
         <div class="slider-row">
           <div class="slider-head">
@@ -176,7 +176,7 @@ export const TariffPanel = (): JSX.Element => {
         <div class="inline-actions">
           <ActionButton
             variant="gold"
-            icon="check"
+            icon="lucide:check"
             disabled={overCeiling()}
             onClick={() => actions.setTariffs(draft(), workshop())}
           >
@@ -193,7 +193,7 @@ export const TariffPanel = (): JSX.Element => {
           </ActionButton>
         </div>
         <div class="callout">
-          <Icon name="info" size={16} />
+          <Icon icon="lucide:info" size={16} />
           <span>{t("policy.debateHelp")}</span>
         </div>
       </Panel>

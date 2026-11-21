@@ -29,7 +29,11 @@ export const InfrastructurePanel = (): JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel title={t("panel.infrastructure")} kicker={t("pillar.infrastructureTag")} icon="road">
+      <Panel
+        title={t("panel.infrastructure")}
+        kicker={t("pillar.infrastructureTag")}
+        icon="lucide:road"
+      >
         <div class="coverage-row">
           <ProgressRing
             value={infra().coverage}
@@ -56,31 +60,35 @@ export const InfrastructurePanel = (): JSX.Element => {
           </div>
         </div>
         <div class="stat-grid">
-          <Stat label={t("infra.dirt")} value={`${Math.round(infra().dirtKm)} km`} icon="road" />
+          <Stat
+            label={t("infra.dirt")}
+            value={`${Math.round(infra().dirtKm)} km`}
+            icon="lucide:road"
+          />
           <Stat
             label={t("infra.cobble")}
             value={`${Math.round(infra().cobbleKm)} km`}
-            icon="road"
+            icon="lucide:road"
           />
           <Stat
             label={t("infra.asphalt")}
             value={`${Math.round(infra().asphaltKm)} km`}
-            icon="road"
+            icon="lucide:road"
           />
           <Stat
             label={t("infra.fleet")}
             value={t("pillar.trucksValue", { count: infra().fleet })}
             hint={formatBillion(fleetCost(infra().fleet, state().market))}
-            icon="truck"
+            icon="lucide:truck"
           />
         </div>
         <div class="callout">
-          <Icon name="map-pin" size={16} />
+          <Icon icon="lucide:map-pin" size={16} />
           <span>{t("infra.universalDesc")}</span>
         </div>
       </Panel>
 
-      <Panel title={t("infra.buildTitle")} kicker={t("action.build")} icon="road">
+      <Panel title={t("infra.buildTitle")} kicker={t("action.build")} icon="lucide:road">
         <p class="muted">{t("infra.buildHelp")}</p>
         <div class="build-list">
           <For each={grades}>
@@ -91,7 +99,7 @@ export const InfrastructurePanel = (): JSX.Element => {
                 <div class="build-card">
                   <div class="build-main">
                     <span class="build-icon" data-grade={grade}>
-                      <Icon name="road" size={20} />
+                      <Icon icon="lucide:road" size={20} />
                     </span>
                     <div>
                       <strong>{t(gradeLabels[grade])}</strong>
@@ -115,7 +123,7 @@ export const InfrastructurePanel = (): JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("infra.fleet")} kicker={t("pillar.infrastructureTag")} icon="truck">
+      <Panel title={t("infra.fleet")} kicker={t("pillar.infrastructureTag")} icon="lucide:truck">
         <div class="fleet-row">
           <div>
             <strong>{t("pillar.trucksValue", { count: infra().fleet })}</strong>
@@ -132,7 +140,7 @@ export const InfrastructurePanel = (): JSX.Element => {
           <ActionButton
             size="sm"
             variant="gold"
-            icon="truck"
+            icon="lucide:truck"
             onClick={() => actions.invest("fleet")}
           >
             {t("action.fleet")}
