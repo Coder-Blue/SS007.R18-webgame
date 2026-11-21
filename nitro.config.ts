@@ -10,6 +10,31 @@ export default defineConfig({
         "cache-control": "public, max-age=2592000",
       },
     },
+    "/favicon.ico": {
+      headers: {
+        "cache-control": "public, max-age=2592000",
+      },
+    },
+    "/favicon.png": {
+      headers: {
+        "cache-control": "public, max-age=2592000",
+      },
+    },
+    "/favicon.svg": {
+      headers: {
+        "cache-control": "public, max-age=2592000",
+      },
+    },
+    "/robots.txt": {
+      headers: {
+        "cache-control": "public, max-age=86400",
+      },
+    },
+    "/images/**": {
+      headers: {
+        "cache-control": "public, max-age=2592000",
+      },
+    },
   },
   serverAssets: [
     {

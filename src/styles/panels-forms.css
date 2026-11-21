@@ -64,7 +64,7 @@
 .action-cost > span,
 .build-side > span,
 .reform-side > span {
-  @apply text-[0.66rem] font-extrabold whitespace-nowrap text-gold-dark tabular-nums;
+  @apply text-[0.66rem] font-extrabold whitespace-nowrap text-gold-ink tabular-nums;
 }
 
 .meter-block {
@@ -92,7 +92,7 @@
 }
 
 .coverage-copy span {
-  @apply text-[0.68rem] font-bold text-gold-dark;
+  @apply text-[0.68rem] font-bold text-gold-ink;
 }
 
 .ring {
@@ -100,7 +100,7 @@
 }
 
 .ring[data-tone="warn"] {
-  @apply text-gold-dark;
+  @apply text-gold-ink;
 }
 
 .ring[data-tone="bad"] {
@@ -149,7 +149,7 @@
 }
 
 .slider-head strong {
-  @apply text-gold-dark tabular-nums;
+  @apply text-gold-ink tabular-nums;
 }
 
 .slider-scale {

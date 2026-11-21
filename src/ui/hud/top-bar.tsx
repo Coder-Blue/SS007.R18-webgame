@@ -50,6 +50,7 @@ export const TopBar = (props: {
           <Bar
             value={Math.max(0, Math.min(100, (state().finance.cash / 24_000) * 100))}
             tone="gold"
+            label="Ngân quỹ"
           />
         </div>
         <div class="top-gauge" data-tone={debtRatio() > 80 ? "bad" : "warn"}>
@@ -60,7 +61,7 @@ export const TopBar = (props: {
           <strong>
             <AnimatedNumber value={() => state().finance.debt} format={formatBillion} />
           </strong>
-          <Bar value={debtRatio()} tone={debtRatio() > 80 ? "bad" : "warn"} />
+          <Bar value={debtRatio()} tone={debtRatio() > 80 ? "bad" : "warn"} label="Dư nợ" />
         </div>
         <div class="top-gauge" data-tone="green">
           <div class="top-gauge-label">
@@ -73,6 +74,7 @@ export const TopBar = (props: {
           <Bar
             value={state().metrics.satisfaction}
             tone={state().metrics.satisfaction >= 55 ? "good" : "bad"}
+            label="Hài lòng dân làng"
           />
         </div>
         <div class="top-gauge" data-tone="green">
@@ -83,7 +85,11 @@ export const TopBar = (props: {
           <strong>
             <AnimatedNumber value={() => state().metrics.trust} format={formatPercent} />
           </strong>
-          <Bar value={state().metrics.trust} tone={state().metrics.trust >= 55 ? "good" : "bad"} />
+          <Bar
+            value={state().metrics.trust}
+            tone={state().metrics.trust >= 55 ? "good" : "bad"}
+            label="Tín nhiệm Chairman"
+          />
         </div>
       </div>
 

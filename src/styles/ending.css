@@ -19,7 +19,7 @@
 }
 
 .ending-date {
-  @apply text-[0.7rem] font-bold text-gold-dark;
+  @apply text-[0.7rem] font-bold text-gold-ink;
 }
 
 .ending-card h1 {

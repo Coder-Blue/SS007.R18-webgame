@@ -179,6 +179,7 @@ export const TariffPanel = (): JSX.Element => {
           <Bar
             value={Math.min(100, (average() / state().tariffs.ceiling) * 100)}
             tone={overCeiling() ? "bad" : "good"}
+            label="Giá bình quân so với trần"
           />
         </div>
         <div class="inline-actions">

@@ -97,7 +97,7 @@
 }
 
 .report-split h4 {
-  @apply mb-1 text-[0.64rem] tracking-[0.08em] text-gold-dark uppercase;
+  @apply mb-1 text-[0.64rem] tracking-[0.08em] text-gold-ink uppercase;
 }
 
 .report-line {

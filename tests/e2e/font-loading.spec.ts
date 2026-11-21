@@ -3,6 +3,10 @@ import { expect, test } from "@playwright/test";
 const criticalPreloads = [
   "/fonts/be-vietnam-pro-400-vietnamese.woff2",
   "/fonts/be-vietnam-pro-400-latin.woff2",
+  "/fonts/be-vietnam-pro-600-vietnamese.woff2",
+  "/fonts/be-vietnam-pro-600-latin.woff2",
+  "/fonts/be-vietnam-pro-700-vietnamese.woff2",
+  "/fonts/be-vietnam-pro-700-latin.woff2",
   "/fonts/be-vietnam-pro-800-vietnamese.woff2",
   "/fonts/be-vietnam-pro-800-latin.woff2",
 ];
@@ -170,7 +174,7 @@ test("maps every weight to its own local WOFF2 face", async ({ page }) => {
   await cdp.detach();
 });
 
-test("preloads only the four critical regular and extrabold WOFF2 subsets", async ({ page }) => {
+test("preloads only the critical WOFF2 subsets used by the title screen", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".title-screen")).toBeVisible();
 

@@ -97,7 +97,7 @@ export const LeftDock = (props: {
                   <strong>{pillar.label}</strong>
                   <span>{pillar.detail}</span>
                 </span>
-                <Bar value={pillar.value} tone={pillar.tone} />
+                <Bar value={pillar.value} tone={pillar.tone} label={pillar.label} />
               </button>
             )}
           </For>

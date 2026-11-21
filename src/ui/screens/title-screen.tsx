@@ -1,5 +1,4 @@
 import type { JSX } from "@solidjs/web";
-import { Show } from "solid-js";
 import { ActionButton } from "../components/base";
 import { Icon } from "../components/icons";
 import { GAME_VERSION } from "~/domain";
@@ -28,11 +27,15 @@ export const TitleScreen = (props: {
         <ActionButton variant="gold" size="lg" icon="lucide:play" onClick={props.onStart}>
           Bắt đầu nhiệm kỳ
         </ActionButton>
-        <Show when={props.hasSave}>
-          <ActionButton variant="primary" size="lg" icon="lucide:clock" onClick={props.onContinue}>
-            Tiếp tục ván đang lưu
-          </ActionButton>
-        </Show>
+        <ActionButton
+          variant="primary"
+          size="lg"
+          icon="lucide:clock"
+          onClick={props.onContinue}
+          disabled={!props.hasSave}
+        >
+          Tiếp tục ván đang lưu
+        </ActionButton>
         <ActionButton variant="secondary" size="lg" icon="lucide:save" onClick={props.onOpenLoad}>
           Mở kho lưu
         </ActionButton>

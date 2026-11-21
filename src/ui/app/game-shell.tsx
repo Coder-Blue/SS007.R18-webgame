@@ -14,7 +14,7 @@ import { EventModal } from "../modals/event-modal";
 import { EndingScreen } from "../modals/ending-screen";
 import { TitleScreen } from "../screens/title-screen";
 import { Icon } from "../components/icons";
-import { latestSave, readSession, writeSession } from "~/state/persistence";
+import { hasAnySave, latestSave, readSession, writeSession } from "~/state/persistence";
 import type { SceneSelection } from "~/scene/create-village-scene";
 
 interface CopyDictionary {
@@ -123,7 +123,7 @@ export const GameShell = (): JSX.Element => {
       document.documentElement.dataset.motion = prefs.reducedMotion ? "reduced" : "full";
     }
 
-    setHasSave(latestSave() !== null);
+    setHasSave(hasAnySave());
 
     if (!prefs.tutorialDone) {
       setTutorialOpen(false);
@@ -186,12 +186,13 @@ export const GameShell = (): JSX.Element => {
   };
 
   return (
-    <div class="game-shell" data-screen={screen()}>
+    <main class="game-shell" data-screen={screen()}>
       <Show when={screen() === "title"}>
         <TitlePoster />
       </Show>
       <Show when={screen() === "game"}>
         <VillageCanvas onSelect={sceneSelect} />
+        <h1 class="sr-only">Độc Quyền Kinh Tế</h1>
         <TopBar onOpenMenu={() => setMenuOpen(true)} onOpenTutorial={() => setTutorialOpen(true)} />
         <LeftDock
           selected={selected()}
@@ -241,6 +242,6 @@ export const GameShell = (): JSX.Element => {
           </div>
         )}
       </Show>
-    </div>
+    </main>
   );
 };

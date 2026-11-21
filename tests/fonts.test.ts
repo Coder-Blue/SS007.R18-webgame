@@ -31,6 +31,10 @@ const woff2Files = faces.flatMap((face) => [
 const criticalPreloads = [
   "be-vietnam-pro-400-vietnamese.woff2",
   "be-vietnam-pro-400-latin.woff2",
+  "be-vietnam-pro-600-vietnamese.woff2",
+  "be-vietnam-pro-600-latin.woff2",
+  "be-vietnam-pro-700-vietnamese.woff2",
+  "be-vietnam-pro-700-latin.woff2",
   "be-vietnam-pro-800-vietnamese.woff2",
   "be-vietnam-pro-800-latin.woff2",
 ];
@@ -257,7 +261,7 @@ describe("local font manifest", () => {
     );
   });
 
-  test("preloads only the four critical WOFF2 subsets", () => {
+  test("preloads only the critical WOFF2 subsets used by the title screen", () => {
     expect(rootSource).not.toContain(".ttf");
 
     for (const file of criticalPreloads) {

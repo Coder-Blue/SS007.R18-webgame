@@ -9,6 +9,16 @@ the project uses semantic versioning for save-compatible releases.
 
 - Self-hosted Be Vietnam Pro WOFF2 subsets serve the UI and preload manifest;
   full TTF weights remain for the Open Graph image.
+- The title screen uses a lightweight village poster and renders the Three.js
+  scene only during play, so the first visit does not pay for the renderer.
+- The title and HUD reserve their layout, preload the visible font weights, and
+  expose named meters, a single main landmark, accessible mobile tabs and the
+  reduced-motion switch.
+
+### Added
+
+- Canonical, Open Graph locale/site metadata, a crawlable `sitemap.xml` and a
+  dynamic `robots.txt` for the public deployment.
 
 ## [1.0.0] - 2026-11-21
 

@@ -24,6 +24,11 @@ const SessionPrefsSchema = v.object({
   reducedMotion: v.optional(v.boolean(), false),
 });
 
+const SaveEnvelopeSchema = v.object({
+  format: v.literal("dqkt-save"),
+  version: v.literal(SAVE_VERSION),
+});
+
 export const DEFAULT_PREFS: SessionPrefs = {
   activeSlot: null,
   panel: "overview",
@@ -112,6 +117,22 @@ export const slotMeta = (slot: SlotId): SaveMeta | null => {
 
 export const listSaves = (): readonly (SaveMeta | null)[] => SLOT_IDS.map((slot) => slotMeta(slot));
 
+export const hasAnySave = (): boolean => {
+  if (!hasStorage()) return false;
+
+  return ALL_SLOT_IDS.some((slot) => {
+    const raw = window.localStorage.getItem(keyFor(slot));
+
+    if (raw === null) return false;
+
+    try {
+      return v.safeParse(SaveEnvelopeSchema, JSON.parse(raw)).success;
+    } catch {
+      return false;
+    }
+  });
+};
+
 export const latestSave = (): {
   readonly slot: SlotId;
   readonly state: GameState;
@@ -121,14 +142,17 @@ export const latestSave = (): {
   const candidates: { slot: SlotId; state: GameState; savedAt: string }[] = [];
 
   for (const slot of ALL_SLOT_IDS) {
-    const loaded = loadFromSlot(slot);
+    const raw = window.localStorage.getItem(keyFor(slot));
 
-    if (loaded.ok) {
-      const meta = slotMeta(slot);
+    if (raw === null) continue;
+    const decoded = decodeSaveFile(raw);
 
-      if (meta !== null) {
-        candidates.push({ slot, state: loaded.value, savedAt: meta.savedAt });
-      }
+    if (decoded.ok) {
+      candidates.push({
+        slot,
+        state: decoded.value.state,
+        savedAt: decoded.value.savedAt,
+      });
     }
   }
 

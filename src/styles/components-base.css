@@ -79,7 +79,7 @@
 }
 
 .stat[data-tone="gold"] .stat-value {
-  @apply text-gold-dark;
+  @apply text-gold-ink;
 }
 
 .bar {
