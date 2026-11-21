@@ -21,7 +21,7 @@
     "check:domain": "node scripts/check-domain.mjs",
     "check:bundle": "node scripts/check-bundle.mjs",
     "quality": "pnpm lint && pnpm format:check && pnpm check:lines && pnpm check:emoji && pnpm check:domain && pnpm coverage && pnpm build && pnpm check:bundle",
-    "build:vercel": "NITRO_PRESET=vercel pnpm build",
+    "build:vercel": "NITRO_PRESET=vercel pnpm build && node scripts/check-bundle.mjs .vercel/output/static/assets",
     "lint:fix": "oxlint --fix src tests scripts routes"
   },
   "dependencies": {

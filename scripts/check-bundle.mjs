@@ -1,9 +1,21 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { gzipSync } from "node:zlib";
 
-const assetDirectory = join(process.cwd(), ".output", "public", "assets");
+const requestedDirectory = process.argv[2];
+
+const assetDirectory = requestedDirectory
+  ? join(process.cwd(), requestedDirectory)
+  : join(process.cwd(), ".output", "public", "assets");
+
 const limit = 500_000;
+
+if (!existsSync(assetDirectory)) {
+  console.error(
+    `Bundle budget failed: ${assetDirectory} does not exist. Run the production build first.`,
+  );
+  process.exit(1);
+}
 
 const bundles = readdirSync(assetDirectory)
   .filter((file) => file.endsWith(".js"))
@@ -35,6 +47,21 @@ if (oversized.length > 0) {
   process.exit(1);
 }
 
-console.log(
-  `\nBundle budget: OK (${bundles.length} client chunks, every chunk <= 500 kB minified)`,
-);
+const shellPath = join(dirname(assetDirectory), "_shell.html");
+
+if (existsSync(shellPath)) {
+  const shell = readFileSync(shellPath, "utf8");
+  const initial = [...shell.matchAll(/\/assets\/([^"']+?\.js)/g)].map((match) => match[1]);
+  const deferred = initial.filter((file) => /^(?:three|gsap)/.test(file));
+
+  if (deferred.length > 0) {
+    console.error(
+      `\nBundle budget failed: the initial shell references deferred vendor chunks: ${deferred.join(", ")}`,
+    );
+    process.exit(1);
+  }
+
+  console.log(`\nInitial shell: ${initial.length} JavaScript preloads, no Three.js or GSAP.`);
+}
+
+console.log(`Bundle budget: OK (${bundles.length} client chunks, every chunk <= 500 kB minified)`);

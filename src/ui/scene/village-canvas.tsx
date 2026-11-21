@@ -7,7 +7,7 @@ import { seasonOf } from "~/domain";
 
 type SceneModule = typeof import("~/scene/create-village-scene");
 
-const IDLE_TIMEOUT_MS = 2_500;
+const IDLE_TIMEOUT_MS = 1_500;
 const FALLBACK_DELAY_MS = 200;
 
 const reduced = (): boolean => {
@@ -35,27 +35,41 @@ export const VillageCanvas = (props: {
     if (canvas === undefined || container === undefined) return;
 
     let cancelled = false;
+    let loading = false;
     let frame: number | undefined;
     let idleHandle: number | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
     const load = (): void => {
-      if (cancelled || controller !== null) return;
+      if (cancelled || loading || controller !== null) return;
+      loading = true;
 
       void import("~/scene/create-village-scene")
         .then(({ createVillageScene }: SceneModule) => {
           if (cancelled || canvas === undefined || container === undefined) return;
-          controller = createVillageScene({
+
+          const next = createVillageScene({
             canvas,
             container,
             onSelect: props.onSelect,
             reducedMotion: reduced,
           });
-          controller.update(state());
+
+          try {
+            next.update(state());
+          } catch {
+            next.dispose();
+            throw new Error("village scene failed to initialise");
+          }
+
+          controller = next;
           setReady(true);
         })
         .catch(() => {
           if (!cancelled) setLoadFailed(true);
+        })
+        .finally(() => {
+          loading = false;
         });
     };
 

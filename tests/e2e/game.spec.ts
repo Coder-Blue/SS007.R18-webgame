@@ -23,6 +23,19 @@ const expectMonth = async (page: Page, label: string): Promise<void> => {
   await expect(page.locator(".mobile-date")).toContainText(label);
 };
 
+test("loads the deferred village scene once and recovers from a failed chunk", async ({ page }) => {
+  let blocked = true;
+
+  await page.route(/create-village-scene/, (route) => (blocked ? route.abort() : route.continue()));
+  await page.goto("/");
+  await expect(page.getByRole("button", { name: /Thử lại/i })).toBeVisible({ timeout: 15_000 });
+
+  blocked = false;
+  await page.getByRole("button", { name: /Thử lại/i }).click();
+  await expect(page.locator(".scene-loading")).toHaveCount(0, { timeout: 15_000 });
+  await expect(page.locator(".village-canvas")).toHaveCount(1);
+});
+
 test("renders Iconify icons without API calls or untracked reads", async ({ page }) => {
   const diagnostics: string[] = [];
   const iconRequests: string[] = [];

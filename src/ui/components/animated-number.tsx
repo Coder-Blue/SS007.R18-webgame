@@ -2,7 +2,7 @@ import { createSignal, createTrackedEffect } from "solid-js";
 import type { JSX } from "@solidjs/web";
 
 const DURATION_MS = 550;
-const easeOutCubic = (progress: number): number => 1 - (1 - progress) ** 3;
+const easeOutQuad = (progress: number): number => 1 - (1 - progress) ** 2;
 
 export const AnimatedNumber = (props: {
   readonly value: () => number;
@@ -37,7 +37,7 @@ export const AnimatedNumber = (props: {
     const step = (timestamp: number): void => {
       startedAt ??= timestamp;
       const progress = Math.min(1, (timestamp - startedAt) / DURATION_MS);
-      const value = from + (target - from) * easeOutCubic(progress);
+      const value = from + (target - from) * easeOutQuad(progress);
 
       current = value;
       setDisplay(value);
