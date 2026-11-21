@@ -49,6 +49,17 @@ const selectionOf = (object: THREE.Object3D): SceneSelection | null => {
   return null;
 };
 
+const isVisibleInHierarchy = (object: THREE.Object3D): boolean => {
+  let current: THREE.Object3D | null = object;
+
+  while (current !== null) {
+    if (!current.visible) return false;
+    current = current.parent;
+  }
+
+  return true;
+};
+
 export const createVillageScene = (options: VillageSceneOptions): VillageScene => {
   const renderer = new THREE.WebGLRenderer({
     canvas: options.canvas,
@@ -130,7 +141,7 @@ export const createVillageScene = (options: VillageSceneOptions): VillageScene =
 
     raycaster.setFromCamera(pointer, cameraRig.camera);
     const hits = raycaster.intersectObjects(selectables, true);
-    const hit = hits[0];
+    const hit = hits.find((candidate) => isVisibleInHierarchy(candidate.object));
 
     if (hit === undefined) return;
     const selection = selectionOf(hit.object);
@@ -155,30 +166,13 @@ export const createVillageScene = (options: VillageSceneOptions): VillageScene =
     elapsed += delta;
 
     if (currentState !== null) {
-      fleet.update(currentState, elapsed);
-      smokeTick(currentState, elapsed);
+      fleet.update(currentState, delta);
+      buildings.updateSmoke(elapsed, currentState.metrics.industrialOutput);
     }
 
     weather.tick(delta);
     renderer.render(scene, cameraRig.camera);
     frame = requestAnimationFrame(loop);
-  };
-
-  const smokeTick = (state: GameState, time: number): void => {
-    for (let index = 0; index < buildings.smokeStacks.length; index += 1) {
-      const smoke = buildings.smokeStacks[index];
-
-      if (smoke === undefined) continue;
-      const baseY = 3.1;
-      smoke.position.y = baseY + ((time * 0.35 + index * 0.7) % 1.1);
-      const material = smoke.material;
-
-      if (material instanceof THREE.MeshBasicMaterial) {
-        material.opacity =
-          Math.max(0, 0.5 - ((time * 0.2 + index * 0.3) % 0.6)) *
-          (0.7 + state.metrics.industrialOutput / 300);
-      }
-    }
   };
 
   const resizeObserver = new ResizeObserver(() => resize());

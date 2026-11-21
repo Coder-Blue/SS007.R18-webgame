@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { gsap } from "gsap";
 import type { GameState } from "~/domain";
 import { seasonOf } from "~/domain";
+import { wrapRange } from "./motion";
 import { PALETTE } from "./palette";
 
 export interface WeatherBuild {
@@ -42,12 +43,22 @@ export const createWeather = (scene: THREE.Scene): WeatherBuild => {
   scene.add(ambient, hemisphere, sun);
 
   const rainCount = 420;
+  const rainXLimit = 15;
+  const rainZLimit = 14;
+  const rainMinY = 0.6;
+  const rainMaxY = 19;
   const positions = new Float32Array(rainCount * 3);
+  const fallSpeeds = new Float32Array(rainCount);
+  const driftX = new Float32Array(rainCount);
+  const driftZ = new Float32Array(rainCount);
 
   for (let index = 0; index < rainCount; index += 1) {
-    positions[index * 3] = (index % 30) - 15 + (index % 3) * 0.4;
-    positions[index * 3 + 1] = (index % 17) * 1.2;
-    positions[index * 3 + 2] = ((index * 7) % 28) - 14;
+    positions[index * 3] = ((index * 13) % 30) - rainXLimit + (index % 3) * 0.4;
+    positions[index * 3 + 1] = ((index * 5) % 19) + rainMinY;
+    positions[index * 3 + 2] = ((index * 7) % 28) - rainZLimit;
+    fallSpeeds[index] = 8 + ((index * 7) % 9) * 0.55;
+    driftX[index] = 0.55 + ((index * 5) % 7) * 0.09;
+    driftZ[index] = -0.3 + ((index * 11) % 5) * 0.12;
   }
 
   const rainGeometry = new THREE.BufferGeometry();
@@ -122,13 +133,23 @@ export const createWeather = (scene: THREE.Scene): WeatherBuild => {
 
   const tick = (delta: number): void => {
     if (rainIntensity <= 0) return;
+    const step = Math.min(0.05, Math.max(0, delta));
+
+    if (step <= 0) return;
+
     const attribute = rain.geometry.getAttribute("position");
 
     if (!(attribute instanceof THREE.BufferAttribute)) return;
 
     for (let index = 0; index < attribute.count; index += 1) {
-      const y = attribute.getY(index) - delta * (10 + (index % 5));
-      attribute.setY(index, y < 0.6 ? 16 : y);
+      const fallSpeed = fallSpeeds[index] ?? 8;
+      const windX = driftX[index] ?? 0.55;
+      const windZ = driftZ[index] ?? 0;
+      const x = wrapRange(attribute.getX(index) + windX * step, -rainXLimit, rainXLimit);
+      const y = wrapRange(attribute.getY(index) - fallSpeed * step, rainMinY, rainMaxY);
+      const z = wrapRange(attribute.getZ(index) + windZ * step, -rainZLimit, rainZLimit);
+
+      attribute.setXYZ(index, x, y, z);
     }
 
     attribute.needsUpdate = true;
