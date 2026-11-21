@@ -295,7 +295,3 @@
 .game-shell[data-screen="title"] .scene-hint {
   @apply hidden;
 }
-
-.game-shell[data-screen="title"] .village-canvas {
-  filter: saturate(0.92) brightness(0.92);
-}

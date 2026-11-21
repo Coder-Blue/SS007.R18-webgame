@@ -7,6 +7,15 @@
   );
 }
 
+.title-poster {
+  @apply pointer-events-none absolute inset-0 block h-full w-full overflow-hidden;
+}
+
+.title-poster img {
+  @apply block h-full w-full object-cover;
+  filter: saturate(0.92) brightness(0.92);
+}
+
 .scene-wrap {
   @apply absolute inset-0 touch-none overflow-hidden;
 }

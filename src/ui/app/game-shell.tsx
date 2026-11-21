@@ -1,6 +1,7 @@
 import { createSignal, createTrackedEffect, onSettled, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
+import { TitlePoster } from "../scene/title-poster";
 import { VillageCanvas } from "../scene/village-canvas";
 import { TopBar } from "../hud/top-bar";
 import { LeftDock, RightDock } from "../hud/desktop-dock";
@@ -186,8 +187,11 @@ export const GameShell = (): JSX.Element => {
 
   return (
     <div class="game-shell" data-screen={screen()}>
-      <VillageCanvas onSelect={sceneSelect} />
+      <Show when={screen() === "title"}>
+        <TitlePoster />
+      </Show>
       <Show when={screen() === "game"}>
+        <VillageCanvas onSelect={sceneSelect} />
         <TopBar onOpenMenu={() => setMenuOpen(true)} onOpenTutorial={() => setTutorialOpen(true)} />
         <LeftDock
           selected={selected()}

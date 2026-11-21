@@ -28,11 +28,16 @@ test("loads the deferred village scene once and recovers from a failed chunk", a
 
   await page.route(/create-village-scene/, (route) => (blocked ? route.abort() : route.continue()));
   await page.goto("/");
+  await expect(page.locator(".title-poster img")).toBeVisible();
+  await page.getByRole("button", { name: /Bắt đầu nhiệm kỳ/i }).click();
+  await page.getByRole("button", { name: /Bỏ qua hướng dẫn/i }).click();
   await expect(page.getByRole("button", { name: /Thử lại/i })).toBeVisible({ timeout: 15_000 });
 
   blocked = false;
   await page.getByRole("button", { name: /Thử lại/i }).click();
   await expect(page.locator(".title-screen")).toBeVisible();
+  await page.getByRole("button", { name: /Bắt đầu nhiệm kỳ/i }).click();
+  await page.getByRole("button", { name: /Bỏ qua hướng dẫn/i }).click();
   await expect(page.locator(".scene-loading")).toHaveCount(0, { timeout: 20_000 });
   await expect(page.locator(".village-canvas")).toHaveCount(1);
 });
@@ -92,7 +97,8 @@ test("serves the generated Open Graph image and advertises absolute URLs", async
 test("title, tutorial, and first month on every viewport", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /Độc Quyền Kinh Tế/i })).toBeVisible();
-  await expect(page.locator("canvas")).toHaveCount(1);
+  await expect(page.locator(".title-poster img")).toBeVisible();
+  await expect(page.locator("canvas")).toHaveCount(0);
   await expectNoOverflow(page);
   await startGame(page);
   await expect(page.locator(".top-bar")).toBeVisible();
