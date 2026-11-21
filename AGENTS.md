@@ -116,7 +116,10 @@ claim a gate passed without the command output that proves it.
 Load the skill before starting work that it owns. The routing table in
 `AGENT_DIRECTORY.md` maps every role to its skills. Context7 is mandatory
 before changing a dependency API; graphify is mandatory before exploring code;
-the impeccable and agency-agents reviews are mandatory before UI polish.
+the impeccable, unslop and agency-agents reviews are mandatory before UI
+polish. The unslop skill lives at `.agents/skills/unslop` and keeps the
+product's content and order; it changes spacing, color, icons, copy, type,
+layout, details, visuals and motion in that order.
 
 Do not install, update or vendor a skill inside an unrelated feature branch.
 Skill changes travel in their own issue with provenance in `skills-lock.json`
