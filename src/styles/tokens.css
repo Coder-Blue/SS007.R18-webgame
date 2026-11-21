@@ -140,7 +140,16 @@ ul {
 }
 
 :focus-visible {
-  @apply outline-3 outline-offset-2 outline-gold;
+  @apply outline-3 outline-offset-2 outline-forest-900;
+}
+
+.top-bar :focus-visible,
+.bottom-dock :focus-visible,
+.mobile-nav :focus-visible,
+.title-screen :focus-visible,
+.scene-wrap :focus-visible,
+.panel-head :focus-visible {
+  @apply outline-gold-light;
 }
 
 [data-motion="reduced"] *,
