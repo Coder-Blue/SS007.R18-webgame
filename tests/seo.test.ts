@@ -42,6 +42,8 @@ describe("production metadata", () => {
       expect(vercelSource).toContain(path);
     }
 
+    expect(nitroSource).toContain('"/images/**"');
+    expect(vercelSource).toContain('"source": "/images/(.*)"');
     expect(nitroSource).toContain('"cache-control": "public, max-age=2592000"');
     expect(vercelSource).toContain("public, max-age=2592000");
     expect(rootSource).not.toContain("s-maxage");

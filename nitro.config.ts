@@ -30,6 +30,11 @@ export default defineConfig({
         "cache-control": "public, max-age=86400",
       },
     },
+    "/images/**": {
+      headers: {
+        "cache-control": "public, max-age=2592000",
+      },
+    },
   },
   serverAssets: [
     {
