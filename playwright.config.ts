@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+const port = process.env.PLAYWRIGHT_PORT ?? "3000";
+const baseURL = `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -11,7 +13,7 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never" }]],
   timeout: 45_000,
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     launchOptions: {
@@ -20,8 +22,8 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: "pnpm dev --host 127.0.0.1",
-    url: "http://127.0.0.1:3000",
+    command: `pnpm dev --host 127.0.0.1 --port ${port}`,
+    url: baseURL,
     reuseExistingServer: true,
     timeout: 120_000,
   },
