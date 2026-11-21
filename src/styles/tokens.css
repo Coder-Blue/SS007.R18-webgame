@@ -130,7 +130,7 @@ h2,
 h3,
 h4,
 strong {
-  @apply font-medium tracking-[-0.01em];
+  @apply font-medium tracking-normal;
 }
 
 ul {

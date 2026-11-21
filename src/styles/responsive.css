@@ -12,7 +12,7 @@
   }
 
   .overview-score {
-    @apply flex-[0_0_auto] flex-row items-center gap-[10px];
+    @apply flex-[0_0_auto] flex-row items-center gap-[12px];
   }
 
   .overview-score .bar {
@@ -150,7 +150,7 @@
   }
 
   .panel-body {
-    @apply gap-2 p-[10px];
+    @apply gap-2 p-[12px];
   }
 
   .guide-list,
@@ -226,11 +226,11 @@
   }
 
   .top-actions .advance-btn {
-    @apply min-h-11 px-[10px] text-[0.72rem];
+    @apply min-h-11 px-[12px] text-[0.72rem];
   }
 
   .mobile-status {
-    @apply flex w-full items-center gap-[10px] border-t border-paper/15 pt-1 text-[0.68rem] text-paper/70;
+    @apply flex w-full items-center gap-[12px] border-t border-paper/15 pt-1 text-[0.68rem] text-paper/70;
   }
 
   .mobile-status span {
@@ -267,6 +267,14 @@
   .title-actions .btn {
     @apply flex-auto;
   }
+
+  .title-utilities {
+    @apply flex-col items-stretch;
+  }
+
+  .title-utilities .btn {
+    @apply w-full justify-center;
+  }
 }
 
 @media (max-width: 480px) {
@@ -279,7 +287,7 @@
   }
 
   .scene-badges {
-    @apply left-[10px] flex-col items-start;
+    @apply left-[12px] flex-col items-start;
     transform: none;
   }
 }

@@ -1,5 +1,5 @@
 .policy-hero {
-  @apply grid grid-cols-[1fr_1.1fr] items-stretch gap-[10px];
+  @apply grid grid-cols-[1fr_1.1fr] items-stretch gap-[12px];
 }
 
 .big-number {
@@ -11,7 +11,7 @@
 }
 
 .policy-role-card iconify-icon {
-  @apply text-paper/60;
+  @apply text-paper/80;
 }
 
 .policy-role-card strong {
@@ -19,11 +19,11 @@
 }
 
 .policy-role-card p {
-  @apply text-[0.7rem] leading-[1.5] text-paper/70;
+  @apply text-[0.7rem] leading-[1.5] text-paper;
 }
 
 .policy-row {
-  @apply flex items-center justify-between gap-[10px];
+  @apply flex items-center justify-between gap-[12px];
 }
 
 .policy-row h4 {
@@ -39,7 +39,7 @@
 }
 
 .reform-head {
-  @apply flex flex-wrap items-center gap-[6px];
+  @apply flex flex-wrap items-center gap-[8px];
 }
 
 .reform-card[data-enabled="true"] {
@@ -123,7 +123,7 @@
 }
 
 .chart-label {
-  @apply fill-ink-soft font-sans text-[10px];
+  @apply fill-ink-soft font-sans text-[0.68rem];
 }
 
 .mini-bars {
@@ -139,7 +139,7 @@
 }
 
 .toast {
-  @apply fixed bottom-[calc(84px+var(--safe-bottom))] left-1/2 z-[90] flex max-w-[min(520px,calc(100vw_-_24px))] -translate-x-1/2 items-center gap-2 rounded-[8px] border border-paper/15 bg-forest-950 px-[16px] py-[10px] text-[0.76rem] font-medium text-paper shadow-panel;
+  @apply fixed bottom-[calc(84px+var(--safe-bottom))] left-1/2 z-[90] flex max-w-[min(520px,calc(100vw_-_24px))] -translate-x-1/2 items-center gap-2 rounded-[8px] border border-paper/15 bg-forest-950 px-[16px] py-[12px] text-[0.76rem] font-medium text-paper shadow-panel;
   animation: toast-in 0.28s var(--ease-out);
 }
 

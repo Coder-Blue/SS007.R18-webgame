@@ -36,7 +36,7 @@
 }
 
 .scene-badge {
-  @apply inline-flex items-center gap-[6px] rounded-[4px] border border-paper/20 bg-forest-950/90 px-[10px] py-[4px] text-[0.68rem] font-medium tracking-normal text-paper/80;
+  @apply inline-flex items-center gap-[8px] rounded-[4px] border border-paper/20 bg-forest-950/90 px-[12px] py-[4px] text-[0.68rem] font-medium tracking-normal text-paper/80;
 }
 
 .scene-controls {
@@ -66,7 +66,7 @@
 }
 
 .brand-block {
-  @apply flex min-w-[190px] items-center gap-[10px];
+  @apply flex min-w-[190px] items-center gap-[12px];
 }
 
 .brand-mark {

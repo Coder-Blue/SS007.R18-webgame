@@ -49,7 +49,7 @@
 }
 
 .choice-index {
-  @apply grid h-[32px] w-[32px] shrink-0 place-items-center rounded-[6px] border border-outline bg-forest-800 text-[0.76rem] font-semibold text-paper/70;
+  @apply grid h-[32px] w-[32px] shrink-0 place-items-center rounded-[6px] border border-outline bg-forest-800 text-[0.76rem] font-semibold text-paper;
 }
 
 .choice-copy {
@@ -65,12 +65,12 @@
 }
 
 .outcome-modal {
-  @apply flex w-[min(92vw,520px)] flex-col items-start gap-[10px];
+  @apply flex w-[min(92vw,520px)] flex-col items-start gap-[12px];
 }
 
 .outcome-icon,
 .tutorial-icon {
-  @apply grid h-[48px] w-[48px] place-items-center rounded-[8px] border border-paper/15 bg-forest-800 text-paper/70;
+  @apply grid h-[48px] w-[48px] place-items-center rounded-[8px] border border-paper/15 bg-forest-800 text-paper;
 }
 
 .tutorial-modal {
@@ -90,7 +90,7 @@
 }
 
 .tutorial-dot {
-  @apply h-[4px] w-[24px] rounded-[2px] bg-ink/15 transition-colors duration-200;
+  @apply h-[4px] w-[24px] rounded-[2px] bg-ink/15 transition-colors duration-200 ease-[var(--ease-out)];
 }
 
 .tutorial-dot[data-active="true"] {
@@ -110,7 +110,7 @@
 }
 
 .slot-card {
-  @apply flex items-center justify-between gap-[10px] border-b border-line px-0 py-[10px];
+  @apply flex items-center justify-between gap-[12px] border-b border-line px-0 py-[12px];
 }
 
 .slot-card[data-current="true"] {
@@ -138,7 +138,7 @@
 }
 
 .autosave-row {
-  @apply flex items-center gap-2 border border-line bg-paper-2 px-[10px] py-2 text-[0.68rem];
+  @apply flex items-center gap-2 border border-line bg-paper-2 px-[12px] py-2 text-[0.68rem];
 }
 
 .autosave-row .btn {
@@ -156,11 +156,11 @@
 }
 
 .save-tool-actions {
-  @apply flex flex-wrap justify-end gap-[6px];
+  @apply flex flex-wrap justify-end gap-[8px];
 }
 
 .file-button {
-  @apply inline-flex min-h-11 cursor-pointer items-center gap-[6px] rounded-[8px] border border-outline/20 bg-paper-2 px-[12px] text-[0.72rem] font-medium;
+  @apply inline-flex min-h-11 cursor-pointer items-center gap-[8px] rounded-[8px] border border-outline/20 bg-paper-2 px-[12px] text-[0.72rem] font-medium;
 }
 
 .file-button input {
@@ -176,7 +176,7 @@
 }
 
 [data-slot="switch"] {
-  @apply relative inline-flex h-8 w-12 rounded-[6px] border border-outline/20 bg-paper-3 p-[4px] transition-colors duration-200;
+  @apply relative inline-flex h-8 w-12 rounded-[6px] border border-outline/20 bg-paper-3 p-[4px] transition-colors duration-200 ease-[var(--ease-out)];
 }
 
 [data-slot="switch"][data-checked] {
@@ -192,7 +192,7 @@
 }
 
 .workspace-modal {
-  @apply flex h-[min(92dvh,900px)] w-[min(96vw,1180px)] flex-col gap-[10px] p-4;
+  @apply flex h-[min(92dvh,900px)] w-[min(96vw,1180px)] flex-col gap-[12px] p-4;
 }
 
 .workspace-head {

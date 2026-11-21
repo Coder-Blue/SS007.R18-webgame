@@ -3,7 +3,7 @@
 }
 
 .panel-head {
-  @apply flex items-start justify-between gap-[10px] border-b border-outline bg-forest-800 px-[12px] pt-[10px] pb-[8px];
+  @apply flex items-start justify-between gap-[12px] border-b border-outline bg-forest-800 px-[12px] pt-[12px] pb-[8px];
 }
 
 .panel-heading {
@@ -11,11 +11,11 @@
 }
 
 .panel-icon {
-  @apply mt-[2px] shrink-0 text-paper/70;
+  @apply mt-[2px] shrink-0 text-paper;
 }
 
 .panel-kicker {
-  @apply text-[0.68rem] font-medium tracking-normal text-paper/70 leading-[1.2];
+  @apply text-[0.68rem] font-medium tracking-normal text-paper leading-[1.2];
 }
 
 .panel-title {
@@ -27,7 +27,7 @@
 }
 
 .panel-head .icon-btn {
-  @apply border-paper/20 bg-forest-900 text-paper/70;
+  @apply border-paper/20 bg-forest-900 text-paper;
 }
 
 .panel-head .icon-btn:hover:not(:disabled) {
@@ -35,7 +35,7 @@
 }
 
 .panel-body {
-  @apply flex flex-col gap-[10px] p-[12px];
+  @apply flex flex-col gap-[12px] p-[12px];
 }
 
 .stat-grid {
@@ -47,7 +47,7 @@
 }
 
 .stat-top {
-  @apply flex items-center justify-between gap-[6px];
+  @apply flex items-center justify-between gap-[8px];
 }
 
 .stat-label {
@@ -107,7 +107,7 @@
 }
 
 .badge {
-  @apply inline-flex items-center gap-1 rounded-[4px] border px-[6px] py-[2px] text-[0.68rem] font-medium tracking-normal whitespace-nowrap;
+  @apply inline-flex items-center gap-1 rounded-[4px] border px-[8px] py-[2px] text-[0.68rem] font-medium tracking-normal whitespace-nowrap;
 }
 
 .badge[data-tone="neutral"] {
@@ -131,7 +131,7 @@
 }
 
 .badge[data-tone="dark"] {
-  @apply border-forest-950 bg-forest-800 text-gold-light;
+  @apply border-forest-950 bg-forest-800 text-paper;
 }
 
 .btn {
@@ -190,11 +190,11 @@
 }
 
 .icon-btn {
-  @apply inline-grid h-11 w-11 place-items-center rounded-[8px] border border-outline/20 bg-paper-2 text-ink-soft transition-colors duration-150;
+  @apply inline-grid h-11 w-11 place-items-center rounded-[8px] border border-outline/20 bg-paper-2 text-ink-soft transition-colors duration-150 ease-[var(--ease-out)];
 }
 
 .top-bar .icon-btn {
-  @apply border-paper/20 bg-forest-900 text-paper/70;
+  @apply border-paper/20 bg-forest-900 text-paper;
 }
 
 .icon-btn:hover:not(:disabled) {
@@ -206,7 +206,7 @@
 }
 
 .section-heading {
-  @apply flex items-start justify-between gap-[10px];
+  @apply flex items-start justify-between gap-[12px];
 }
 
 .section-heading h3 {
@@ -222,7 +222,7 @@
 }
 
 .empty-state {
-  @apply flex flex-col items-center gap-[6px] rounded-[var(--radius-sm)] border border-dashed border-line-strong px-3 py-[24px] text-center text-ink-soft;
+  @apply flex flex-col items-center gap-[8px] rounded-[var(--radius-sm)] border border-dashed border-line-strong px-3 py-[24px] text-center text-ink-soft;
 }
 
 .empty-state strong {
@@ -234,7 +234,7 @@
 }
 
 .callout {
-  @apply flex items-start gap-2 rounded-[var(--radius-sm)] border border-gold-dark/55 bg-gold/12 px-[10px] py-[8px] text-[0.68rem] leading-[1.5] text-[oklch(42%_0.075_80)];
+  @apply flex items-start gap-2 rounded-[var(--radius-sm)] border border-gold-dark/55 bg-gold/12 px-[12px] py-[8px] text-[0.68rem] leading-[1.5] text-[oklch(42%_0.075_80)];
 }
 
 .callout iconify-icon {

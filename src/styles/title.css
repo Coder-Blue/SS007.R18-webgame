@@ -54,7 +54,19 @@
 }
 
 .title-actions {
-  @apply mt-1 flex flex-wrap gap-[10px];
+  @apply mt-1 flex flex-wrap gap-[12px];
+}
+
+.title-utilities {
+  @apply flex flex-wrap gap-[8px];
+}
+
+.title-utilities .btn {
+  @apply min-h-10 border-transparent bg-transparent px-2 text-paper shadow-none;
+}
+
+.title-utilities .btn:hover:not(:disabled) {
+  @apply bg-paper/8 text-paper;
 }
 
 .title-acts {
@@ -62,7 +74,7 @@
 }
 
 .title-act {
-  @apply flex flex-col gap-1 border-t border-gold-dark/40 px-0 pt-[10px];
+  @apply flex flex-col gap-1 border-t border-gold-dark/40 px-0 pt-[12px];
 }
 
 .title-act span {

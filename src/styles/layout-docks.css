@@ -18,11 +18,11 @@
 }
 
 .dock .panel-body {
-  @apply gap-[10px];
+  @apply gap-[12px];
 }
 
 .dock-pillars {
-  @apply flex flex-col gap-[6px];
+  @apply flex flex-col gap-[8px];
 }
 
 .dock-pillar {
@@ -34,7 +34,7 @@
 }
 
 .dock-pillar-icon {
-  @apply row-span-2 grid h-[32px] w-[32px] place-items-center rounded-[6px] border border-paper/15 bg-forest-800 text-paper/60;
+  @apply row-span-2 grid h-[32px] w-[32px] place-items-center rounded-[6px] border border-paper/15 bg-forest-800 text-paper/80;
 }
 
 .dock-pillar-copy {
@@ -54,11 +54,11 @@
 }
 
 .quick-actions {
-  @apply flex flex-wrap gap-[6px];
+  @apply flex flex-wrap gap-[8px];
 }
 
 .selection-card {
-  @apply flex items-center justify-between rounded-[6px] border border-dashed border-line-strong bg-paper-2 px-[10px] py-2;
+  @apply flex items-center justify-between rounded-[6px] border border-dashed border-line-strong bg-paper-2 px-[12px] py-2;
 }
 
 .selection-card strong {
@@ -66,11 +66,11 @@
 }
 
 .dock-note {
-  @apply flex items-center gap-[6px] rounded-[6px] border border-line bg-paper-2 px-[8px] py-[8px] text-[0.68rem] font-medium text-ink-soft;
+  @apply flex items-center gap-[8px] rounded-[6px] border border-line bg-paper-2 px-[8px] py-[8px] text-[0.68rem] font-medium text-ink-soft;
 }
 
 .finance-hero {
-  @apply flex flex-col gap-[4px] rounded-[8px] border border-paper/15 bg-forest-800 px-3 py-[10px] text-paper;
+  @apply flex flex-col gap-[4px] rounded-[8px] border border-paper/15 bg-forest-800 px-3 py-[12px] text-paper;
 }
 
 .finance-hero span {
@@ -78,7 +78,7 @@
 }
 
 .finance-hero strong {
-  @apply text-[1.25rem] text-gold-light;
+  @apply text-[1.5rem] text-gold-light;
 }
 
 .finance-hero .badge[data-tone="good"] {
@@ -94,7 +94,7 @@
 }
 
 .dock-kpis {
-  @apply grid grid-cols-3 gap-[6px];
+  @apply grid grid-cols-3 gap-[8px];
 }
 
 .dock-kpis div {
@@ -110,7 +110,7 @@
 }
 
 .bottom-dock {
-  @apply absolute bottom-[calc(16px+var(--safe-bottom))] left-1/2 z-[18] flex -translate-x-1/2 items-center gap-[10px] rounded-[10px] border border-paper/15 bg-forest-950 px-2 py-[6px] text-paper shadow-panel;
+  @apply absolute bottom-[calc(16px+var(--safe-bottom))] left-1/2 z-[18] flex -translate-x-1/2 items-center gap-[12px] rounded-[10px] border border-paper/15 bg-forest-950 px-2 py-[8px] text-paper shadow-panel;
 }
 
 .bottom-dock-tabs {
@@ -118,7 +118,7 @@
 }
 
 .bottom-dock-tab {
-  @apply inline-flex min-h-[40px] items-center gap-[6px] rounded-[6px] border-0 px-[10px] text-[0.72rem] font-medium tracking-normal text-paper/75;
+  @apply inline-flex min-h-[40px] items-center gap-[8px] rounded-[6px] border-0 px-[12px] text-[0.72rem] font-medium tracking-normal text-paper/75;
   background: transparent;
 }
 

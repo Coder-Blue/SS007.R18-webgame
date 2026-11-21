@@ -7,7 +7,7 @@
 }
 
 .ending-head {
-  @apply flex items-center justify-between gap-[10px];
+  @apply flex items-center justify-between gap-[12px];
 }
 
 .ending-date {

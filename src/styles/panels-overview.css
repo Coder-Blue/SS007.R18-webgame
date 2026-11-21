@@ -3,7 +3,7 @@
 }
 
 .overview-copy {
-  @apply flex min-w-0 flex-col gap-[6px];
+  @apply flex min-w-0 flex-col gap-[8px];
 }
 
 .overview-copy h3 {
@@ -19,7 +19,7 @@
 }
 
 .overview-score .score-label {
-  @apply text-[0.68rem] tracking-normal text-paper/70;
+  @apply text-[0.68rem] tracking-normal text-paper;
 }
 
 .overview-score strong {
@@ -39,7 +39,7 @@
 }
 
 .pillar-icon {
-  @apply grid h-8 w-8 shrink-0 place-items-center rounded-[6px] border border-paper/15 bg-forest-800 text-paper/60;
+  @apply grid h-8 w-8 shrink-0 place-items-center rounded-[6px] border border-paper/15 bg-forest-800 text-paper/80;
 }
 
 .pillar-top div {
@@ -59,7 +59,7 @@
 }
 
 .goal-list {
-  @apply flex flex-col gap-[6px];
+  @apply flex flex-col gap-[8px];
 }
 
 .goal {
@@ -104,7 +104,7 @@
 }
 
 .supply-mix-bar {
-  @apply flex h-[10px] overflow-hidden rounded-[2px] border border-outline/25 bg-paper-3;
+  @apply flex h-[8px] overflow-hidden rounded-[2px] border border-outline/25 bg-paper-3;
 }
 
 .mix-self {
