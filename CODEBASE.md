@@ -85,7 +85,7 @@ package is patched for Solid 2's attribute namespace and element typings.
 `nitro.config.ts`. Takumi builds a 1200x630 card from the local Be Vietnam Pro
 TTF weights under `public/fonts/`; Nitro bundles those files as server assets so
 the Vercel function does not need a self-fetch, and `ImageResponse` streams the
-card with a one-day immutable cache. Public font responses use a seven-day
+card with a one-day immutable cache. Public font responses use a thirty-day
 shared cache. Nitro bundles the Takumi WASM backend for production; Vite dev
 feeds the WASM bytes directly because pnpm's virtual store hides the native
 addon. The root route advertises an absolute `/og.png` URL through the Open

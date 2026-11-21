@@ -10,12 +10,13 @@ full-charset TrueType faces because Takumi renders from SFNT data.
 ## UI WOFF2 subsets
 
 The ten WOFF2 files are the Google Fonts Latin and Vietnamese subsets for the
-Be Vietnam Pro 1.0083 family build, fetched from the Google Fonts CSS API v2:
+Be Vietnam Pro 1.0083 family release (binary version 1.002), fetched from the
+Google Fonts CSS API v2:
 
 `https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap`
 
-They carry the `BeVietnamPro-*` PostScript names and report version 1.0083, the
-same family version as the TTF faces below.
+They carry the `BeVietnamPro-*` PostScript names and report binary version
+1.002, the same binary version as the TTF faces below.
 
 | Weight | Subset | Repository file | SHA-256 |
 | --- | --- | --- | --- |
@@ -47,5 +48,5 @@ archive keeps the original filenames:
 
 Only the OG route reads these TTF files; the UI never requests them.
 
-All faces report family version 1.0083 and the same 1000 unit em metrics.
+All faces report binary version 1.002 and the same 1000 unit em metrics.
 Licensed under the SIL Open Font License 1.1; see `OFL.txt`.

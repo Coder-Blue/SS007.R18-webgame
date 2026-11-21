@@ -7,7 +7,7 @@ export default defineConfig({
   routeRules: {
     "/fonts/**": {
       headers: {
-        "cache-control": "public, max-age=31536000, immutable",
+        "cache-control": "public, max-age=2592000",
       },
     },
   },
