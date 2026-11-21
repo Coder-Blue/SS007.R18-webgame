@@ -1,182 +1,102 @@
 .title-screen {
-  position: absolute;
-  inset: 0;
-  z-index: 30;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: clamp(24px, 6vw, 88px);
+  @apply absolute inset-0 z-30 flex items-center justify-start p-[clamp(24px,6vw,88px)] text-paper;
   background:
     linear-gradient(
       100deg,
-      rgba(8, 22, 13, 0.92) 0%,
-      rgba(9, 24, 15, 0.74) 42%,
-      rgba(9, 24, 15, 0.18) 72%,
+      oklch(18.39% 0.0272 154.77 / 0.92) 0%,
+      oklch(19.21% 0.0278 156.29 / 0.74) 42%,
+      oklch(19.21% 0.0278 156.29 / 0.18) 72%,
       transparent 100%
     ),
-    radial-gradient(80% 70% at 15% 40%, rgba(216, 169, 75, 0.18), transparent 55%);
-  color: var(--paper);
+    radial-gradient(80% 70% at 15% 40%, oklch(76.03% 0.1236 82.19 / 0.18), transparent 55%);
 }
 
 .title-vignette {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(to top, rgba(5, 14, 8, 0.75), transparent 35%);
+  @apply pointer-events-none absolute inset-0;
+  background: linear-gradient(to top, oklch(15.14% 0.0201 156.21 / 0.75), transparent 35%);
 }
 
 .title-content {
-  position: relative;
-  z-index: 1;
-  max-width: 620px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  @apply relative z-[1] flex max-w-[620px] flex-col gap-4;
 }
 
 .title-kicker {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--gold-light);
+  @apply flex items-center gap-[10px] text-[0.68rem] tracking-[0.16em] text-gold-light uppercase;
 }
 
 .brand-seal {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  border: 1px solid rgba(242, 212, 139, 0.5);
-  background: rgba(13, 33, 22, 0.6);
+  @apply grid h-[34px] w-[34px] place-items-center rounded-full border border-gold-light/50;
+  background: oklch(22.68% 0.0341 158.05 / 0.6);
 }
 
 .title-main {
-  font-size: clamp(2.5rem, 6.5vw, 5.6rem);
-  line-height: 0.95;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  color: var(--paper);
-  text-wrap: balance;
-  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.36);
+  @apply text-[clamp(2.5rem,6.5vw,5.6rem)] leading-[0.95] font-extrabold tracking-[-0.04em] text-paper text-balance;
+  text-shadow: 0 8px 30px oklch(0% 0 0 / 0.36);
 }
 
 .title-sub {
-  font-size: clamp(0.8rem, 1.4vw, 1rem);
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--gold);
+  @apply text-[clamp(0.8rem,1.4vw,1rem)] tracking-[0.3em] text-gold uppercase;
 }
 
 .title-tagline {
-  max-width: 520px;
-  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
-  line-height: 1.65;
-  color: rgba(247, 240, 226, 0.82);
-  text-wrap: pretty;
+  @apply max-w-[520px] text-[clamp(0.9rem,1.2vw,1.05rem)] leading-[1.65] text-paper/82 text-pretty;
 }
 
 .title-role {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(242, 212, 139, 0.28);
-  background: rgba(13, 33, 22, 0.5);
-  font-size: 0.72rem;
-  color: var(--gold-light);
+  @apply inline-flex w-fit items-center gap-2 rounded-full border border-gold-light/28 px-3 py-2 text-[0.72rem] text-gold-light;
+  background: oklch(22.68% 0.0341 158.05 / 0.5);
 }
 
 .title-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 4px;
+  @apply mt-1 flex flex-wrap gap-[10px];
 }
 
 .title-acts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 14px;
+  @apply mt-[14px] grid grid-cols-3 gap-[10px];
 }
 
 .title-act {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(242, 212, 139, 0.16);
-  background: rgba(13, 33, 22, 0.46);
-  backdrop-filter: blur(8px);
+  @apply flex flex-col gap-1 rounded-[14px] border border-gold-light/16 p-3 backdrop-blur-[8px];
+  background: oklch(22.68% 0.0341 158.05 / 0.46);
 }
 
 .title-act span {
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: var(--gold);
-  letter-spacing: 0.16em;
+  @apply text-[0.62rem] font-extrabold tracking-[0.16em] text-gold;
 }
 
 .title-act strong {
-  font-size: 0.76rem;
+  @apply text-[0.76rem];
 }
 
 .title-act p {
-  font-size: 0.66rem;
-  line-height: 1.5;
-  color: rgba(247, 240, 226, 0.66);
+  @apply text-[0.66rem] leading-[1.5] text-paper/66;
 }
 
 .title-footer {
-  margin-top: 8px;
-  font-size: 0.62rem;
-  color: rgba(247, 240, 226, 0.46);
+  @apply mt-2 text-[0.62rem] text-paper/46;
 }
 
 .title-actions .btn[data-variant="ghost"] {
-  color: var(--paper);
-  border-color: rgba(242, 212, 139, 0.24);
-  background: rgba(13, 33, 22, 0.42);
+  @apply border-gold-light/24 text-paper;
+  background: oklch(22.68% 0.0341 158.05 / 0.42);
 }
 
 .title-actions .btn[data-variant="ghost"]:hover:not(:disabled) {
-  background: rgba(242, 212, 139, 0.14);
-  color: var(--gold-light);
+  @apply bg-gold-light/14 text-gold-light;
 }
 
 .error-screen {
-  display: grid;
-  place-items: center;
-  height: 100dvh;
-  padding: 20px;
-  background: var(--forest-900);
+  @apply grid h-[100dvh] place-items-center bg-forest-900 p-5;
 }
 
 .error-card {
-  width: min(92vw, 480px);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 24px;
-  border-radius: 20px;
-  background: var(--paper);
-  box-shadow: var(--shadow-lg);
+  @apply flex w-[min(92vw,480px)] flex-col items-start gap-3 rounded-[20px] bg-paper p-6 shadow-deep;
 }
 
 .error-card h1 {
-  font-size: 1.4rem;
-  color: var(--forest-900);
+  @apply text-[1.4rem] text-forest-900;
 }
 
 .error-card p {
-  color: var(--ink-soft);
-  font-size: 0.84rem;
+  @apply text-[0.84rem] text-ink-soft;
 }

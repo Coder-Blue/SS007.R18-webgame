@@ -1,219 +1,124 @@
 .dock {
-  position: absolute;
-  z-index: 15;
-  top: calc(86px + var(--safe-top));
-  width: 266px;
+  @apply absolute top-[calc(86px+var(--safe-top))] z-[15] w-[266px] overflow-y-auto;
   max-height: calc(100dvh - 178px - var(--safe-top) - var(--safe-bottom));
-  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--line-strong) transparent;
 }
 
 .dock-left {
-  left: 14px;
+  @apply left-[14px];
 }
 
 .dock-right {
-  right: 14px;
+  @apply right-[14px];
 }
 
 .dock-panel.panel {
-  background: rgba(247, 240, 226, 0.95);
-  backdrop-filter: blur(12px);
+  @apply bg-paper/95 backdrop-blur-[12px];
 }
 
 .dock .panel-body {
-  gap: 10px;
+  @apply gap-[10px];
 }
 
 .dock-pillars {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  @apply flex flex-col gap-[6px];
 }
 
 .dock-pillar {
-  display: grid;
-  grid-template-columns: 30px 1fr;
-  gap: 3px 9px;
-  align-items: center;
-  width: 100%;
-  padding: 8px;
-  border: 1px solid var(--line);
-  border-radius: 11px;
-  background: rgba(255, 252, 245, 0.6);
-  text-align: left;
+  @apply grid w-full grid-cols-[30px_1fr] items-center gap-x-[9px] gap-y-[3px] rounded-[11px] border border-line bg-cream/60 p-2 text-left;
 }
 
 .dock-pillar:hover {
-  border-color: var(--gold);
-  background: #fffaf0;
+  @apply border-gold bg-cream;
 }
 
 .dock-pillar-icon {
-  grid-row: span 2;
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border-radius: 9px;
-  background: var(--forest-800);
-  color: var(--gold-light);
+  @apply row-span-2 grid h-[30px] w-[30px] place-items-center rounded-[9px] bg-forest-800 text-gold-light;
 }
 
 .dock-pillar-copy {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-  min-width: 0;
+  @apply flex min-w-0 flex-col leading-[1.2];
 }
 
 .dock-pillar-copy strong {
-  font-size: 0.76rem;
+  @apply text-[0.76rem];
 }
 
 .dock-pillar-copy span {
-  font-size: 0.66rem;
-  color: var(--ink-soft);
+  @apply text-[0.66rem] text-ink-soft;
 }
 
 .dock-pillar .bar {
-  grid-column: 2;
+  @apply col-start-2;
 }
 
 .quick-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  @apply flex flex-wrap gap-[6px];
 }
 
 .selection-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: var(--paper-2);
-  border: 1px dashed var(--gold-dark);
+  @apply flex items-center justify-between rounded-[10px] border border-dashed border-gold-dark bg-paper-2 px-[10px] py-2;
 }
 
 .selection-card strong {
-  display: block;
-  font-size: 0.78rem;
+  @apply block text-[0.78rem];
 }
 
 .dock-note {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 9px;
-  border-radius: 9px;
-  background: rgba(29, 74, 50, 0.08);
-  color: var(--forest-700);
-  font-size: 0.68rem;
-  font-weight: 600;
+  @apply flex items-center gap-[6px] rounded-[9px] bg-forest-700/8 px-[9px] py-[7px] text-[0.68rem] font-semibold text-forest-700;
 }
 
 .finance-hero {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: var(--forest-800);
-  color: var(--paper);
+  @apply flex flex-col gap-[3px] rounded-xl bg-forest-800 px-3 py-[10px] text-paper;
 }
 
 .finance-hero span {
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  opacity: 0.7;
+  @apply text-[0.62rem] tracking-[0.1em] uppercase opacity-70;
 }
 
 .finance-hero strong {
-  font-size: 1.25rem;
-  color: var(--gold-light);
+  @apply text-[1.25rem] text-gold-light;
 }
 
 .dock-meter {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  @apply flex flex-col gap-1;
 }
 
 .dock-kpis {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  @apply grid grid-cols-3 gap-[6px];
 }
 
 .dock-kpis div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 6px;
-  border-radius: 8px;
-  background: rgba(36, 29, 22, 0.05);
+  @apply flex flex-col gap-[2px] rounded-lg bg-ink/5 p-[6px];
 }
 
 .dock-kpis span {
-  font-size: 0.58rem;
-  color: var(--ink-soft);
+  @apply text-[0.58rem] text-ink-soft;
 }
 
 .dock-kpis strong {
-  font-size: 0.74rem;
+  @apply text-[0.74rem];
 }
 
 .bottom-dock {
-  position: absolute;
-  left: 50%;
-  bottom: calc(14px + var(--safe-bottom));
-  transform: translateX(-50%);
-  z-index: 18;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(242, 212, 139, 0.22);
-  background: rgba(13, 33, 22, 0.84);
-  color: var(--paper);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(12px);
+  @apply absolute bottom-[calc(14px+var(--safe-bottom))] left-1/2 z-[18] flex -translate-x-1/2 items-center gap-[10px] rounded-full border border-gold-light/22 px-[10px] py-[7px] text-paper shadow-lift backdrop-blur-[12px];
+  background: oklch(22.68% 0.0341 158.05 / 0.84);
 }
 
 .bottom-dock-tabs {
-  display: flex;
-  gap: 4px;
+  @apply flex gap-1;
 }
 
 .bottom-dock-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 0 11px;
-  border: 0;
-  border-radius: 999px;
+  @apply inline-flex min-h-[40px] items-center gap-[6px] rounded-full border-0 px-[11px] text-[0.7rem] font-semibold text-paper/78;
   background: transparent;
-  color: rgba(247, 240, 226, 0.78);
-  font-size: 0.7rem;
-  font-weight: 600;
 }
 
 .bottom-dock-tab:hover {
-  background: rgba(242, 212, 139, 0.14);
-  color: var(--gold-light);
+  @apply bg-gold-light/14 text-gold-light;
 }
 
 .bottom-dock-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding-left: 10px;
-  border-left: 1px solid rgba(242, 212, 139, 0.18);
-  font-size: 0.64rem;
-  color: rgba(247, 240, 226, 0.52);
+  @apply inline-flex items-center gap-[5px] border-l border-gold-light/18 pl-[10px] text-[0.64rem] text-paper/52;
 }

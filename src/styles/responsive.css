@@ -1,76 +1,68 @@
 @media (max-width: 1100px) {
   .panel-body {
-    padding: 11px;
+    @apply p-[11px];
   }
 
   .stat-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    @apply grid-cols-2;
   }
 
   .overview-hero {
-    flex-direction: column;
+    @apply flex-col;
   }
 
   .overview-score {
-    flex: 0 0 auto;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
+    @apply flex-[0_0_auto] flex-row items-center gap-[10px];
   }
 
   .overview-score .bar {
-    flex: 1;
+    @apply flex-1;
   }
 
   .overview-score strong {
-    font-size: 1.15rem;
+    @apply text-[1.15rem];
   }
 
   .policy-hero {
-    grid-template-columns: 1fr;
+    @apply grid-cols-1;
   }
 
   .coverage-row {
-    grid-template-columns: 52px 1fr;
+    @apply grid-cols-[52px_1fr];
   }
 
   .coverage-row .coverage-copy:nth-of-type(2) {
-    grid-column: 2;
+    @apply col-start-2;
   }
 
   .pillar-grid {
-    gap: 7px;
+    @apply gap-[7px];
   }
 
   .title-role {
-    font-size: 0.66rem;
+    @apply text-[0.66rem];
   }
 }
 
 @media (max-width: 767px) {
   body {
-    font-size: 14px;
+    @apply text-[14px];
   }
 
   .top-bar {
-    min-height: 52px;
-    border-radius: 14px;
+    @apply min-h-[52px] rounded-[14px];
   }
 
   .top-actions .advance-btn.desktop-only {
-    display: none;
+    @apply hidden;
   }
 
   .top-actions .advance-btn {
-    min-width: 44px;
+    @apply min-w-11;
   }
 
   .top-actions .advance-btn span {
-    display: none;
-  }
-
-  .top-actions .advance-btn::after {
-    content: "";
+    @apply hidden;
   }
 
   .scene-controls {
@@ -78,7 +70,7 @@
   }
 
   .scene-hint {
-    display: none;
+    @apply hidden;
   }
 
   .scene-badges {
@@ -86,26 +78,25 @@
   }
 
   .modal-title {
-    font-size: 1.08rem;
+    @apply text-[1.08rem];
   }
 
   .event-choice {
-    min-height: 66px;
+    @apply min-h-[66px];
   }
 
   .ending-actions .btn {
-    flex: 1 1 auto;
+    @apply flex-auto;
   }
 
   .toast {
-    bottom: calc(156px + var(--safe-bottom));
-    font-size: 0.72rem;
+    @apply bottom-[calc(156px+var(--safe-bottom))] text-[0.72rem];
   }
 
   .btn[data-size="sm"],
   .file-button,
   .sheet-tab {
-    min-height: 44px;
+    @apply min-h-11;
   }
 }
 
@@ -113,32 +104,31 @@
   .stat-grid,
   .market-grid,
   .annual-grid {
-    grid-template-columns: 1fr;
+    @apply grid-cols-1;
   }
 
   .title-actions {
-    flex-direction: column;
-    align-items: stretch;
+    @apply flex-col items-stretch;
   }
 
   .title-actions .btn {
-    width: 100%;
+    @apply w-full;
   }
 
   .title-kicker {
-    font-size: 0.58rem;
+    @apply text-[0.58rem];
   }
 
   .title-tagline {
-    font-size: 0.78rem;
+    @apply text-[0.78rem];
   }
 
   .scene-badges {
-    display: none;
+    @apply hidden;
   }
 
   .mobile-sheet {
-    width: 100vw;
+    @apply w-screen;
   }
 
   .sheet-body {
@@ -146,17 +136,15 @@
   }
 
   .modal {
-    width: calc(100vw - 16px);
-    padding: 14px;
+    @apply w-[calc(100vw_-_16px)] p-[14px];
   }
 
   .event-choice {
-    padding: 9px;
+    @apply p-[9px];
   }
 
   .choice-index {
-    width: 26px;
-    height: 26px;
+    @apply h-[26px] w-[26px];
   }
 }
 
@@ -166,66 +154,50 @@
   }
 
   .panel-body {
-    gap: 8px;
-    padding: 10px;
+    @apply gap-2 p-[10px];
   }
 
   .guide-list,
   .dock-note {
-    display: none;
+    @apply hidden;
   }
 }
 
 @media (hover: none) {
   .event-choice:hover,
   .dock-pillar:hover {
-    transform: none;
+    @apply transform-none;
   }
 }
 
 @media (max-width: 1100px) {
   .desktop-only {
-    display: none !important;
+    @apply hidden!;
   }
 
   .dock,
   .bottom-dock,
   .scene-hint {
-    display: none !important;
+    @apply hidden!;
   }
 
   .mobile-nav {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 25;
-    padding: 8px 8px calc(8px + var(--safe-bottom));
-    background: linear-gradient(to top, rgba(10, 27, 17, 0.98), rgba(10, 27, 17, 0.88));
-    border-top: 1px solid rgba(242, 212, 139, 0.18);
-    backdrop-filter: blur(14px);
+    @apply absolute right-0 bottom-0 left-0 z-[25] grid grid-cols-5 border-t border-gold-light/18 px-2 pt-2 backdrop-blur-[14px];
+    padding-bottom: calc(8px + var(--safe-bottom));
+    background: linear-gradient(
+      to top,
+      oklch(20.35% 0.0307 156.5 / 0.98),
+      oklch(20.35% 0.0307 156.5 / 0.88)
+    );
   }
 
   .mobile-tab {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    min-height: 48px;
-    border: 0;
-    border-radius: 10px;
+    @apply flex min-h-12 flex-col items-center justify-center gap-[3px] rounded-[10px] border-0 text-[0.58rem] font-semibold text-paper/68;
     background: transparent;
-    color: rgba(247, 240, 226, 0.68);
-    font-size: 0.58rem;
-    font-weight: 600;
   }
 
   .mobile-tab:active {
-    background: rgba(242, 212, 139, 0.12);
-    color: var(--gold-light);
+    @apply bg-gold-light/12 text-gold-light;
   }
 
   .scene-badges {
@@ -233,125 +205,104 @@
   }
 
   .scene-controls {
-    right: 12px;
+    @apply right-3;
     bottom: calc(84px + var(--safe-bottom));
   }
 
   .top-bar {
-    top: calc(8px + var(--safe-top));
-    left: 8px;
-    right: 8px;
-    padding: 7px 9px;
-    gap: 8px;
-    flex-wrap: wrap;
+    @apply top-[calc(8px+var(--safe-top))] right-2 left-2 flex-wrap gap-2 px-[9px] py-[7px];
   }
 
   .brand-copy span,
   .date-block {
-    display: none;
+    @apply hidden;
   }
 
   .brand-block {
-    min-width: 0;
-    flex: 1;
+    @apply min-w-0 flex-1;
   }
 
   .brand-mark {
-    width: 32px;
-    height: 32px;
+    @apply h-8 w-8;
   }
 
   .brand-copy strong {
-    font-size: 0.74rem;
+    @apply text-[0.74rem];
   }
 
   .top-actions {
-    gap: 5px;
+    @apply gap-[5px];
   }
 
   .top-actions .advance-btn {
-    min-height: 44px;
-    padding: 0 10px;
-    font-size: 0.68rem;
+    @apply min-h-11 px-[10px] text-[0.68rem];
   }
 
   .mobile-status {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    gap: 10px;
-    padding-top: 4px;
-    border-top: 1px solid rgba(242, 212, 139, 0.14);
-    font-size: 0.64rem;
-    color: rgba(247, 240, 226, 0.76);
+    @apply flex w-full items-center gap-[10px] border-t border-gold-light/14 pt-1 text-[0.64rem] text-paper/76;
   }
 
   .mobile-status span {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    @apply inline-flex items-center gap-1;
   }
 
   .title-screen {
-    align-items: flex-end;
-    padding: 24px 18px calc(24px + var(--safe-bottom));
+    @apply items-end px-[18px] pt-6;
+    padding-bottom: calc(24px + var(--safe-bottom));
     background:
       linear-gradient(
         to top,
-        rgba(8, 22, 13, 0.96) 0%,
-        rgba(9, 24, 15, 0.72) 55%,
-        rgba(9, 24, 15, 0.25) 100%
+        oklch(18.39% 0.0272 154.77 / 0.96) 0%,
+        oklch(19.21% 0.0278 156.29 / 0.72) 55%,
+        oklch(19.21% 0.0278 156.29 / 0.25) 100%
       ),
-      radial-gradient(80% 70% at 30% 30%, rgba(216, 169, 75, 0.16), transparent 55%);
+      radial-gradient(80% 70% at 30% 30%, oklch(76.03% 0.1236 82.19 / 0.16), transparent 55%);
   }
 
   .title-content {
-    gap: 10px;
+    @apply gap-[10px];
   }
 
   .title-main {
-    font-size: clamp(2.4rem, 13vw, 4rem);
+    @apply text-[clamp(2.4rem,13vw,4rem)];
   }
 
   .title-acts {
-    display: none;
+    @apply hidden;
   }
 
   .title-tagline {
-    font-size: 0.84rem;
+    @apply text-[0.84rem];
   }
 
   .title-actions .btn {
-    flex: 1 1 auto;
+    @apply flex-auto;
   }
 }
 
 @media (max-width: 480px) {
   .top-actions .icon-btn:nth-of-type(2) {
-    display: none;
+    @apply hidden;
   }
 
   .mobile-nav {
-    padding-left: 4px;
-    padding-right: 4px;
+    @apply px-1;
   }
 
   .mobile-tab {
-    font-size: 0.54rem;
+    @apply text-[0.54rem];
   }
 
   .scene-badges {
-    left: 10px;
+    @apply left-[10px] flex-col items-start;
     transform: none;
-    flex-direction: column;
-    align-items: flex-start;
   }
 }
 
 .game-shell[data-screen="title"] .scene-controls,
 .game-shell[data-screen="title"] .scene-badges,
 .game-shell[data-screen="title"] .scene-hint {
-  display: none;
+  @apply hidden;
 }
 
 .game-shell[data-screen="title"] .village-canvas {

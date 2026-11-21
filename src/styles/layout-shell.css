@@ -1,219 +1,123 @@
 .game-shell {
-  position: relative;
-  width: 100%;
-  height: 100dvh;
-  overflow: hidden;
-  background: radial-gradient(circle at 30% 20%, #2c5139 0%, #0d2116 65%);
+  @apply relative h-[100dvh] w-full overflow-hidden;
+  background: radial-gradient(
+    circle at 30% 20%,
+    oklch(39.96% 0.0592 154.34) 0%,
+    var(--color-forest-900) 65%
+  );
 }
 
 .scene-wrap {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  touch-action: none;
+  @apply absolute inset-0 touch-none overflow-hidden;
 }
 
 .village-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  touch-action: none;
-  cursor: grab;
+  @apply block h-full w-full cursor-grab touch-none;
 }
 
 .village-canvas:active {
-  cursor: grabbing;
+  @apply cursor-grabbing;
 }
 
 .scene-vignette {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+  @apply pointer-events-none absolute inset-0;
   background:
-    radial-gradient(120% 80% at 50% 10%, transparent 40%, rgba(5, 15, 9, 0.55) 100%),
-    linear-gradient(to top, rgba(5, 15, 9, 0.72) 0%, transparent 28%);
+    radial-gradient(120% 80% at 50% 10%, transparent 40%, oklch(15.54% 0.0209 158.79 / 0.55) 100%),
+    linear-gradient(to top, oklch(15.54% 0.0209 158.79 / 0.72) 0%, transparent 28%);
 }
 
 .scene-badges {
-  position: absolute;
+  @apply pointer-events-none absolute left-1/2 z-[3] flex -translate-x-1/2 gap-2;
   top: calc(82px + var(--safe-top));
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
-  pointer-events: none;
-  z-index: 3;
 }
 
 .scene-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 11px;
-  border-radius: 999px;
-  background: rgba(13, 33, 22, 0.72);
-  border: 1px solid rgba(242, 212, 139, 0.24);
-  color: var(--paper);
-  font-size: 0.72rem;
-  font-weight: 600;
-  backdrop-filter: blur(8px);
+  @apply inline-flex items-center gap-[6px] rounded-full border border-gold-light/24 px-[11px] py-[6px] text-[0.72rem] font-semibold text-paper backdrop-blur-[8px];
+  background: oklch(22.68% 0.0341 158.05 / 0.72);
 }
 
 .scene-controls {
-  position: absolute;
-  right: 18px;
-  bottom: 96px;
-  z-index: 4;
+  @apply absolute right-[18px] bottom-[96px] z-[4];
 }
 
 .scene-reset {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(242, 212, 139, 0.3);
-  background: rgba(13, 33, 22, 0.74);
-  color: var(--paper);
-  font-size: 0.74rem;
-  font-weight: 600;
-  backdrop-filter: blur(8px);
+  @apply inline-flex min-h-11 items-center gap-2 rounded-full border border-gold-light/30 px-[14px] text-[0.74rem] font-semibold text-paper backdrop-blur-[8px];
+  background: oklch(22.68% 0.0341 158.05 / 0.74);
 }
 
 .scene-hint {
-  position: absolute;
-  left: 50%;
-  bottom: 16px;
-  transform: translateX(-50%);
-  color: rgba(247, 240, 226, 0.72);
-  font-size: 0.66rem;
-  letter-spacing: 0.02em;
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 3;
+  @apply pointer-events-none absolute bottom-4 left-1/2 z-[3] -translate-x-1/2 text-[0.66rem] tracking-[0.02em] whitespace-nowrap text-paper/72;
 }
 
 .scene-loading {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: var(--gold-light);
-  font-weight: 600;
-  background: rgba(8, 19, 12, 0.62);
-  letter-spacing: 0.04em;
+  @apply absolute inset-0 grid place-items-center font-semibold tracking-[0.04em] text-gold-light;
+  background: oklch(17.33% 0.0219 155.73 / 0.62);
 }
 
 .top-bar {
-  position: absolute;
+  @apply absolute left-3 right-3 z-20 flex min-h-[60px] items-center gap-[18px] rounded-[var(--radius)] border border-gold-light/24 px-[14px] py-2 text-paper shadow-lift backdrop-blur-[14px];
   top: calc(12px + var(--safe-top));
-  left: 12px;
-  right: 12px;
-  z-index: 20;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 8px 14px;
-  border-radius: var(--radius);
-  border: 1px solid rgba(242, 212, 139, 0.24);
-  background: linear-gradient(180deg, rgba(18, 43, 29, 0.94), rgba(11, 29, 19, 0.9));
-  color: var(--paper);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(14px);
+  background: linear-gradient(
+    180deg,
+    oklch(26.41% 0.0411 157.42 / 0.94),
+    oklch(21.15% 0.0314 157.89 / 0.9)
+  );
 }
 
 .brand-block {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 190px;
+  @apply flex min-w-[190px] items-center gap-[10px];
 }
 
 .brand-mark {
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--gold), #b7852f);
-  color: var(--forest-900);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  @apply grid h-9 w-9 place-items-center rounded-xl text-forest-900;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-deep));
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.35);
 }
 
 .brand-copy {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
+  @apply flex flex-col leading-[1.15];
 }
 
 .brand-copy strong {
-  font-size: 0.84rem;
-  letter-spacing: 0.01em;
+  @apply text-[0.84rem] tracking-[0.01em];
 }
 
 .brand-copy span {
-  font-size: 0.58rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--gold-light);
-  opacity: 0.8;
+  @apply text-[0.58rem] tracking-[0.16em] uppercase text-gold-light opacity-80;
 }
 
 .date-block {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.25;
-  padding-left: 16px;
-  border-left: 1px solid rgba(242, 212, 139, 0.2);
-  min-width: 138px;
+  @apply flex min-w-[138px] flex-col border-l border-gold-light/20 pl-4 leading-[1.25];
 }
 
 .date-main {
-  font-weight: 700;
-  font-size: 0.84rem;
+  @apply text-[0.84rem] font-bold;
 }
 
 .date-sub {
-  font-size: 0.64rem;
-  color: rgba(247, 240, 226, 0.62);
+  @apply text-[0.64rem] text-paper/62;
 }
 
 .top-gauges {
-  display: flex;
-  gap: 14px;
-  flex: 1;
-  justify-content: center;
+  @apply flex flex-1 justify-center gap-[14px];
 }
 
 .top-gauge {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 96px;
+  @apply flex min-w-[96px] flex-col gap-1;
 }
 
 .top-gauge-label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.61rem;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: rgba(247, 240, 226, 0.62);
+  @apply flex items-center gap-[5px] text-[0.61rem] tracking-[0.07em] uppercase text-paper/62;
 }
 
 .top-gauge strong {
-  font-size: 0.8rem;
+  @apply text-[0.8rem];
 }
 
 .top-actions {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+  @apply flex items-center gap-[7px];
 }
 
 .mobile-status {
-  display: none;
+  @apply hidden;
 }
