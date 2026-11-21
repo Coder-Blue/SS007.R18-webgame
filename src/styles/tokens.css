@@ -1,40 +1,66 @@
 @theme {
-  --font-sans: "Be Vietnam Pro", "Segoe UI", sans-serif;
-  --color-ink: #241d16;
-  --color-paper: #f6efe1;
-  --color-gold: #d8a94b;
-  --color-forest: #173a27;
+  --font-sans: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --color-ink: oklch(23.66% 0.0169 66.86);
+  --color-ink-soft: oklch(45.74% 0.0314 74.3);
+  --color-ink-faint: oklch(59.66% 0.0351 77.95);
+  --color-paper: oklch(95.68% 0.02 84.59);
+  --color-paper-2: oklch(91.96% 0.032 82.77);
+  --color-paper-3: oklch(88.18% 0.0413 81.69);
+  --color-cream: oklch(98.62% 0.0142 84.58);
+  --color-cream-warm: oklch(98.05% 0.0211 85.94);
+  --color-forest-950: oklch(15.14% 0.0201 156.21);
+  --color-forest-900: oklch(22.68% 0.0341 158.05);
+  --color-forest-800: oklch(29.51% 0.0494 158.07);
+  --color-forest-700: oklch(37% 0.0651 157.59);
+  --color-forest-600: oklch(45.22% 0.0793 157.21);
+  --color-forest-500: oklch(52.94% 0.0894 156.52);
+  --color-forest-400: oklch(57.43% 0.0979 157.85);
+  --color-forest-300: oklch(50.96% 0.0876 157.57);
+  --color-gold: oklch(76.03% 0.1236 82.19);
+  --color-gold-light: oklch(87.9% 0.0976 88.02);
+  --color-gold-dark: oklch(58.81% 0.1078 78.74);
+  --color-gold-deep: oklch(65.08% 0.1171 77.13);
+  --color-rust: oklch(54.09% 0.1441 32.94);
+  --color-rust-dark: oklch(41.52% 0.1165 31.42);
+  --color-teal: oklch(54.3% 0.0649 184.45);
+  --color-line: oklch(23.66% 0.0169 66.86 / 0.14);
+  --color-line-strong: oklch(23.66% 0.0169 66.86 / 0.24);
+
+  --shadow-panel: 0 2px 8px oklch(22.24% 0.0289 150.26 / 0.1);
+  --shadow-lift: 0 14px 36px oklch(19.35% 0.026 153.21 / 0.18);
+  --shadow-deep: 0 30px 80px oklch(15.14% 0.0201 156.21 / 0.34);
 }
 
 :root {
-  --paper: #f7f0e2;
-  --paper-2: #efe3cd;
-  --paper-3: #e6d6ba;
-  --ink: #241d16;
-  --ink-soft: #625544;
-  --ink-faint: #8b7d68;
-  --forest-900: #0d2116;
-  --forest-800: #143423;
-  --forest-700: #1d4a32;
-  --forest-600: #2a6344;
-  --forest-500: #3a7b56;
-  --gold: #d8a94b;
-  --gold-light: #f2d48b;
-  --gold-dark: #9f7424;
-  --red: #b34833;
-  --red-dark: #7f2d20;
-  --teal: #3f7c74;
-  --line: rgba(36, 29, 22, 0.14);
-  --line-strong: rgba(36, 29, 22, 0.24);
-  --shadow-sm: 0 2px 8px rgba(17, 31, 20, 0.1);
-  --shadow: 0 14px 36px rgba(11, 24, 15, 0.18);
-  --shadow-lg: 0 30px 80px rgba(6, 16, 10, 0.34);
+  --paper: var(--color-paper);
+  --paper-2: var(--color-paper-2);
+  --paper-3: var(--color-paper-3);
+  --ink: var(--color-ink);
+  --ink-soft: var(--color-ink-soft);
+  --ink-faint: var(--color-ink-faint);
+  --forest-900: var(--color-forest-900);
+  --forest-800: var(--color-forest-800);
+  --forest-700: var(--color-forest-700);
+  --forest-600: var(--color-forest-600);
+  --forest-500: var(--color-forest-500);
+  --gold: var(--color-gold);
+  --gold-light: var(--color-gold-light);
+  --gold-dark: var(--color-gold-dark);
+  --red: var(--color-rust);
+  --red-dark: var(--color-rust-dark);
+  --teal: var(--color-teal);
+  --line: var(--color-line);
+  --line-strong: var(--color-line-strong);
+  --shadow-sm: var(--shadow-panel);
+  --shadow: var(--shadow-lift);
+  --shadow-lg: var(--shadow-deep);
   --radius-sm: 10px;
   --radius: 16px;
   --radius-lg: 22px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --font-ui: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-ui: var(--font-sans);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
 }
@@ -42,17 +68,18 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+  @apply box-border;
 }
 
-html,
+html {
+  @apply m-0 h-full p-0;
+  background: var(--color-forest-900);
+  font-size: 16px;
+}
+
 body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: var(--forest-900);
-  color: var(--ink);
-  font-family: var(--font-ui);
+  @apply m-0 h-full p-0 font-sans text-ink;
+  background: var(--color-forest-900);
   font-size: 15px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -60,8 +87,7 @@ body {
 }
 
 body {
-  overflow: hidden;
-  overscroll-behavior: none;
+  @apply overflow-hidden overscroll-none;
 }
 
 #app {
@@ -77,16 +103,15 @@ textarea {
 }
 
 button {
-  cursor: pointer;
+  @apply cursor-pointer;
 }
 
 button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
+  @apply cursor-not-allowed opacity-45;
 }
 
 a {
-  color: inherit;
+  @apply text-inherit;
 }
 
 h1,
@@ -94,7 +119,7 @@ h2,
 h3,
 h4,
 p {
-  margin: 0;
+  @apply m-0;
 }
 
 h1,
@@ -102,24 +127,19 @@ h2,
 h3,
 h4,
 strong {
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  @apply font-bold tracking-[-0.01em];
 }
 
 ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  @apply m-0 list-none p-0;
 }
 
 ::selection {
-  background: var(--gold);
-  color: var(--forest-900);
+  @apply bg-gold text-forest-900;
 }
 
 :focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
+  @apply outline-2 outline-offset-2 outline-gold;
 }
 
 [data-motion="reduced"] *,
@@ -140,33 +160,25 @@ ul {
 }
 
 .muted {
-  color: var(--ink-soft);
-  font-size: 0.82rem;
-  line-height: 1.55;
+  @apply text-[0.82rem] leading-[1.55] text-ink-soft;
 }
 
 .negative {
-  color: var(--red) !important;
+  @apply text-rust!;
 }
 
 .eyebrow {
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--gold-dark);
+  @apply text-[0.66rem] font-bold tracking-[0.14em] text-gold-dark uppercase;
 }
 
 .stack-lg {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  @apply flex flex-col gap-[14px];
 }
 
 .desktop-only {
-  display: flex;
+  @apply flex;
 }
 
 .mobile-only {
-  display: none;
+  @apply hidden;
 }
