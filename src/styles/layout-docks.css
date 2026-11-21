@@ -74,7 +74,7 @@
 }
 
 .finance-hero span {
-  @apply text-[0.68rem] tracking-normal opacity-70;
+  @apply text-[0.68rem] tracking-normal text-paper;
 }
 
 .finance-hero strong {
@@ -127,5 +127,5 @@
 }
 
 .bottom-dock-status {
-  @apply inline-flex items-center gap-[4px] border-l border-paper/15 pl-[10px] text-[0.68rem] font-medium text-paper/55;
+  @apply inline-flex items-center gap-[4px] border-l border-paper/15 pl-[12px] text-[0.68rem] font-medium text-paper/55;
 }
