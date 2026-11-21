@@ -1,0 +1,9 @@
+# Agent skill bundles and reference docs are third-party material; exclude
+# them from GitHub's language statistics so the game's TypeScript source is
+# the reported primary language.
+.agents/** linguist-vendored
+.claude/** linguist-vendored
+.codex/** linguist-vendored
+.opencode/** linguist-vendored
+docs/** linguist-documentation
+*.md linguist-documentation
