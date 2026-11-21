@@ -55,6 +55,20 @@ The `lint` and `test` GitHub workflows mirror these commands and publish their
 status in the repository Deployments section through the `Lint` and `Test`
 environments.
 
+## Git hooks
+
+`pnpm install` runs `lefthook install` through the `prepare` script. The
+checked-in `lefthook.yml` runs the fast gates on every commit:
+
+- oxlint on staged TypeScript and oxfmt check on staged source;
+- the file budget, emoji and layer-boundary audits;
+- the Vitest suite.
+
+`pre-push` runs the full `pnpm quality` suite. Run the hooks manually with
+`pnpm exec lefthook run pre-commit`. Use `LEFTHOOK=0` or `git commit --no-verify`
+only for an emergency, and state why in the pull request. CI still runs every
+gate.
+
 ## Change shape
 
 - One coherent outcome per branch, pull request and commit.

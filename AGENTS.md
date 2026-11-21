@@ -29,6 +29,7 @@ Use pnpm. The shell normally runs inside `direnv` / `nix develop`.
 | --- | --- |
 | Enter environment | `direnv allow` then `direnv exec . bash` |
 | Install | `pnpm install` |
+| Git hooks | `pnpm exec lefthook install` |
 | Dev server | `pnpm dev` |
 | Build and typecheck | `pnpm build` |
 | Unit tests | `pnpm test` |

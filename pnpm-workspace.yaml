@@ -1,5 +1,6 @@
 allowBuilds:
   esbuild: true
+  lefthook: true
 
 # The Nix dev shell runs a glibc Node on a musl host. Install both libc
 # variants of native optional dependencies so Rolldown can follow the runtime
