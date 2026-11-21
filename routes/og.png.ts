@@ -2,26 +2,71 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { defineHandler } from "nitro";
+import { useStorage } from "nitro/storage";
 import { container, text } from "takumi-js/helpers";
 import ImageResponse from "takumi-js/response";
 import wasmUrl from "takumi-js/wasm-url";
 
 const WIDTH = 1200;
 const HEIGHT = 630;
+const fontCache = new Map<string, Promise<Uint8Array>>();
+
+const normalizeFont = (value: Uint8Array | ArrayBuffer): Uint8Array =>
+  value instanceof Uint8Array ? value : new Uint8Array(value);
+
+const fetchFont = async (origin: string, file: string): Promise<Uint8Array> => {
+  const response = await fetch(`${origin}/fonts/${file}`);
+
+  if (!response.ok) {
+    throw new Error(`Font request failed for ${file}: HTTP ${response.status}`);
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+
+  if (!contentType.startsWith("font/")) {
+    throw new Error(`Font request for ${file} returned ${contentType}`);
+  }
+
+  const bytes = new Uint8Array(await response.arrayBuffer());
+
+  if (bytes.byteLength < 1_000) {
+    throw new Error(`Font request for ${file} returned ${bytes.byteLength} bytes`);
+  }
+
+  return bytes;
+};
+
+const loadFont = (origin: string, file: string): Promise<Uint8Array> => {
+  const cached = fontCache.get(file);
+
+  if (cached !== undefined) return cached;
+
+  const pending = (async () => {
+    try {
+      const bundled = await useStorage("assets:fonts").getItemRaw<Uint8Array | ArrayBuffer>(file);
+
+      if (bundled !== null && bundled !== undefined) return normalizeFont(bundled);
+    } catch {
+      // Fall through to the filesystem and origin fetch paths.
+    }
+
+    try {
+      return await readFile(join(process.cwd(), "public", "fonts", file));
+    } catch {
+      return fetchFont(origin, file);
+    }
+  })();
+
+  fontCache.set(file, pending);
+
+  return pending;
+};
 
 const font = (origin: string, file: string, weight: number) => ({
   name: "Be Vietnam Pro",
   weight,
   style: "normal",
-  data: async () => {
-    try {
-      return await readFile(join(process.cwd(), "public", "fonts", file));
-    } catch {
-      const response = await fetch(`${origin}/fonts/${file}`);
-
-      return new Uint8Array(await response.arrayBuffer());
-    }
-  },
+  data: () => loadFont(origin, file),
 });
 
 const pillar = (kicker: string, title: string) =>
@@ -52,12 +97,10 @@ export default defineHandler(async (event) => {
   const wasmModule = import.meta.env.DEV ? await readFile(fileURLToPath(wasmUrl)) : undefined;
 
   const fonts = [
-    font(origin, "be-vietnam-pro-600-vietnamese.woff2", 600),
-    font(origin, "be-vietnam-pro-600-latin.woff2", 600),
-    font(origin, "be-vietnam-pro-700-vietnamese.woff2", 700),
-    font(origin, "be-vietnam-pro-700-latin.woff2", 700),
-    font(origin, "be-vietnam-pro-800-vietnamese.woff2", 800),
-    font(origin, "be-vietnam-pro-800-latin.woff2", 800),
+    font(origin, "be-vietnam-pro-regular.ttf", 400),
+    font(origin, "be-vietnam-pro-semibold.ttf", 600),
+    font(origin, "be-vietnam-pro-bold.ttf", 700),
+    font(origin, "be-vietnam-pro-extrabold.ttf", 800),
   ];
 
   const card = container({

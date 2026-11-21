@@ -16,7 +16,7 @@ const walk = (directory) => {
       continue;
     }
 
-    if (/\.(woff2|png|jpg|jpeg|ico|gz|lock)$/.test(entry)) continue;
+    if (/\.(ttf|otf|woff2?|png|jpg|jpeg|ico|gz|lock)$/.test(entry)) continue;
     files.push(path);
   }
 };
