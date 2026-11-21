@@ -32,7 +32,8 @@ test("loads the deferred village scene once and recovers from a failed chunk", a
 
   blocked = false;
   await page.getByRole("button", { name: /Thử lại/i }).click();
-  await expect(page.locator(".scene-loading")).toHaveCount(0, { timeout: 15_000 });
+  await expect(page.locator(".title-screen")).toBeVisible();
+  await expect(page.locator(".scene-loading")).toHaveCount(0, { timeout: 20_000 });
   await expect(page.locator(".village-canvas")).toHaveCount(1);
 });
 

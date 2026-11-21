@@ -26,7 +26,6 @@ export const VillageCanvas = (props: {
   let canvas: HTMLCanvasElement | undefined;
   let container: HTMLDivElement | undefined;
   let controller: VillageScene | null = null;
-  let requestLoad: (() => void) | undefined;
   createTrackedEffect(() => {
     if (!ready()) return;
     controller?.update(state());
@@ -71,11 +70,6 @@ export const VillageCanvas = (props: {
         .finally(() => {
           loading = false;
         });
-    };
-
-    requestLoad = () => {
-      setLoadFailed(false);
-      load();
     };
 
     const schedule = (): void => {
@@ -162,9 +156,9 @@ export const VillageCanvas = (props: {
         </div>
       </Show>
       <Show when={loadFailed()}>
-        <div class="scene-loading" role="alert">
+        <div class="scene-error" role="alert">
           <span>Không dựng được cảnh làng.</span>
-          <button type="button" class="scene-reset" onClick={() => requestLoad?.()}>
+          <button type="button" class="scene-reset" onClick={() => window.location.reload()}>
             Thử lại
           </button>
         </div>
