@@ -3,6 +3,10 @@ import { defineConfig, devices } from "@playwright/test";
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 const port = process.env.PLAYWRIGHT_PORT ?? "3000";
 const baseURL = `http://127.0.0.1:${port}`;
+const serverMode = process.env.PLAYWRIGHT_SERVER === "start" ? "start" : "dev";
+
+const serverCommand =
+  serverMode === "start" ? `PORT=${port} pnpm start` : `pnpm dev --host 127.0.0.1 --port ${port}`;
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -22,7 +26,7 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: `pnpm dev --host 127.0.0.1 --port ${port}`,
+    command: serverCommand,
     url: baseURL,
     reuseExistingServer: true,
     timeout: 120_000,

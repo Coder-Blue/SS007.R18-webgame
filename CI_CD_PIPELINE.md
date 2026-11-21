@@ -55,6 +55,7 @@ pnpm build
 pnpm check:bundle
 pnpm exec playwright install --with-deps chromium
 pnpm exec playwright test
+PLAYWRIGHT_SERVER=start PLAYWRIGHT_PORT=3100 pnpm exec playwright test tests/e2e/game.spec.ts --project=desktop
 ```
 
 The Playwright spec boots the development server, checks overflow, touch target

@@ -42,6 +42,26 @@ test("loads the deferred village scene once and recovers from a failed chunk", a
   await expect(page.locator(".village-canvas")).toHaveCount(1);
 });
 
+test("loads the scene from a deferred production chunk", async ({ page }) => {
+  test.skip(process.env.PLAYWRIGHT_SERVER !== "start", "production server only");
+
+  const sceneChunks: string[] = [];
+  page.on("response", (response) => {
+    const path = new URL(response.url()).pathname;
+
+    if (/\/assets\/create-village-scene-.*\.js/.test(path)) sceneChunks.push(path);
+  });
+
+  await page.goto("/");
+  await expect(page.locator(".title-poster img")).toBeVisible();
+  expect(sceneChunks).toEqual([]);
+
+  await startGame(page);
+  await expect.poll(() => sceneChunks.length, { timeout: 15_000 }).toBeGreaterThan(0);
+  await expect(page.locator(".scene-loading")).toHaveCount(0, { timeout: 20_000 });
+  await expect(page.locator(".village-canvas")).toHaveCount(1);
+});
+
 test("renders Iconify icons without API calls or untracked reads", async ({ page }) => {
   const diagnostics: string[] = [];
   const iconRequests: string[] = [];
