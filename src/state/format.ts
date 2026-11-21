@@ -23,9 +23,9 @@ export const formatDelta = (value: number, unit = "tỷ"): string => {
 export const formatDate = (year: number, month: number): string => `Tháng ${month}/${year}`;
 
 export const seasonLabel = (season: Season): string => {
-  if (season === "xuan") return "Xuân";
-  if (season === "ha") return "Hạ";
-  if (season === "thu") return "Thu";
+  if (season === "spring") return "Xuân";
+  if (season === "summer") return "Hạ";
+  if (season === "autumn") return "Thu";
   return "Đông";
 };
 

@@ -1,0 +1,13 @@
+diff --git a/dist/bindings.js b/dist/bindings.js
+index d1c9e6d1c4018258a2314b3da48bf5ec5b419cab..90690e92eec841932cfdb337dffdec2a8c4f53d6 100644
+--- a/dist/bindings.js
++++ b/dist/bindings.js
+@@ -4,7 +4,7 @@ const ArrayIsArray = Array.isArray, require = createRequire(import.meta.url), {
+ let nativeBinding = null;
+ const loadErrors = [], isMusl = () => {
+ 	let musl = !1;
+-	return process.platform === "linux" && (musl = isMuslFromFilesystem(), musl === null && (musl = isMuslFromReport()), musl === null && (musl = isMuslFromChildProcess())), musl;
++	return process.platform === "linux" && (musl = isMuslFromReport(), musl === null && (musl = isMuslFromFilesystem()), musl === null && (musl = isMuslFromChildProcess())), musl;
+ }, isFileMusl = (f) => f.includes("libc.musl-") || f.includes("ld-musl-"), isMuslFromFilesystem = () => {
+ 	try {
+ 		return readFileSync("/usr/bin/ldd", "utf-8").includes("musl");

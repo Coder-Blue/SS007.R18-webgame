@@ -31,10 +31,7 @@ export const dueEventIds = (state: GameState): readonly string[] => {
 };
 
 export const scheduleEvents = (state: GameState): GameState => {
-  const queue = [...state.events.queue];
-  for (const id of dueEventIds(state)) {
-    if (!queue.includes(id)) queue.push(id);
-  }
+  const queue = [...state.events.queue, ...dueEventIds(state)];
   const activeId = state.events.activeId ?? queue[0] ?? null;
   return {
     ...state,

@@ -1,0 +1,219 @@
+.game-shell {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: radial-gradient(circle at 30% 20%, #2c5139 0%, #0d2116 65%);
+}
+
+.scene-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.village-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+.village-canvas:active {
+  cursor: grabbing;
+}
+
+.scene-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 80% at 50% 10%, transparent 40%, rgba(5, 15, 9, 0.55) 100%),
+    linear-gradient(to top, rgba(5, 15, 9, 0.72) 0%, transparent 28%);
+}
+
+.scene-badges {
+  position: absolute;
+  top: calc(82px + var(--safe-top));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.scene-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: rgba(13, 33, 22, 0.72);
+  border: 1px solid rgba(242, 212, 139, 0.24);
+  color: var(--paper);
+  font-size: 0.72rem;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+
+.scene-controls {
+  position: absolute;
+  right: 18px;
+  bottom: 96px;
+  z-index: 4;
+}
+
+.scene-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(242, 212, 139, 0.3);
+  background: rgba(13, 33, 22, 0.74);
+  color: var(--paper);
+  font-size: 0.74rem;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+
+.scene-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  color: rgba(247, 240, 226, 0.72);
+  font-size: 0.66rem;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 3;
+}
+
+.scene-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--gold-light);
+  font-weight: 600;
+  background: rgba(8, 19, 12, 0.62);
+  letter-spacing: 0.04em;
+}
+
+.top-bar {
+  position: absolute;
+  top: calc(12px + var(--safe-top));
+  left: 12px;
+  right: 12px;
+  z-index: 20;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(242, 212, 139, 0.24);
+  background: linear-gradient(180deg, rgba(18, 43, 29, 0.94), rgba(11, 29, 19, 0.9));
+  color: var(--paper);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.brand-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 190px;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold), #b7852f);
+  color: var(--forest-900);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.brand-copy strong {
+  font-size: 0.84rem;
+  letter-spacing: 0.01em;
+}
+
+.brand-copy span {
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  opacity: 0.8;
+}
+
+.date-block {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  padding-left: 16px;
+  border-left: 1px solid rgba(242, 212, 139, 0.2);
+  min-width: 138px;
+}
+
+.date-main {
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+.date-sub {
+  font-size: 0.64rem;
+  color: rgba(247, 240, 226, 0.62);
+}
+
+.top-gauges {
+  display: flex;
+  gap: 14px;
+  flex: 1;
+  justify-content: center;
+}
+
+.top-gauge {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 96px;
+}
+
+.top-gauge-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.61rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(247, 240, 226, 0.62);
+}
+
+.top-gauge strong {
+  font-size: 0.8rem;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.mobile-status {
+  display: none;
+}

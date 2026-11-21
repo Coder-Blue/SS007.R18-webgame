@@ -16,14 +16,14 @@ import {
 
 describe("clock", () => {
   it.each([
-    [1, "xuan"],
-    [3, "xuan"],
-    [4, "ha"],
-    [6, "ha"],
-    [7, "thu"],
-    [9, "thu"],
-    [10, "dong"],
-    [12, "dong"],
+    [1, "spring"],
+    [3, "spring"],
+    [4, "summer"],
+    [6, "summer"],
+    [7, "autumn"],
+    [9, "autumn"],
+    [10, "winter"],
+    [12, "winter"],
   ] as const)("maps month %i to season %s", (month, season) => {
     expect(seasonOf(month)).toBe(season);
   });

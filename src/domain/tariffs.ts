@@ -9,7 +9,7 @@ import {
 
 export const averageHouseholdTariff = (tiers: TariffTiers): number =>
   tiers.tiers.reduce((sum, price, index) => {
-    const weight = TARIFF_WEIGHTS[index] ?? 0;
+    const weight = TARIFF_WEIGHTS[index]!;
     return sum + price * weight;
   }, 0);
 

@@ -1,0 +1,172 @@
+@theme {
+  --font-sans: "Be Vietnam Pro", "Segoe UI", sans-serif;
+  --color-ink: #241d16;
+  --color-paper: #f6efe1;
+  --color-gold: #d8a94b;
+  --color-forest: #173a27;
+}
+
+:root {
+  --paper: #f7f0e2;
+  --paper-2: #efe3cd;
+  --paper-3: #e6d6ba;
+  --ink: #241d16;
+  --ink-soft: #625544;
+  --ink-faint: #8b7d68;
+  --forest-900: #0d2116;
+  --forest-800: #143423;
+  --forest-700: #1d4a32;
+  --forest-600: #2a6344;
+  --forest-500: #3a7b56;
+  --gold: #d8a94b;
+  --gold-light: #f2d48b;
+  --gold-dark: #9f7424;
+  --red: #b34833;
+  --red-dark: #7f2d20;
+  --teal: #3f7c74;
+  --line: rgba(36, 29, 22, 0.14);
+  --line-strong: rgba(36, 29, 22, 0.24);
+  --shadow-sm: 0 2px 8px rgba(17, 31, 20, 0.1);
+  --shadow: 0 14px 36px rgba(11, 24, 15, 0.18);
+  --shadow-lg: 0 30px 80px rgba(6, 16, 10, 0.34);
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 22px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --font-ui: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--forest-900);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+#app {
+  height: 100dvh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+strong {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--forest-900);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+[data-motion="reduced"] *,
+[data-motion="reduced"] *::before,
+[data-motion="reduced"] *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.muted {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.negative {
+  color: var(--red) !important;
+}
+
+.eyebrow {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+}
+
+.stack-lg {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.desktop-only {
+  display: flex;
+}
+
+.mobile-only {
+  display: none;
+}

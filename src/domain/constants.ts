@@ -59,6 +59,7 @@ export const IRRIGATION_BASE_COST = 600;
 export const RND_BASE_COST = 500;
 export const FLEET_COST = 320;
 export const FLEET_STEP = 20;
+export const FLEET_MAX = 320;
 export const CAMPAIGN_COST = 450;
 export const CAMPAIGN_COOLDOWN_MONTHS = 6;
 export const CRACKDOWN_COST = 350;

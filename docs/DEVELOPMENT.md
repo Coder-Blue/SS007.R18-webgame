@@ -26,6 +26,11 @@ the Solid handler. The project applies a `pnpm patch` that maps
 `patches/`; `pnpm install` reapplies it. Remove it once upstream publishes the
 export.
 
+Rolldown, oxlint and oxfmt also receive a small patch: their libc detection
+reads `/usr/bin/ldd` before `process.report`, which misidentifies a glibc Node
+inside the Nix shell on Chimera. The patches consult the runtime report first
+and `pnpm-workspace.yaml` installs both glibc and musl native bindings.
+
 ## Source layout
 
 - `src/domain`: pure economy and state transitions.

@@ -2,6 +2,7 @@ import type { ActionResult, GameState, InvestmentKind } from "../types";
 import { err } from "../types";
 import {
   CAMPAIGN_COOLDOWN_MONTHS,
+  FLEET_MAX,
   CAMPAIGN_COST,
   CRACKDOWN_COST,
   FLEET_COST,
@@ -48,7 +49,7 @@ const atCap = (state: GameState, kind: InvestmentKind): boolean => {
     case "rnd":
       return state.production.rndLevel >= 5;
     case "fleet":
-      return state.infrastructure.fleet >= 320;
+      return state.infrastructure.fleet >= FLEET_MAX;
     case "campaign":
       return state.policy.campaignCooldown > 0;
     case "crackdown":

@@ -1,0 +1,15 @@
+diff --git a/dist/bindings-DIFu6gr2.js b/dist/bindings-DIFu6gr2.js
+index 5579cbf888ac6f9615de9252327cd5750f578b69..327f5bc77629d2f2238ba8b563d2b85877099dcc 100644
+--- a/dist/bindings-DIFu6gr2.js
++++ b/dist/bindings-DIFu6gr2.js
+@@ -16,8 +16,8 @@ const loadErrors = [];
+ const isMusl = () => {
+ 	let musl = false;
+ 	if (process.platform === "linux") {
+-		musl = isMuslFromFilesystem();
+-		if (musl === null) musl = isMuslFromReport();
++		musl = isMuslFromReport();
++		if (musl === null) musl = isMuslFromFilesystem();
+ 		if (musl === null) musl = isMuslFromChildProcess();
+ 	}
+ 	return musl;

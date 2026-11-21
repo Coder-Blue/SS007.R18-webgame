@@ -77,5 +77,6 @@ through the privatization debate. The ending depends on what you protect.
 - `docs/GAME_DESIGN.md`: detailed mechanics and balance.
 - `docs/DEVELOPMENT.md`: local workflow, saves and verification.
 - `docs/adr/0001-solid2-tanstack-start.md`: why the Solid 2 patch exists.
+- `docs/VERIFICATION.md`: reproducible gate results and residual risks.
 - `SKILL.md`: installed skill matrix and Graphify/ui-sdk notes.
 - `CODING_CONVENTION.md`, `CONTRIBUTE.md`, `CI_CD_PIPELINE.md`.

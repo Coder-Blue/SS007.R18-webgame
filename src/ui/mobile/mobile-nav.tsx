@@ -1,0 +1,102 @@
+import { createSignal, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import {
+  Drawer,
+  DrawerBackdrop,
+  DrawerClose,
+  DrawerContent,
+  DrawerTitle,
+} from "@ui-sdk/solid/drawer";
+import { Icon, type IconName } from "../components/icons";
+import { t } from "../localization";
+import { OverviewPanel } from "../panels/overview-panel";
+import { ProductionPanel } from "../panels/production-panel";
+import { InfrastructurePanel } from "../panels/infrastructure-panel";
+import { TariffPanel } from "../panels/tariff-panel";
+import { PolicyPanel } from "../panels/policy-panel";
+import { FinancePanel } from "../panels/finance-panel";
+import { HistoryPanel } from "../panels/history-panel";
+
+export type PanelId =
+  | "overview"
+  | "production"
+  | "infrastructure"
+  | "tariffs"
+  | "finance"
+  | "policy"
+  | "history";
+
+const tabs: readonly { readonly id: PanelId; readonly label: string; readonly icon: IconName }[] = [
+  { id: "overview", label: "mobile.overview", icon: "gauge" },
+  { id: "production", label: "mobile.production", icon: "rice" },
+  { id: "infrastructure", label: "mobile.infrastructure", icon: "road" },
+  { id: "tariffs", label: "mobile.tariffs", icon: "scale" },
+  { id: "policy", label: "mobile.policy", icon: "landmark" },
+];
+
+const PanelView = (props: { readonly panel: PanelId }): JSX.Element => {
+  if (props.panel === "production") return <ProductionPanel />;
+  if (props.panel === "infrastructure") return <InfrastructurePanel />;
+  if (props.panel === "tariffs") return <TariffPanel />;
+  if (props.panel === "finance") return <FinancePanel />;
+  if (props.panel === "policy") return <PolicyPanel />;
+  if (props.panel === "history") return <HistoryPanel />;
+  return <OverviewPanel />;
+};
+
+export const MobileNav = (): JSX.Element => {
+  const [open, setOpen] = createSignal(false);
+  const [panel, setPanel] = createSignal<PanelId>("overview");
+  const openPanel = (id: PanelId): void => {
+    setPanel(id);
+    setOpen(true);
+  };
+  return (
+    <>
+      <nav class="mobile-nav" aria-label={t("mobile.sheetTitle")}>
+        {tabs.map((tab) => (
+          <button type="button" class="mobile-tab" onClick={() => openPanel(tab.id)}>
+            <Icon name={tab.icon} size={20} />
+            <span>{t(tab.label)}</span>
+          </button>
+        ))}
+      </nav>
+      <Drawer open={open()} onOpenChange={setOpen}>
+        <DrawerBackdrop class="sheet-backdrop" />
+        <DrawerContent class="mobile-sheet">
+          <div class="sheet-head">
+            <DrawerTitle class="modal-title">{t("mobile.sheetTitle")}</DrawerTitle>
+            <DrawerClose class="icon-btn" aria-label={t("panel.close")}>
+              <Icon name="close" size={18} />
+            </DrawerClose>
+          </div>
+          <div class="sheet-tabs">
+            {tabs.map((tab) => (
+              <button
+                type="button"
+                class="sheet-tab"
+                data-active={panel() === tab.id}
+                onClick={() => setPanel(tab.id)}
+              >
+                {t(tab.label)}
+              </button>
+            ))}
+            <button
+              type="button"
+              class="sheet-tab"
+              data-active={panel() === "history"}
+              onClick={() => setPanel("history")}
+            >
+              {t("panel.history")}
+            </button>
+          </div>
+          <div class="sheet-body">
+            <Show when={open()}>
+              <PanelView panel={panel()} />
+            </Show>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+};

@@ -160,7 +160,7 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
     village: next.month === 1 ? growVillage(endedEarly.village) : endedEarly.village,
     tariffs: {
       ...endedEarly.tariffs,
-      ceiling: CEILINGS[next.year] ?? endedEarly.tariffs.ceiling,
+      ceiling: CEILINGS[next.year]!,
     },
     policy: {
       ...endedEarly.policy,

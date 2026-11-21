@@ -2,16 +2,16 @@ import type { Act, Clock, Season } from "./types";
 import { MONTHS_PER_YEAR } from "./constants";
 
 export const seasonOf = (month: number): Season => {
-  if (month <= 3) return "xuan";
-  if (month <= 6) return "ha";
-  if (month <= 9) return "thu";
-  return "dong";
+  if (month <= 3) return "spring";
+  if (month <= 6) return "summer";
+  if (month <= 9) return "autumn";
+  return "winter";
 };
 
 export const seasonFactor = (month: number): number => {
   const season = seasonOf(month);
-  if (season === "ha") return 1.08;
-  if (season === "dong") return 0.96;
+  if (season === "summer") return 1.08;
+  if (season === "winter") return 0.96;
   return 1;
 };
 

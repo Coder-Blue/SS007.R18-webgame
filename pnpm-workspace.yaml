@@ -1,7 +1,23 @@
 allowBuilds:
   esbuild: true
 
+# The Nix dev shell runs a glibc Node on a musl host. Install both libc
+# variants of native optional dependencies so Rolldown can follow the runtime
+# report after the checked-in patch.
+supportedArchitectures:
+  os:
+    - linux
+    - darwin
+  cpu:
+    - x64
+    - arm64
+  libc:
+    - glibc
+    - musl
+
 patchedDependencies:
   '@tanstack/start-server-core@1.169.45': patches/@tanstack__start-server-core@1.169.45.patch
+  oxfmt@0.79.0: patches/oxfmt@0.79.0.patch
+  oxlint@1.94.0: patches/oxlint@1.94.0.patch
   rolldown@1.2.19: patches/rolldown@1.2.19.patch
   rolldown@1.3.3: patches/rolldown@1.3.3.patch

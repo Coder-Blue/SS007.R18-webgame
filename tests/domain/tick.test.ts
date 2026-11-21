@@ -171,3 +171,25 @@ describe("tick", () => {
     expect(buildNotices(initial, 0, 0)).toEqual([]);
   });
 });
+
+describe("zero-demand tick", () => {
+  it("uses full reliability and zero served ratio when nobody is connected", () => {
+    const state = {
+      ...initial,
+      village: {
+        householdsThousand: 0,
+        remoteHouseholdsThousand: 0,
+        workshopsThousand: 0,
+      },
+      production: { ...initial.production, riceInventory: 0 },
+      infrastructure: { ...initial.infrastructure, coverage: 0, fleet: 0 },
+    };
+    const result = advanceMonth(state);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.ledger.totalDemand).toBe(0);
+      expect(result.value.ledger.reliability).toBe(100);
+      expect(result.value.ledger.revenueTotal).toBe(0);
+    }
+  });
+});

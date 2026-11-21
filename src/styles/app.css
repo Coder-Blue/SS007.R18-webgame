@@ -1,0 +1,17 @@
+@layer ui-sdk;
+
+@import "tailwindcss";
+@import "@ui-sdk/core/web.css" layer(components);
+@import "./fonts.css";
+@import "./tokens.css";
+@import "./layout-shell.css";
+@import "./layout-docks.css";
+@import "./mobile-nav.css";
+@import "./title.css";
+@import "./components-base.css";
+@import "./panels-overview.css";
+@import "./panels-forms.css";
+@import "./data.css";
+@import "./modals-dialog.css";
+@import "./ending.css";
+@import "./responsive.css";

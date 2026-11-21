@@ -164,6 +164,8 @@ settings:
 
 patchedDependencies:
   '@tanstack/start-server-core@1.169.45': 3a9dd64dbb9483cc311db58a9dfd765da961e029a4d35553a28ac617541a9645
+  oxfmt@0.79.0: 76630bb62ac894303e53dd86707d4d3a326fd021c82ac68fa6e4df27c42a7d67
+  oxlint@1.94.0: 7389ac008af4d90dbdc3460cecb7f2713b60f5e736bc10ee546dab25b6611290
   rolldown@1.2.19: b93dc8706247adb9f4936a29604482485d1a637435ea354a378e76cccdd42df3
   rolldown@1.3.3: 1a9338878fdb38b0369fb4f846c278010d40cd68411cd394c35a2077d84a4058
 
@@ -225,10 +227,10 @@ importers:
         version: 3.0.260903-beta
       oxfmt:
         specifier: ^0.79.0
-        version: 0.79.0
+        version: 0.79.0(patch_hash=76630bb62ac894303e53dd86707d4d3a326fd021c82ac68fa6e4df27c42a7d67)
       oxlint:
         specifier: ^1.94.0
-        version: 1.94.0
+        version: 1.94.0(patch_hash=7389ac008af4d90dbdc3460cecb7f2713b60f5e736bc10ee546dab25b6611290)
       tailwindcss:
         specifier: ^4.3.5
         version: 4.3.5
@@ -3305,7 +3307,7 @@ snapshots:
 
   ocache@0.3.2: {}
 
-  oxfmt@0.79.0:
+  oxfmt@0.79.0(patch_hash=76630bb62ac894303e53dd86707d4d3a326fd021c82ac68fa6e4df27c42a7d67):
     dependencies:
       tinypool: 2.2.0
     optionalDependencies:
@@ -3329,7 +3331,7 @@ snapshots:
       '@oxfmt/binding-win32-ia32-msvc': 0.79.0
       '@oxfmt/binding-win32-x64-msvc': 0.79.0
 
-  oxlint@1.94.0:
+  oxlint@1.94.0(patch_hash=7389ac008af4d90dbdc3460cecb7f2713b60f5e736bc10ee546dab25b6611290):
     optionalDependencies:
       '@oxlint/binding-android-arm-eabi': 1.94.0
       '@oxlint/binding-android-arm64': 1.94.0

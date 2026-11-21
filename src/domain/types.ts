@@ -1,4 +1,4 @@
-export type Season = "xuan" | "ha" | "thu" | "dong";
+export type Season = "spring" | "summer" | "autumn" | "winter";
 export type Act = 1 | 2 | 3;
 export type Phase = "title" | "playing" | "ended";
 export type RoadGrade = "dirt" | "cobble" | "asphalt";
