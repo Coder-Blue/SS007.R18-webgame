@@ -239,6 +239,6 @@
   @apply flex items-start gap-2 rounded-[var(--radius-sm)] border-2 border-gold-dark/55 bg-gold/12 px-[10px] py-[9px] text-[0.68rem] leading-[1.5] text-[oklch(42%_0.075_80)];
 }
 
-.callout svg {
+.callout iconify-icon {
   @apply mt-px shrink-0;
 }

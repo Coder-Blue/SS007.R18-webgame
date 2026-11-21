@@ -1,5 +1,5 @@
 diff --git a/dist/iconify.d.ts b/dist/iconify.d.ts
-index a1e4bb7cace336a851d8db56afaba3ec04a1cd91..e5f01434dd8053f1fb9a958310e7a072e7fa9c50 100644
+index a1e4bb7cace336a851d8db56afaba3ec04a1cd91..4f2fc11e1ead40eb0da5a7889c62a2359cb13c5c 100644
 --- a/dist/iconify.d.ts
 +++ b/dist/iconify.d.ts
 @@ -1,4 +1,3 @@
@@ -7,7 +7,7 @@ index a1e4bb7cace336a851d8db56afaba3ec04a1cd91..e5f01434dd8053f1fb9a958310e7a072
  import type { IconifyIconProperties } from 'iconify-icon';
  /**
   * Export types
-@@ -16,11 +15,20 @@ export { iconLoaded, getIcon, listIcons, addIcon, addCollection, calculateSize,
+@@ -16,11 +15,19 @@ export { iconLoaded, getIcon, listIcons, addIcon, addCollection, calculateSize,
  /**
   * Properties for Solid component
   */
@@ -20,7 +20,6 @@ index a1e4bb7cace336a851d8db56afaba3ec04a1cd91..e5f01434dd8053f1fb9a958310e7a072
 +    tabIndex?: number;
 +    'aria-label'?: string;
 +    'aria-hidden'?: string | boolean;
-+    children?: unknown;
 +};
  export interface IconifyIconProps extends BaseElementProps, IconifyIconProperties {
      rotate?: string | number;
@@ -31,13 +30,20 @@ index a1e4bb7cace336a851d8db56afaba3ec04a1cd91..e5f01434dd8053f1fb9a958310e7a072
 -export declare function Icon(props: IconifyIconProps): JSX.Element;
 +export declare function Icon(props: IconifyIconProps): any;
 diff --git a/dist/iconify.jsx b/dist/iconify.jsx
-index eb2ff8a8eafcd085620974e9aba0bc26c299ee55..59812130ed33e55a29f87c2d24e2361b3e0f79db 100644
+index eb2ff8a8eafcd085620974e9aba0bc26c299ee55..d5a2d93caa35d27207dbf31d461bb6623e796871 100644
 --- a/dist/iconify.jsx
 +++ b/dist/iconify.jsx
-@@ -13,5 +13,5 @@ export function Icon(props) {
-     }
+@@ -6,12 +6,7 @@ export { iconLoaded, getIcon, listIcons, addIcon, addCollection, calculateSize,
+  * Solid component
+  */
+ export function Icon(props) {
+-    let { icon, mode, inline, rotate, flip, width, height, preserveAspectRatio, noobserver, } = props;
+-    // Convert icon to string
+-    if (typeof icon === 'object') {
+-        icon = JSON.stringify(icon);
+-    }
      return (
      // @ts-ignore
 -    <iconify-icon attr:icon={icon} attr:mode={mode} attr:inline={inline} attr:rotate={rotate} attr:flip={flip} attr:width={width} attr:height={height} attr:preserveAspectRatio={preserveAspectRatio} attr:noobserver={noobserver} {...props}/>);
-+    <iconify-icon icon={icon} mode={mode} inline={inline} rotate={rotate} flip={flip} width={width} height={height} preserveAspectRatio={preserveAspectRatio} noobserver={noobserver} {...props}/>);
++    <iconify-icon icon={typeof props.icon === 'object' ? JSON.stringify(props.icon) : props.icon} mode={props.mode} inline={props.inline} rotate={props.rotate} flip={props.flip} width={props.width} height={props.height} preserveAspectRatio={props.preserveAspectRatio} noobserver={props.noobserver} class={props.class} id={props.id} style={props.style} role={props.role} tabIndex={props.tabIndex} aria-label={props['aria-label']} aria-hidden={props['aria-hidden']}/>);
  }
