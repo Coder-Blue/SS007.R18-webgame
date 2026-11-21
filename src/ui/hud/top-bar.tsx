@@ -93,7 +93,7 @@ export const TopBar = (props: {
         <Show when={state().events.activeId === null && state().ending === null}>
           <ActionButton
             class="advance-btn desktop-only"
-            variant="gold"
+            variant="secondary"
             icon={store.autoPlay() ? "lucide:pause" : "lucide:play"}
             onClick={() => store.setAutoPlay(!store.autoPlay())}
             ariaLabel={store.autoPlay() ? t("hud.stopAuto") : t("hud.autoPlay")}
@@ -102,7 +102,7 @@ export const TopBar = (props: {
           </ActionButton>
           <ActionButton
             class="advance-btn"
-            variant="primary"
+            variant="gold"
             icon="lucide:calendar"
             disabled={advance.isPending}
             onClick={runAdvance}
