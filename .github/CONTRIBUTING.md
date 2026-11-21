@@ -48,6 +48,7 @@ Every change must pass the same gates locally and in CI:
 | `pnpm check:domain` | `src/domain/` has no UI, scene, state or browser imports |
 | `pnpm coverage` | domain statements, functions and lines stay at 100 percent |
 | `pnpm build` | Vite production build and zero TypeScript errors |
+| `pnpm check:bundle` | every client chunk is at most 500 kB and the shell defers Three.js and GSAP |
 | `pnpm exec playwright test` | desktop, tablet, mobile and narrow layouts behave |
 
 Run the static suite with `pnpm quality`. Run the browser suite separately.

@@ -28,6 +28,7 @@ pnpm check:emoji
 pnpm check:domain
 pnpm coverage
 pnpm build
+pnpm check:bundle
 ```
 
 For a UI or scene change, also run the Playwright responsiveness spec and

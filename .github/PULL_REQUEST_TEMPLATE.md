@@ -35,6 +35,7 @@ not accepted.
 - [ ] `pnpm check:domain`
 - [ ] `pnpm coverage`
 - [ ] `pnpm build`
+- [ ] `pnpm check:bundle`
 - [ ] `pnpm exec playwright test`
 
 ## Responsive and accessibility evidence

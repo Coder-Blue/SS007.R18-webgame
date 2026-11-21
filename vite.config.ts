@@ -16,6 +16,19 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ["@ui-sdk/core"],
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            { name: "three-core", test: /three[\\/]build[\\/]three\.core\.js/ },
+            { name: "three", test: /node_modules[\\/]three[\\/]/ },
+            { name: "gsap", test: /node_modules[\\/]gsap[\\/]/ },
+          ],
+        },
+      },
+    },
+  },
   plugins: [
     iconifySubset(),
     tailwindcss(),

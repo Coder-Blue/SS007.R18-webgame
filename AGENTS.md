@@ -39,6 +39,7 @@ Use pnpm. The shell normally runs inside `direnv` / `nix develop`.
 | Lint | `pnpm lint` |
 | Format | `pnpm format` / `pnpm format:check` |
 | File budget | `pnpm check:lines` |
+| Client chunk budget | `pnpm check:bundle` |
 | Emoji audit | `pnpm check:emoji` |
 | Layer boundary audit | `pnpm check:domain` |
 | Full quality gate | `pnpm quality` |

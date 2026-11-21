@@ -45,6 +45,9 @@ jobs:
       - name: Build and typecheck
         run: pnpm build
 
+      - name: Enforce the client chunk budget
+        run: pnpm check:bundle
+
   browser:
     name: browser
     runs-on: ubuntu-latest
@@ -72,6 +75,12 @@ jobs:
 
       - name: Run responsive browser checks
         run: pnpm exec playwright test
+
+      - name: Build the production bundle
+        run: pnpm build
+
+      - name: Run the production dynamic-import smoke test
+        run: PLAYWRIGHT_SERVER=start PLAYWRIGHT_PORT=3100 pnpm exec playwright test tests/e2e/game.spec.ts --project=desktop
 
       - name: Upload the Playwright report
         if: always()

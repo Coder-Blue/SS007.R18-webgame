@@ -2,12 +2,13 @@ import { createSignal, createTrackedEffect, onSettled, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { Icon } from "../components/icons";
-import {
-  createVillageScene,
-  type SceneSelection,
-  type VillageScene,
-} from "~/scene/create-village-scene";
+import type { SceneSelection, VillageScene } from "~/scene/create-village-scene";
 import { seasonOf } from "~/domain";
+
+type SceneModule = typeof import("~/scene/create-village-scene");
+
+const IDLE_TIMEOUT_MS = 1_500;
+const FALLBACK_DELAY_MS = 200;
 
 const reduced = (): boolean => {
   if (typeof document === "undefined") return false;
@@ -21,6 +22,7 @@ export const VillageCanvas = (props: {
   const { store } = useGame();
   const state = store.state;
   const [ready, setReady] = createSignal(false);
+  const [loadFailed, setLoadFailed] = createSignal(false);
   let canvas: HTMLCanvasElement | undefined;
   let container: HTMLDivElement | undefined;
   let controller: VillageScene | null = null;
@@ -30,16 +32,67 @@ export const VillageCanvas = (props: {
   });
   onSettled(() => {
     if (canvas === undefined || container === undefined) return;
-    controller = createVillageScene({
-      canvas,
-      container,
-      onSelect: props.onSelect,
-      reducedMotion: reduced,
-    });
-    controller.update(state());
-    setReady(true);
+
+    let cancelled = false;
+    let loading = false;
+    let frame: number | undefined;
+    let idleHandle: number | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const load = (): void => {
+      if (cancelled || loading || controller !== null) return;
+      loading = true;
+
+      void import("~/scene/create-village-scene")
+        .then(({ createVillageScene }: SceneModule) => {
+          if (cancelled || canvas === undefined || container === undefined) return;
+
+          const next = createVillageScene({
+            canvas,
+            container,
+            onSelect: props.onSelect,
+            reducedMotion: reduced,
+          });
+
+          try {
+            next.update(state());
+          } catch {
+            next.dispose();
+            throw new Error("village scene failed to initialise");
+          }
+
+          controller = next;
+          setReady(true);
+        })
+        .catch(() => {
+          if (!cancelled) setLoadFailed(true);
+        })
+        .finally(() => {
+          loading = false;
+        });
+    };
+
+    const schedule = (): void => {
+      if ("requestIdleCallback" in window) {
+        idleHandle = window.requestIdleCallback(load, { timeout: IDLE_TIMEOUT_MS });
+
+        return;
+      }
+
+      timer = setTimeout(load, FALLBACK_DELAY_MS);
+    };
+
+    frame = requestAnimationFrame(schedule);
 
     return () => {
+      cancelled = true;
+
+      if (frame !== undefined) cancelAnimationFrame(frame);
+
+      if (idleHandle !== undefined) window.cancelIdleCallback(idleHandle);
+
+      if (timer !== undefined) clearTimeout(timer);
+
       controller?.dispose();
       controller = null;
     };
@@ -97,8 +150,18 @@ export const VillageCanvas = (props: {
         </button>
       </div>
       <p class="scene-hint">Kéo để di chuyển · Lăn chuột để phóng · Chạm để xem</p>
-      <Show when={!ready()}>
-        <div class="scene-loading">Đang dựng làng…</div>
+      <Show when={!ready() && !loadFailed()}>
+        <div class="scene-loading" role="status" aria-live="polite">
+          Đang dựng làng…
+        </div>
+      </Show>
+      <Show when={loadFailed()}>
+        <div class="scene-error" role="alert">
+          <span>Không dựng được cảnh làng.</span>
+          <button type="button" class="scene-reset" onClick={() => window.location.reload()}>
+            Thử lại
+          </button>
+        </div>
       </Show>
     </div>
   );
