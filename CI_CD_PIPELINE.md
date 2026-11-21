@@ -13,7 +13,8 @@ The reviewer owns auto-merge. All six gates must pass with visible output:
    `state/`, DOM, Three.js, Solid or browser globals.
 4. `pnpm coverage` passes with 100 percent statements, functions and lines on
    `src/domain/` (branch threshold documented in `vitest.config.ts`).
-5. `pnpm build` succeeds with zero TypeScript errors. Playwright verifies
+5. `pnpm build` succeeds with zero TypeScript errors and `pnpm check:bundle`
+   keeps every generated client chunk at or below 500 kB. Playwright verifies
    desktop `1440x900`, tablet `768x1024`, mobile `390x844` and narrow `360x740`.
 6. An independent reviewer applies `approved-by-thermo-nuclear-review`.
 
@@ -51,6 +52,7 @@ The test workflow performs:
 pnpm install --frozen-lockfile
 pnpm coverage
 pnpm build
+pnpm check:bundle
 pnpm exec playwright install --with-deps chromium
 pnpm exec playwright test
 ```

@@ -166,8 +166,11 @@ Vietnamese error message and never overwrite the active slot.
 
 ## Three.js lifecycle
 
-The canvas is created once per game session. Snapshot updates diff primitive
-collections by id and reuse geometry/material caches. `dispose` traverses the
-scene, disposes every geometry, material and texture, removes listeners, cancels
-the animation frame and calls `renderer.dispose()`. The renderer caps pixel
-ratio at `min(devicePixelRatio, 2)` on desktop and `1.5` on coarse pointers.
+The canvas is created once per game session. Its factory is dynamically
+imported after the first paint during idle time, so Three.js and GSAP stay out
+of the initial route chunk; a failed chunk load shows a retry control instead
+of a blank scene. Snapshot updates diff primitive collections by id and reuse
+geometry/material caches. `dispose` traverses the scene, disposes every
+geometry, material and texture, removes listeners, cancels the animation frame
+and calls `renderer.dispose()`. The renderer caps pixel ratio at
+`min(devicePixelRatio, 2)` on desktop and `1.5` on coarse pointers.
