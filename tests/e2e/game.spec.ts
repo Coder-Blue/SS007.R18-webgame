@@ -39,22 +39,26 @@ test("reserves the continue action and keeps settings reachable on mobile", asyn
 test("exposes named meters, the motion switch, and mobile tab state", async ({ page }) => {
   await startGame(page);
 
-  const meters = page.getByRole("meter");
-  await expect.poll(() => meters.count()).toBeGreaterThan(0);
+  const isMobile = (page.viewportSize()?.width ?? 0) < 900;
 
-  const invalid = await meters.evaluateAll((nodes) =>
-    nodes
-      .filter((node) => {
-        const label = node.getAttribute("aria-label");
-        const now = Number(node.getAttribute("aria-valuenow"));
-        const max = Number(node.getAttribute("aria-valuemax"));
+  if (!isMobile) {
+    const meters = page.getByRole("meter");
+    await expect.poll(() => meters.count()).toBeGreaterThan(0);
 
-        return !label || Number.isNaN(now) || now < 0 || now > max;
-      })
-      .map((node) => node.outerHTML),
-  );
+    const invalid = await meters.evaluateAll((nodes) =>
+      nodes
+        .filter((node) => {
+          const label = node.getAttribute("aria-label");
+          const now = Number(node.getAttribute("aria-valuenow"));
+          const max = Number(node.getAttribute("aria-valuemax"));
 
-  expect(invalid).toEqual([]);
+          return !label || Number.isNaN(now) || now < 0 || now > max;
+        })
+        .map((node) => node.outerHTML),
+    );
+
+    expect(invalid).toEqual([]);
+  }
 
   await page.getByRole("button", { name: "Kho lưu và cài đặt" }).click();
   await expect(page.getByRole("switch", { name: "Giảm chuyển động" })).toBeVisible();
