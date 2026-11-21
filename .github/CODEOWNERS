@@ -1,0 +1,9 @@
+# Repository owners receive review requests for every change.
+* @Coder-Blue
+
+# Domain contracts require the domain-economist review role.
+src/domain/ @Coder-Blue
+tests/domain/ @Coder-Blue
+
+# Workflows and deployment configuration require the integrator review role.
+.github/ @Coder-Blue

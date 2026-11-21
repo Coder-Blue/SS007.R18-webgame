@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const roots = ["src", "tests", "scripts", "docs", "public"];
+const roots = ["src", "tests", "scripts", "docs", "public", ".github"];
 const skip = new Set(["node_modules", ".output", ".git", "coverage", "test-results", "fonts"]);
 const emoji = /(?:[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]|\u{FE0F})/u;
 const files = [];
@@ -18,7 +18,19 @@ const walk = (directory) => {
   }
 };
 for (const root of roots) walk(root);
-for (const file of ["README.md", "AGENTS.md", "TARGET.md", "CHANGELOG.md", "CONTRIBUTE.md"]) {
+for (const file of [
+  "README.md",
+  "AGENTS.md",
+  "AGENT_DIRECTORY.md",
+  "CHANGELOG.md",
+  "CI_CD_PIPELINE.md",
+  "CODEBASE.md",
+  "CODING_CONVENTION.md",
+  "CONTRIBUTE.md",
+  "SECURITY.md",
+  "SKILL.md",
+  "TARGET.md",
+]) {
   try {
     readFileSync(file, "utf8");
     files.push(file);
