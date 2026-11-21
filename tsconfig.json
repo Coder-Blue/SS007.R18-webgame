@@ -1,0 +1,26 @@
+{
+  "include": ["**/*.ts", "**/*.tsx", "scripts/**/*.ts", "tests/**/*.ts", "*.ts"],
+  "exclude": ["node_modules", ".output", "dist", "coverage"],
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "jsxImportSource": "@solidjs/web",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "~/*": ["./src/*"]
+    },
+    "noEmit": true,
+    "types": ["node", "vite/client"]
+  }
+}

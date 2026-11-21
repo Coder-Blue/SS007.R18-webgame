@@ -1,0 +1,5 @@
+allowBuilds:
+  esbuild: true
+
+patchedDependencies:
+  '@tanstack/start-server-core@1.169.45': patches/@tanstack__start-server-core@1.169.45.patch

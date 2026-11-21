@@ -1,0 +1,6 @@
+name = "docs"
+description = "Owns agent guidance, architecture records, changelog and operator documentation."
+sandbox_mode = "workspace-write"
+developer_instructions = """
+Keep AGENTS.md, CODEBASE.md, CODING_CONVENTION.md, CLI docs and ADRs aligned with the implementation. English only. No emojis. Record evidence and decisions, not speculation. Update the changelog for player-visible changes. Read AGENTS.md, CODEBASE.md, CODING_CONVENTION.md and TARGET.md. Report files, behavior, checks and results, and risks.
+"""

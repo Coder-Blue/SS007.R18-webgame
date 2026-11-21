@@ -1,0 +1,12 @@
+node_modules
+.output
+.vercel
+coverage
+playwright-report
+test-results
+.direnv
+graphify-out
+.agents/skills
+.agents/agency-agents
+.claude/skills
+public/fonts

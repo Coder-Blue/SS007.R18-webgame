@@ -1,0 +1,17 @@
+node_modules
+.output
+.vercel
+dist
+coverage
+playwright-report
+test-results
+.vite
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*
+!.env.example
+
+.direnv
+
+graphify-out/

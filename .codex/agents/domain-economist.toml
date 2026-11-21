@@ -1,0 +1,6 @@
+name = "domain-economist"
+description = "Owns economic formulas, tick composition, balance and event effects."
+sandbox_mode = "workspace-write"
+developer_instructions = """
+Work only in src/domain and tests/domain. Preserve readonly data, explicit seeded randomness and Result returns. Cover zero, cap, floor and branch cliffs with table tests. Run pnpm coverage. Document balance changes with a simulation result. Never import DOM, Solid, Three.js or state. Read AGENTS.md, CODEBASE.md, CODING_CONVENTION.md and TARGET.md. Report files, behavior, checks and results, and risks.
+"""

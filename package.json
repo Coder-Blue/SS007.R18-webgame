@@ -1,0 +1,53 @@
+{
+  "name": "doc-quyen-kinh-te",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build && tsc --noEmit",
+    "preview": "vite preview",
+    "start": "node .output/server/index.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "lint": "oxlint src tests scripts",
+    "format": "oxfmt --write \"src/**/*.{ts,tsx,css}\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"scripts/**/*.ts\" \"*.{ts,json}\"",
+    "format:check": "oxfmt --check \"src/**/*.{ts,tsx,css}\" \"tests/**/*.ts\" \"scripts/**/*.mjs\" \"scripts/**/*.ts\" \"*.{ts,json}\"",
+    "check:lines": "node scripts/check-lines.mjs",
+    "check:emoji": "node scripts/check-emoji.mjs",
+    "check:domain": "node scripts/check-domain.mjs",
+    "quality": "pnpm lint && pnpm format:check && pnpm check:lines && pnpm check:emoji && pnpm check:domain && pnpm coverage && pnpm build",
+    "build:vercel": "NITRO_PRESET=vercel pnpm build"
+  },
+  "dependencies": {
+    "@solidjs/web": "^2.0.3",
+    "@tanstack/solid-query": "6.0.0-rc.6",
+    "@tanstack/solid-router": "^2.0.0-rc.11",
+    "@tanstack/solid-start": "^2.0.0-rc.11",
+    "@ui-sdk/core": "^0.1.0-beta.13",
+    "@ui-sdk/solid": "^0.1.0-beta.13",
+    "gsap": "^3.15.1",
+    "solid-js": "^2.0.3",
+    "three": "^0.187.0",
+    "valibot": "^1.5.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@solidjs/vite-plugin": "^3.0.1",
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/node": "^24.19.2",
+    "@types/three": "^0.187.0",
+    "@vitest/coverage-v8": "^5.1.1",
+    "nitro": "^3.0.260903-beta",
+    "oxfmt": "^0.79.0",
+    "oxlint": "^1.94.0",
+    "tailwindcss": "^4.3.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
+  },
+  "packageManager": "pnpm@12.4.2"
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md", "CODEBASE.md", "CODING_CONVENTION.md", "AGENT_DIRECTORY.md"],
+  "mcp": {
+    "graphify": {
+      "type": "local",
+      "command": ["graphify-mcp", "graphify-out/graph.json"],
+      "enabled": true
+    }
+  }
+}
