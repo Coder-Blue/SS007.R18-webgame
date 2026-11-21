@@ -18,7 +18,7 @@ export const uiCopy: CopyDictionary = {
   "app.act1": "Hồi I · Bao phủ phổ quát",
   "app.act2": "Hồi II · Tranh luận tư nhân hóa",
   "app.act3": "Hồi III · Phục hồi và hiện đại hóa",
-  "app.footer": "Một sản phẩm thuyết trình SS007.R18 · Bản mô phỏng kinh tế chính trị",
+  "app.footer": "Bản mô phỏng kinh tế chính trị",
   "app.installHint": "Chơi trực tiếp trên trình duyệt, không cần cài đặt.",
 
   "hud.date": "Tháng {month}/{year}",
