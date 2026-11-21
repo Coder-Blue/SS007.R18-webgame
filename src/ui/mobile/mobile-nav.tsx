@@ -72,7 +72,13 @@ export const MobileNav = (): JSX.Element => {
     <>
       <nav class="mobile-nav" aria-label="Bảng điều hành">
         {tabs.map((tab) => (
-          <button type="button" class="mobile-tab" onClick={() => openPanel(tab.id)}>
+          <button
+            type="button"
+            class="mobile-tab"
+            aria-haspopup="dialog"
+            aria-expanded={open() ? "true" : "false"}
+            onClick={() => openPanel(tab.id)}
+          >
             <Icon icon={tab.icon} size={20} />
             <span>{tab.label}</span>
           </button>
@@ -93,6 +99,7 @@ export const MobileNav = (): JSX.Element => {
                 type="button"
                 class="sheet-tab"
                 data-active={panel() === tab.id}
+                aria-pressed={panel() === tab.id ? "true" : "false"}
                 onClick={() => setPanel(tab.id)}
               >
                 {tab.label}
@@ -102,6 +109,7 @@ export const MobileNav = (): JSX.Element => {
               type="button"
               class="sheet-tab"
               data-active={panel() === "history"}
+              aria-pressed={panel() === "history" ? "true" : "false"}
               onClick={() => setPanel("history")}
             >
               Lịch sử

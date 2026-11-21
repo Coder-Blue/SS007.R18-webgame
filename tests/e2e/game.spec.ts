@@ -23,6 +23,19 @@ const expectMonth = async (page: Page, label: string): Promise<void> => {
   await expect(page.locator(".mobile-date")).toContainText(label);
 };
 
+test("reserves the continue action and keeps settings reachable on mobile", async ({ page }) => {
+  await page.goto("/");
+  const continueButton = page.getByRole("button", { name: /Tiếp tục ván đang lưu/i });
+  await expect(continueButton).toBeVisible();
+  await expect(continueButton).toBeDisabled();
+  await expect(page.getByRole("main")).toHaveCount(1);
+
+  await startGame(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole("button", { name: "Kho lưu và cài đặt" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Độc Quyền Kinh Tế/i })).toBeVisible();
+});
+
 test("loads the deferred village scene once and recovers from a failed chunk", async ({ page }) => {
   let blocked = true;
 

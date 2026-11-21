@@ -31,6 +31,10 @@ const woff2Files = faces.flatMap((face) => [
 const criticalPreloads = [
   "be-vietnam-pro-400-vietnamese.woff2",
   "be-vietnam-pro-400-latin.woff2",
+  "be-vietnam-pro-600-vietnamese.woff2",
+  "be-vietnam-pro-600-latin.woff2",
+  "be-vietnam-pro-700-vietnamese.woff2",
+  "be-vietnam-pro-700-latin.woff2",
   "be-vietnam-pro-800-vietnamese.woff2",
   "be-vietnam-pro-800-latin.woff2",
 ];
@@ -257,7 +261,7 @@ describe("local font manifest", () => {
     );
   });
 
-  test("preloads only the four critical WOFF2 subsets", () => {
+  test("preloads only the critical WOFF2 subsets used by the title screen", () => {
     expect(rootSource).not.toContain(".ttf");
 
     for (const file of criticalPreloads) {
@@ -267,7 +271,7 @@ describe("local font manifest", () => {
     expect(rootSource.match(/type: "font\/woff2"/g)).toHaveLength(criticalPreloads.length);
   });
 
-  test("bundles TTF OG fonts and caches public font assets for thirty days", () => {
+  test("bundles TTF OG fonts and caches public font assets immutably", () => {
     expect(routeSource).not.toMatch(/woff2?/);
     expect(routeSource).toContain('font(origin, "be-vietnam-pro-regular.ttf", 400)');
     expect(routeSource).toContain('font(origin, "be-vietnam-pro-semibold.ttf", 600)');
@@ -276,9 +280,9 @@ describe("local font manifest", () => {
     expect(nitroSource).toContain('baseName: "fonts"');
     expect(nitroSource).toContain('dir: "./public/fonts"');
     expect(nitroSource).toContain('"/fonts/**"');
-    expect(nitroSource).toContain("public, max-age=2592000");
+    expect(nitroSource).toContain("public, max-age=31536000, immutable");
     expect(vercelSource).toContain('"source": "/fonts/(.*)"');
     expect(vercelSource).toContain('"key": "Cache-Control"');
-    expect(vercelSource).toContain("public, max-age=2592000");
+    expect(vercelSource).toContain("public, max-age=31536000, immutable");
   });
 });

@@ -194,6 +194,7 @@ export const ProductionPanel = (): JSX.Element => {
           <Bar
             value={state().metrics.reliability}
             tone={state().metrics.reliability >= 95 ? "good" : "warn"}
+            label="Độ ổn định cấp gạo"
           />
         </div>
         <div class="meter-block">
@@ -205,7 +206,11 @@ export const ProductionPanel = (): JSX.Element => {
                 : "Không thiếu hụt"}
             </strong>
           </div>
-          <Bar value={Math.min(100, (last()?.shortage ?? 0) * 2)} tone="bad" />
+          <Bar
+            value={Math.min(100, (last()?.shortage ?? 0) * 2)}
+            tone="bad"
+            label="Thiếu hụt gạo"
+          />
         </div>
       </Panel>
     </div>

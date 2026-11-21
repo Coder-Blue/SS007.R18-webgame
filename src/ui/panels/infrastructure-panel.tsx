@@ -38,7 +38,11 @@ export const InfrastructurePanel = (): JSX.Element => {
           <div class="coverage-copy">
             <strong>Bao phủ hộ dân</strong>
             <span>{formatPercent(infra().coverage)}</span>
-            <Bar value={infra().coverage} tone={infra().coverage >= 90 ? "good" : "warn"} />
+            <Bar
+              value={infra().coverage}
+              tone={infra().coverage >= 90 ? "good" : "warn"}
+              label="Bao phủ hộ dân"
+            />
           </div>
           <ProgressRing
             value={infra().remoteCoverage}
@@ -51,6 +55,7 @@ export const InfrastructurePanel = (): JSX.Element => {
             <Bar
               value={infra().remoteCoverage}
               tone={infra().remoteCoverage >= 90 ? "good" : "warn"}
+              label="Bao phủ bản xa"
             />
           </div>
         </div>

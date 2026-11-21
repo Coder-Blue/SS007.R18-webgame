@@ -33,7 +33,7 @@
 }
 
 .event-date {
-  @apply text-[0.66rem] font-bold tracking-[0.08em] text-gold-dark;
+  @apply text-[0.66rem] font-bold tracking-[0.08em] text-gold-ink;
 }
 
 .event-choices {
@@ -130,7 +130,7 @@
 }
 
 .slot-stats {
-  @apply text-gold-dark!;
+  @apply text-gold-ink!;
 }
 
 .slot-actions {
@@ -165,6 +165,10 @@
 
 .file-button input {
   @apply pointer-events-none absolute h-px w-px opacity-0;
+}
+
+.file-button:focus-within {
+  @apply outline-3 outline-offset-2 outline-forest-900;
 }
 
 .switch-label {

@@ -70,10 +70,11 @@ export const Bar = (props: {
       class={cx("bar", props.class)}
       data-tone={props.tone ?? "green"}
       role="meter"
-      aria-label={props.label}
+      aria-label={props.label ?? "Chỉ số"}
       aria-valuemin={0}
       aria-valuemax={max}
       aria-valuenow={Math.round(props.value)}
+      aria-valuetext={`${Math.round(props.value)} trên ${max}`}
     >
       <span class="bar-fill" style={{ width: `${ratio() * 100}%` }} />
     </div>
@@ -180,7 +181,16 @@ export const ProgressRing = (props: {
   const circumference = 2 * Math.PI * radius;
 
   return (
-    <span class="ring" data-tone={props.tone ?? "good"} aria-label={props.label}>
+    <span
+      class="ring"
+      data-tone={props.tone ?? "good"}
+      role="meter"
+      aria-label={props.label ?? "Chỉ số"}
+      aria-valuemin={0}
+      aria-valuemax={max}
+      aria-valuenow={Math.round(props.value)}
+      aria-valuetext={`${Math.round(props.value)} trên ${max}`}
+    >
       <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} aria-hidden="true">
         <circle
           cx={size / 2}

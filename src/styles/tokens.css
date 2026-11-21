@@ -3,7 +3,7 @@
 
   --color-ink: oklch(23.66% 0.0169 66.86);
   --color-ink-soft: oklch(45.74% 0.0314 74.3);
-  --color-ink-faint: oklch(59.66% 0.0351 77.95);
+  --color-ink-faint: oklch(48% 0.0351 77.95);
   --color-paper: oklch(95.68% 0.02 84.59);
   --color-paper-2: oklch(91.96% 0.032 82.77);
   --color-paper-3: oklch(88.18% 0.0413 81.69);
@@ -20,6 +20,7 @@
   --color-gold: oklch(76.03% 0.1236 82.19);
   --color-gold-light: oklch(87.9% 0.0976 88.02);
   --color-gold-dark: oklch(58.81% 0.1078 78.74);
+  --color-gold-ink: oklch(48% 0.11 78.74);
   --color-gold-deep: oklch(65.08% 0.1171 77.13);
   --color-rust: oklch(54.09% 0.1441 32.94);
   --color-rust-dark: oklch(41.52% 0.1165 31.42);
@@ -48,6 +49,7 @@
   --gold: var(--color-gold);
   --gold-light: var(--color-gold-light);
   --gold-dark: var(--color-gold-dark);
+  --gold-ink: var(--color-gold-ink);
   --red: var(--color-rust);
   --red-dark: var(--color-rust-dark);
   --teal: var(--color-teal);
@@ -188,7 +190,7 @@ ul {
 }
 
 .eyebrow {
-  @apply text-[0.66rem] font-bold tracking-[0.14em] text-gold-dark uppercase;
+  @apply text-[0.66rem] font-bold tracking-[0.14em] text-gold-ink uppercase;
 }
 
 .stack-lg {

@@ -7,7 +7,27 @@ export default defineConfig({
   routeRules: {
     "/fonts/**": {
       headers: {
+        "cache-control": "public, max-age=31536000, immutable",
+      },
+    },
+    "/favicon.ico": {
+      headers: {
         "cache-control": "public, max-age=2592000",
+      },
+    },
+    "/favicon.png": {
+      headers: {
+        "cache-control": "public, max-age=2592000",
+      },
+    },
+    "/favicon.svg": {
+      headers: {
+        "cache-control": "public, max-age=2592000",
+      },
+    },
+    "/robots.txt": {
+      headers: {
+        "cache-control": "public, max-age=86400",
       },
     },
   },

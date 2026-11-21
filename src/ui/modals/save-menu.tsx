@@ -245,7 +245,7 @@ export const SaveMenu = (props: {
             <p class="muted">Tắt hiệu ứng camera và chuyển mùa.</p>
           </div>
           <label class="switch-label">
-            <Switch checked={reduced()} onCheckedChange={applyMotion}>
+            <Switch checked={reduced()} onCheckedChange={applyMotion} aria-label="Giảm chuyển động">
               <SwitchThumb />
             </Switch>
           </label>
