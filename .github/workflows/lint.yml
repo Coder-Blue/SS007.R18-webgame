@@ -1,0 +1,55 @@
+name: lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    environment:
+      name: Lint
+      url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint with oxlint
+        run: pnpm lint
+
+      - name: Check formatting with oxfmt
+        run: pnpm format:check
+
+      - name: Enforce the file budget
+        run: pnpm check:lines
+
+      - name: Reject emojis
+        run: pnpm check:emoji
+
+      - name: Enforce layer boundaries
+        run: pnpm check:domain

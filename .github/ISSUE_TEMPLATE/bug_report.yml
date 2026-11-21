@@ -1,0 +1,71 @@
+name: Bug report
+description: Report a reproducible defect in the game or its tooling.
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Search existing issues before filing. Security problems follow SECURITY.md and must not be public.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction
+      description: Numbered steps from a fresh load or a named save slot.
+      placeholder: |
+        1. Start a term.
+        2. Open the tariff panel.
+        3. Raise the fourth tier.
+        4. End the month.
+    validations:
+      required: true
+
+  - type: input
+    id: viewport
+    attributes:
+      label: Viewport
+      description: Width x height, device pixel ratio and whether touch was used.
+      placeholder: 390x844, DPR 2, touch
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Domain economy
+        - Tariffs or policy
+        - Events or endings
+        - UI or accessibility
+        - Three.js scene
+        - Save or import
+        - Build, CI or tooling
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Console errors, screenshots, save slot contents or the failing command.
+      render: shell
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The version shown in the title footer or the commit SHA.
+    validations:
+      required: true

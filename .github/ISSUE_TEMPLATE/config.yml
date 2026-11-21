@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/Coder-Blue/SS007.R18-webgame/blob/main/SECURITY.md
+    about: Report a vulnerability privately. Do not open a public issue.
+  - name: Development guide
+    url: https://github.com/Coder-Blue/SS007.R18-webgame/blob/main/docs/DEVELOPMENT.md
+    about: Local setup, saves and verification commands.
+  - name: Game design
+    url: https://github.com/Coder-Blue/SS007.R18-webgame/blob/main/docs/GAME_DESIGN.md
+    about: Economy, events, endings and balance notes.

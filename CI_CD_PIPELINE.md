@@ -24,7 +24,12 @@ pnpm exec playwright test
 
 ## Continuous integration
 
-A CI runner performs:
+`.github/workflows/lint.yml` and `.github/workflows/test.yml` run on every pull
+request to `main`, on every push to `main`, and by manual dispatch. Each job
+uses a named GitHub environment (`Lint` or `Test`), so its status is visible in
+the repository Deployments section as well as the Actions tab.
+
+The lint workflow performs:
 
 ```bash
 pnpm install --frozen-lockfile
@@ -33,12 +38,19 @@ pnpm format:check
 pnpm check:lines
 pnpm check:emoji
 pnpm check:domain
+```
+
+The test workflow performs:
+
+```bash
+pnpm install --frozen-lockfile
 pnpm coverage
 pnpm build
+pnpm exec playwright install --with-deps chromium
 pnpm exec playwright test
 ```
 
-The Playwright spec boots the built preview server, checks overflow, touch target
+The Playwright spec boots the development server, checks overflow, touch target
 sizes, panel behavior and the save/load flow, and captures screenshots as
 artifacts. Nix users can run the same commands inside `nix develop`; musl hosts
 select `.#musl` through `.envrc`.

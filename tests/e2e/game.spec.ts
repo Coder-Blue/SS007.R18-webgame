@@ -17,6 +17,11 @@ const expectNoOverflow = async (page: Page): Promise<void> => {
   expect(widths.scroll).toBeLessThanOrEqual(widths.viewport + 1);
 };
 
+const expectMonth = async (page: Page, label: string): Promise<void> => {
+  await expect(page.locator(".date-main")).toContainText(label);
+  await expect(page.locator(".mobile-date")).toContainText(label);
+};
+
 test("title, tutorial, and first month on every viewport", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /Độc Quyền Kinh Tế/i })).toBeVisible();
@@ -26,14 +31,9 @@ test("title, tutorial, and first month on every viewport", async ({ page }) => {
   await expect(page.locator(".top-bar")).toBeVisible();
   await expect(page.locator(".village-canvas")).toBeVisible();
   await expectNoOverflow(page);
-  const before = await page.locator(".date-main").count();
-  if (before > 0) await expect(page.locator(".date-main")).toContainText("Tháng 1/2022");
+  await expectMonth(page, "Tháng 1/2022");
   await page.getByRole("button", { name: /Kết thúc tháng/i }).click();
-  await expect(page.locator(".toast")).toBeVisible();
-  const desktopDate = page.locator(".date-main");
-  if ((await desktopDate.count()) > 0) await expect(desktopDate).toContainText("Tháng 2/2022");
-  const mobileDate = page.locator(".mobile-date");
-  if ((await mobileDate.count()) > 0) await expect(mobileDate).toContainText("Tháng 2/2022");
+  await expectMonth(page, "Tháng 2/2022");
 });
 
 test("mobile navigation opens the tariff sheet with large touch targets", async ({ page }) => {
@@ -95,18 +95,17 @@ test("tariff ceiling rejects an over-priced basket", async ({ page }) => {
 test("save, reload, and continue restore the player state", async ({ page }) => {
   await startGame(page);
   await page.getByRole("button", { name: /Kết thúc tháng/i }).click();
-  await expect(page.locator(".toast")).toBeVisible();
+  await expectMonth(page, "Tháng 2/2022");
   await page.locator(".top-actions .icon-btn").last().click();
   await expect(page.locator(".save-modal")).toBeVisible();
   await page.locator(".slot-card").first().getByRole("button", { name: /^Lưu$/ }).click();
-  await expect(page.locator(".toast")).toBeVisible();
+  await expect(page.locator(".toast")).toContainText("Đã lưu ván chơi.");
   await page.locator(".save-head .icon-btn").click();
   await page.reload();
   await expect(page.getByRole("button", { name: /Tiếp tục ván đang lưu/i })).toBeVisible();
   await page.getByRole("button", { name: /Tiếp tục ván đang lưu/i }).click();
   await expect(page.locator(".game-shell")).toHaveAttribute("data-screen", "game");
-  const desktopDate = page.locator(".date-main");
-  if ((await desktopDate.count()) > 0) await expect(desktopDate).toContainText("Tháng 2/2022");
+  await expectMonth(page, "Tháng 2/2022");
 });
 
 test("event decision appears in June and resolves into a consequence", async ({ page }) => {

@@ -1,5 +1,10 @@
 # CONTRIBUTE.md
 
+The canonical contribution guide is
+[.github/CONTRIBUTING.md](.github/CONTRIBUTING.md). It covers the code of
+conduct, issue forms, change shape, review and evidence expectations. The short
+version below stays because the agent roles link to it.
+
 ## Setup
 
 ```bash
