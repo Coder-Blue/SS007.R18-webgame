@@ -41,32 +41,32 @@ export const FinancePanel = (): JSX.Element => {
       <Panel
         title={t("finance.pnl")}
         kicker={formatDate(state().clock.year, state().clock.month)}
-        icon="wallet"
+        icon="lucide:wallet"
       >
         <div class="stat-grid">
           <Stat
             label={t("finance.revenue")}
             value={formatBillion(last()?.revenueTotal ?? 0)}
             tone="good"
-            icon="trend-up"
+            icon="lucide:trending-up"
           />
           <Stat
             label={t("finance.costs")}
             value={formatBillion(last()?.costTotal ?? 0)}
             tone="bad"
-            icon="trend-down"
+            icon="lucide:trending-down"
           />
           <Stat
             label={t("finance.net")}
             value={formatBillion(last()?.netResult ?? 0)}
             tone={(last()?.netResult ?? 0) >= 0 ? "good" : "bad"}
-            icon="chart"
+            icon="lucide:chart-column"
           />
           <Stat
             label={t("finance.debt")}
             value={formatBillion(state().finance.debt)}
             tone={projection().isDanger ? "bad" : "warn"}
-            icon="landmark"
+            icon="lucide:landmark"
           />
         </div>
         <div class="report-split">
@@ -130,13 +130,13 @@ export const FinancePanel = (): JSX.Element => {
       <Panel
         title={t("finance.chart")}
         kicker={t("chart.months", { count: history().length })}
-        icon="chart"
+        icon="lucide:chart-column"
       >
         <Show
           when={history().length > 0}
           fallback={
             <div class="empty-state">
-              <Icon name="chart" size={24} />
+              <Icon icon="lucide:chart-column" size={24} />
               <span>{t("finance.noHistory")}</span>
             </div>
           }
@@ -149,30 +149,30 @@ export const FinancePanel = (): JSX.Element => {
       <Panel
         title={t("policy.n2")}
         kicker={t("finance.auditYear", { year: recovery().eligibleYear })}
-        icon="landmark"
+        icon="lucide:landmark"
       >
         <div class="stat-grid">
           <Stat
             label={t("finance.eligible")}
             value={formatBillion(recovery().eligibleLoss)}
             tone={recovery().eligibleLoss > 0 ? "warn" : "neutral"}
-            icon="scale"
+            icon="lucide:scale"
           />
           <Stat
             label={t("finance.monthlyCredit")}
             value={formatBillion(recovery().monthlyCredit)}
             tone={recovery().monthlyCredit > 0 ? "good" : "neutral"}
-            icon="coins"
+            icon="lucide:coins"
           />
           <Stat
             label={t("finance.recovered")}
             value={formatBillion(state().finance.recoveredTotal)}
-            icon="check"
+            icon="lucide:check"
           />
           <Stat
             label={t("finance.remaining")}
             value={formatBillion(recovery().remaining)}
-            icon="clock"
+            icon="lucide:clock"
           />
         </div>
         <Badge tone={state().policy.n2Enabled ? "good" : "warn"}>
@@ -186,12 +186,12 @@ export const FinancePanel = (): JSX.Element => {
         </p>
       </Panel>
 
-      <Panel title={t("finance.projection")} kicker={t("hud.status")} icon="gauge">
+      <Panel title={t("finance.projection")} kicker={t("hud.status")} icon="lucide:gauge">
         <div class="stat-grid">
           <Stat
             label={t("finance.fixedCost")}
             value={formatBillion(projection().monthlyFixed)}
-            icon="coins"
+            icon="lucide:coins"
           />
           <Stat
             label={t("finance.runway")}
@@ -201,26 +201,26 @@ export const FinancePanel = (): JSX.Element => {
                 : t("finance.runwayValue", { months: Math.round(projection().runwayMonths) })
             }
             tone={projection().isDanger ? "bad" : "good"}
-            icon="clock"
+            icon="lucide:clock"
           />
           <Stat
             label={t("finance.debt")}
             value={formatBillion(state().finance.debt)}
             hint={`${t("hud.debtLimit")} ${formatBillion(state().finance.debtLimit)}`}
-            icon="landmark"
+            icon="lucide:landmark"
           />
           <Stat
             label={t("finance.accumulated")}
             value={formatBillion(state().finance.accumulatedLoss)}
             tone="bad"
-            icon="trend-down"
+            icon="lucide:trending-down"
           />
         </div>
         <div class="inline-actions">
           <ActionButton
             variant="danger"
             size="sm"
-            icon="shield"
+            icon="lucide:shield"
             disabled={state().policy.bailoutUsed}
             onClick={() => actions.requestBailout()}
           >
@@ -233,7 +233,7 @@ export const FinancePanel = (): JSX.Element => {
       <Panel
         title={t("finance.reportYear", { year: state().clock.year })}
         kicker={t("panel.history")}
-        icon="book"
+        icon="lucide:book-open"
       >
         <Show
           when={state().finance.annualHistory.length > 0}

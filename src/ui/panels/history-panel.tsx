@@ -21,26 +21,30 @@ export const HistoryPanel = (): JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel title={t("history.title")} kicker={t("panel.historyDesc")} icon="book">
+      <Panel title={t("history.title")} kicker={t("panel.historyDesc")} icon="lucide:book-open">
         <div class="stat-grid">
           <Stat
             label={t("finance.revenue")}
             value={formatBillion(
               state().finance.monthlyHistory.reduce((sum, row) => sum + row.revenueTotal, 0),
             )}
-            icon="wallet"
+            icon="lucide:wallet"
           />
           <Stat
             label={t("finance.net")}
             value={formatBillion(totalNet())}
             tone={totalNet() >= 0 ? "good" : "bad"}
-            icon="chart"
+            icon="lucide:chart-column"
           />
-          <Stat label={t("hud.debt")} value={formatBillion(state().finance.debt)} icon="landmark" />
+          <Stat
+            label={t("hud.debt")}
+            value={formatBillion(state().finance.debt)}
+            icon="lucide:landmark"
+          />
           <Stat
             label={t("panel.history")}
             value={t("chart.months", { count: state().finance.monthlyHistory.length })}
-            icon="calendar"
+            icon="lucide:calendar"
           />
         </div>
         <div class="table-wrap">
@@ -81,7 +85,7 @@ export const HistoryPanel = (): JSX.Element => {
       <Panel
         title={t("panel.history")}
         kicker={t("finance.reportYear", { year: state().clock.year })}
-        icon="calendar"
+        icon="lucide:calendar"
       >
         {state().finance.annualHistory.length === 0 ? (
           <p class="muted">{t("finance.noHistory")}</p>

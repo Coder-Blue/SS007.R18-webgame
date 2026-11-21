@@ -24,7 +24,7 @@ const pillar = (
   <div class="pillar-card" data-tone={tone}>
     <div class="pillar-top">
       <span class="pillar-icon">
-        <Icon name={icon} size={18} />
+        <Icon icon={icon} size={18} />
       </span>
       <div>
         <strong>{name}</strong>
@@ -76,7 +76,11 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
 
   return (
     <div class="stack-lg">
-      <Panel title={t("overview.situation")} kicker={actLabel(state().act)} icon="chart">
+      <Panel
+        title={t("overview.situation")}
+        kicker={actLabel(state().act)}
+        icon="lucide:chart-column"
+      >
         <div class="overview-hero">
           <div class="overview-copy">
             <p class="eyebrow">
@@ -103,7 +107,7 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
             label={t("overview.demand")}
             value={formatTonne(last()?.totalDemand ?? 0)}
             hint={t("overview.shortage")}
-            icon="rice"
+            icon="tabler:wheat"
           />
           <Stat
             label={t("overview.reliability")}
@@ -115,13 +119,13 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
                   ? "warn"
                   : "bad"
             }
-            icon="shield"
+            icon="lucide:shield"
           />
           <Stat
             label={t("overview.profit")}
             value={last() === undefined ? "—" : formatBillion(last()?.netResult ?? 0)}
             tone={(last()?.netResult ?? 0) >= 0 ? "good" : "bad"}
-            icon="wallet"
+            icon="lucide:wallet"
           />
           <Stat
             label={t("finance.runway")}
@@ -137,17 +141,17 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
                   ? "warn"
                   : "bad"
             }
-            icon="clock"
+            icon="lucide:clock"
           />
         </div>
       </Panel>
 
-      <Panel title={t("overview.pillars")} kicker={t("hud.status")} icon="landmark">
+      <Panel title={t("overview.pillars")} kicker={t("hud.status")} icon="lucide:landmark">
         <div class="pillar-grid">
           {pillar(
             t("pillar.production"),
             t("pillar.productionTag"),
-            "rice",
+            "tabler:wheat",
             Math.min(
               100,
               (last()?.reliability ?? 100) * 0.55 +
@@ -159,7 +163,7 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
           {pillar(
             t("pillar.infrastructure"),
             t("pillar.infrastructureTag"),
-            "road",
+            "lucide:road",
             state().infrastructure.coverage,
             `${t("infra.remote")}: ${formatPercent(state().infrastructure.remoteCoverage)} · ${t("pillar.fleet")}: ${state().infrastructure.fleet}`,
             state().infrastructure.coverage >= 90
@@ -171,7 +175,7 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
           {pillar(
             t("pillar.retail"),
             t("pillar.retailTag"),
-            "scale",
+            "lucide:scale",
             Math.max(
               0,
               100 -
@@ -189,13 +193,13 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("overview.goals")} kicker={t("hud.status")} icon="shield">
+      <Panel title={t("overview.goals")} kicker={t("hud.status")} icon="lucide:shield">
         <div class="goal-list">
           <For each={goals()}>
             {(goal) => (
               <div class="goal" data-done={goal.done}>
                 <span class={cx("goal-check", goal.done && "is-done")}>
-                  <Icon name={goal.done ? "check" : "clock"} size={15} />
+                  <Icon icon={goal.done ? "lucide:check" : "lucide:clock"} size={15} />
                 </span>
                 <div>
                   <strong>{goal.label}</strong>
@@ -207,7 +211,7 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
         </div>
       </Panel>
 
-      <Panel title={t("overview.guide")} kicker={t("hud.tutorial")} icon="book">
+      <Panel title={t("overview.guide")} kicker={t("hud.tutorial")} icon="lucide:book-open">
         <ul class="guide-list">
           <li>{t("overview.guide1")}</li>
           <li>{t("overview.guide2")}</li>
@@ -216,7 +220,7 @@ export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
         </ul>
         <Show when={recovery().eligibleLoss > 0}>
           <div class="callout">
-            <Icon name="info" size={16} />
+            <Icon icon="lucide:info" size={16} />
             <span>
               {t("finance.auditYear", { year: recovery().eligibleYear })}:{" "}
               {formatBillion(recovery().eligibleLoss)} · {t("finance.monthlyCredit")}:{" "}

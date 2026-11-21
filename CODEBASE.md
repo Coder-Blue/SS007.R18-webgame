@@ -69,7 +69,13 @@ tweens are factory closures, never classes.
 Presentational Solid components. Localization dictionaries are Vietnamese.
 The HUD is desktop-persistent and mobile-compact. Bottom tabs open accessible
 drawers built on UI SDK primitives. Charts are dependency-free SVG components.
-All iconography is a local Lucide-shaped path set in `icons.tsx`.
+All iconography comes from Lucide and Tabler through
+`@iconify-icon/solid`. Components use ordinary names such as
+`icon="lucide:circle-exclamation-point"`. A Vite virtual module
+(`build/iconify-subset.ts`) reads the two `@iconify-json` packages at build time
+and registers only the names listed in `icon-names.ts`, so the repository
+contains no hand-written SVG and the page makes no Iconify API request. The
+package is patched for Solid 2's attribute namespace and element typings.
 
 ## Economy
 

@@ -16,7 +16,8 @@ describe what is actually implemented.
 - SolidJS 2 with `@solidjs/web`, TanStack Start (Solid) and
   TanStack Solid Query 6.
 - UI SDK for Solid (`@ui-sdk/solid`) for accessible unstyled primitives.
-- Tailwind CSS 4, Be Vietnam Pro, custom SVG icons, GSAP and Three.js.
+- Iconify icons for Solid (`@iconify-icon/solid`) with generated Lucide and
+  Tabler data, Tailwind CSS 4, Be Vietnam Pro, GSAP and Three.js.
 - Valibot for every runtime boundary. Do not add Zod.
 - Vite 8, TypeScript 5.9, Vitest 5, oxlint and oxfmt.
 - Nix flakes with `glibc` and `musl` development shells; Vercel deployment.

@@ -13,11 +13,11 @@ import { t } from "../localization";
 
 const steps: readonly { readonly title: string; readonly body: string; readonly icon: IconName }[] =
   [
-    { title: "tutorial.step1Title", body: "tutorial.step1Body", icon: "rice" },
-    { title: "tutorial.step2Title", body: "tutorial.step2Body", icon: "calendar" },
-    { title: "tutorial.step3Title", body: "tutorial.step3Body", icon: "scale" },
-    { title: "tutorial.step4Title", body: "tutorial.step4Body", icon: "landmark" },
-    { title: "tutorial.step5Title", body: "tutorial.step5Body", icon: "map-pin" },
+    { title: "tutorial.step1Title", body: "tutorial.step1Body", icon: "tabler:wheat" },
+    { title: "tutorial.step2Title", body: "tutorial.step2Body", icon: "lucide:calendar" },
+    { title: "tutorial.step3Title", body: "tutorial.step3Body", icon: "lucide:scale" },
+    { title: "tutorial.step4Title", body: "tutorial.step4Body", icon: "lucide:landmark" },
+    { title: "tutorial.step5Title", body: "tutorial.step5Body", icon: "lucide:map-pin" },
   ];
 
 export const TutorialModal = (props: {
@@ -39,13 +39,13 @@ export const TutorialModal = (props: {
       <DialogContent class="modal tutorial-modal">
         <div class="tutorial-head">
           <span class="tutorial-icon">
-            <Icon name={current().icon} size={24} />
+            <Icon icon={current().icon} size={24} />
           </span>
           <div>
             <p class="eyebrow">{t("tutorial.title")}</p>
             <DialogTitle class="modal-title">{t(current().title)}</DialogTitle>
           </div>
-          <IconButton icon="close" label={t("tutorial.skip")} onClick={close} />
+          <IconButton icon="lucide:x" label={t("tutorial.skip")} onClick={close} />
         </div>
         <DialogDescription class="modal-desc">{t(current().body)}</DialogDescription>
         <div class="tutorial-progress">

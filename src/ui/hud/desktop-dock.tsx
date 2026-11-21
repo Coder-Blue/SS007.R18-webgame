@@ -20,21 +20,21 @@ const pillars = (
 }[] => [
   {
     label: t("pillar.production"),
-    icon: "rice",
+    icon: "tabler:wheat",
     value: Math.min(100, (state.metrics.reliability ?? 100) * 0.6 + 20),
     tone: "good",
     detail: formatTonne(state.production.riceInventory),
   },
   {
     label: t("pillar.infrastructure"),
-    icon: "road",
+    icon: "lucide:road",
     value: state.infrastructure.remoteCoverage,
     tone: state.infrastructure.remoteCoverage >= 80 ? "good" : "warn",
     detail: formatPercent(state.infrastructure.coverage),
   },
   {
     label: t("pillar.retail"),
-    icon: "scale",
+    icon: "lucide:scale",
     value: Math.max(
       0,
       100 -
@@ -60,7 +60,7 @@ export const LeftDock = (props: {
       <Panel
         title={t("panel.valueChain")}
         kicker={t("hud.pillars")}
-        icon="landmark"
+        icon="lucide:landmark"
         class="dock-panel"
       >
         <div class="dock-pillars">
@@ -71,16 +71,16 @@ export const LeftDock = (props: {
                 class="dock-pillar"
                 onClick={() =>
                   props.onOpenPanel(
-                    pillar.icon === "rice"
+                    pillar.icon === "tabler:wheat"
                       ? "production"
-                      : pillar.icon === "road"
+                      : pillar.icon === "lucide:road"
                         ? "infrastructure"
                         : "tariffs",
                   )
                 }
               >
                 <span class="dock-pillar-icon">
-                  <Icon name={pillar.icon} size={17} />
+                  <Icon icon={pillar.icon} size={17} />
                 </span>
                 <span class="dock-pillar-copy">
                   <strong>{pillar.label}</strong>
@@ -95,7 +95,7 @@ export const LeftDock = (props: {
           <ActionButton
             size="sm"
             variant="gold"
-            icon="road"
+            icon="lucide:road"
             onClick={() => actions.buildRoad("asphalt")}
           >
             {t("action.buildAsphalt")}
@@ -103,7 +103,7 @@ export const LeftDock = (props: {
           <ActionButton
             size="sm"
             variant="secondary"
-            icon="droplets"
+            icon="lucide:droplets"
             onClick={() => actions.invest("hydro")}
           >
             {t("action.hydro")}
@@ -111,7 +111,7 @@ export const LeftDock = (props: {
           <ActionButton
             size="sm"
             variant="secondary"
-            icon="warehouse"
+            icon="lucide:warehouse"
             onClick={() => actions.importRice()}
           >
             {t("action.importRice")}
@@ -129,13 +129,13 @@ export const LeftDock = (props: {
               aria-label={t("scene.close")}
               onClick={props.onClearSelected}
             >
-              <Icon name="close" size={15} />
+              <Icon icon="lucide:x" size={15} />
             </button>
           </div>
         </Show>
         <Show when={recovery().monthlyCredit > 0}>
           <div class="dock-note">
-            <Icon name="coins" size={15} />
+            <Icon icon="lucide:coins" size={15} />
             <span>
               N-2 +{formatBillion(recovery().monthlyCredit)}/{t("chart.months", { count: 1 })}
             </span>
@@ -157,7 +157,12 @@ export const RightDock = (props: {
 
   return (
     <aside class="dock dock-right desktop-only" aria-label={t("panel.finance")}>
-      <Panel title={t("panel.finance")} kicker={t("finance.pnl")} icon="wallet" class="dock-panel">
+      <Panel
+        title={t("panel.finance")}
+        kicker={t("finance.pnl")}
+        icon="lucide:wallet"
+        class="dock-panel"
+      >
         <div class="finance-hero">
           <span>{t("hud.cash")}</span>
           <strong>{formatBillion(state().finance.cash)}</strong>
@@ -194,7 +199,7 @@ export const RightDock = (props: {
           <ActionButton
             size="sm"
             variant="secondary"
-            icon="scale"
+            icon="lucide:scale"
             onClick={() => props.onOpenPanel("tariffs")}
           >
             {t("panel.tariffs")}
@@ -202,20 +207,20 @@ export const RightDock = (props: {
           <ActionButton
             size="sm"
             variant="secondary"
-            icon="landmark"
+            icon="lucide:landmark"
             onClick={() => props.onOpenPanel("policy")}
           >
             {t("panel.policy")}
           </ActionButton>
         </div>
         <div class="dock-note">
-          <Icon name={state().policy.n2Enabled ? "check" : "clock"} size={15} />
+          <Icon icon={state().policy.n2Enabled ? "lucide:check" : "lucide:clock"} size={15} />
           <span>{state().policy.n2Enabled ? t("hud.recoveryActive") : t("policy.n2")}</span>
         </div>
         <ActionButton
           size="sm"
           variant="gold"
-          icon="landmark"
+          icon="lucide:landmark"
           onClick={() => actions.enactRecovery()}
           disabled={state().clock.year < 2024 || state().policy.n2Enabled}
         >

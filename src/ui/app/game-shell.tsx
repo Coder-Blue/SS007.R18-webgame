@@ -162,7 +162,10 @@ export const GameShell = (): JSX.Element => {
       <Show when={toast()}>
         {(current) => (
           <div class="toast" data-kind={current().kind} role="status" aria-live="polite">
-            <Icon name={current().kind === "error" ? "alert" : "check"} size={17} />
+            <Icon
+              icon={current().kind === "error" ? "tabler:alert-triangle" : "lucide:check"}
+              size={17}
+            />
             <span>{current().text}</span>
           </div>
         )}

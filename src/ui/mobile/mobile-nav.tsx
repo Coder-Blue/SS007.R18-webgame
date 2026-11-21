@@ -37,11 +37,11 @@ export const PANEL_IDS = [
 ] as const satisfies readonly PanelId[];
 
 const tabs: readonly { readonly id: PanelId; readonly label: string; readonly icon: IconName }[] = [
-  { id: "overview", label: "mobile.overview", icon: "gauge" },
-  { id: "production", label: "mobile.production", icon: "rice" },
-  { id: "infrastructure", label: "mobile.infrastructure", icon: "road" },
-  { id: "tariffs", label: "mobile.tariffs", icon: "scale" },
-  { id: "policy", label: "mobile.policy", icon: "landmark" },
+  { id: "overview", label: "mobile.overview", icon: "lucide:gauge" },
+  { id: "production", label: "mobile.production", icon: "tabler:wheat" },
+  { id: "infrastructure", label: "mobile.infrastructure", icon: "lucide:road" },
+  { id: "tariffs", label: "mobile.tariffs", icon: "lucide:scale" },
+  { id: "policy", label: "mobile.policy", icon: "lucide:landmark" },
 ];
 
 const PanelView = (props: { readonly panel: PanelId }): JSX.Element => {
@@ -74,7 +74,7 @@ export const MobileNav = (): JSX.Element => {
       <nav class="mobile-nav" aria-label={t("mobile.sheetTitle")}>
         {tabs.map((tab) => (
           <button type="button" class="mobile-tab" onClick={() => openPanel(tab.id)}>
-            <Icon name={tab.icon} size={20} />
+            <Icon icon={tab.icon} size={20} />
             <span>{t(tab.label)}</span>
           </button>
         ))}
@@ -85,7 +85,7 @@ export const MobileNav = (): JSX.Element => {
           <div class="sheet-head">
             <DrawerTitle class="modal-title">{t("mobile.sheetTitle")}</DrawerTitle>
             <DrawerClose class="icon-btn" aria-label={t("panel.close")}>
-              <Icon name="close" size={18} />
+              <Icon icon="lucide:x" size={18} />
             </DrawerClose>
           </div>
           <div class="sheet-tabs">

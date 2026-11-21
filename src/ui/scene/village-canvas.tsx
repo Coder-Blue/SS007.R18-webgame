@@ -75,11 +75,14 @@ export const VillageCanvas = (props: {
       <div class="scene-vignette" />
       <div class="scene-badges">
         <span class="scene-badge">
-          <Icon name={state().market.drought > 0.6 ? "sun" : "rain"} size={14} />
+          <Icon
+            icon={state().market.drought > 0.6 ? "lucide:sun" : "lucide:cloud-rain"}
+            size={14}
+          />
           {weatherLabel()}
         </span>
         <span class="scene-badge">
-          <Icon name="map-pin" size={14} />
+          <Icon icon="lucide:map-pin" size={14} />
           {Math.round(state().infrastructure.coverage)}%
         </span>
       </div>
@@ -90,7 +93,7 @@ export const VillageCanvas = (props: {
           onClick={() => controller?.resetView()}
           aria-label={t("scene.resetView")}
         >
-          <Icon name="map-pin" size={16} />
+          <Icon icon="lucide:map-pin" size={16} />
           <span>{t("scene.resetView")}</span>
         </button>
       </div>

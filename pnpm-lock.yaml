@@ -163,6 +163,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  '@iconify-icon/solid@3.0.6': 52eaaa59b313bd35ab64b5c7eec59b398cefadb6215009a4e618807866469ac6
   '@tanstack/start-server-core@1.169.45': 3a9dd64dbb9483cc311db58a9dfd765da961e029a4d35553a28ac617541a9645
   oxfmt@0.79.0: 76630bb62ac894303e53dd86707d4d3a326fd021c82ac68fa6e4df27c42a7d67
   oxlint@1.94.0: 7389ac008af4d90dbdc3460cecb7f2713b60f5e736bc10ee546dab25b6611290
@@ -173,6 +174,9 @@ importers:
 
   .:
     dependencies:
+      '@iconify-icon/solid':
+        specifier: 3.0.6
+        version: 3.0.6(patch_hash=52eaaa59b313bd35ab64b5c7eec59b398cefadb6215009a4e618807866469ac6)(solid-js@2.0.3)
       '@solidjs/web':
         specifier: ^2.0.3
         version: 2.0.3(solid-js@2.0.3)
@@ -204,6 +208,12 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(typescript@5.9.3)
     devDependencies:
+      '@iconify-json/lucide':
+        specifier: 1.2.157
+        version: 1.2.157
+      '@iconify-json/tabler':
+        specifier: 1.2.46
+        version: 1.2.46
       '@oxlint/plugins':
         specifier: 1.94.0
         version: 1.94.0
@@ -506,6 +516,20 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@iconify-icon/solid@3.0.6':
+    resolution: {integrity: sha512-3gScY5Jnl3W+XGUA2OLhggAJJM/Bch7uWEDtjoj0ljnoKdsrpmCpYEw32/ekj+tPcwbDEbZtmro0YlG0ynRQsA==}
+    peerDependencies:
+      solid-js: '>=1.0.0'
+
+  '@iconify-json/lucide@1.2.157':
+    resolution: {integrity: sha512-hFOoLrhzbDkDfWdLhrEWHTyUXUkBxV5jrY00XgtI6zDKrwh5jANu0BLXb6xfCS/FeQ6A/9XDvEk4aJovNbOslg==}
+
+  '@iconify-json/tabler@1.2.46':
+    resolution: {integrity: sha512-iyEZEUhHV4x1ZbNzzjk3i6Z+MH5h5nXipqKaH7+bUlnoQwzn7fNjWRSqwWtwQ4PYN6WM+N/fLQC/48TRto26qQ==}
+
+  '@iconify/types@2.0.0':
+    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -1595,6 +1619,9 @@ packages:
   httpxy@0.5.6:
     resolution: {integrity: sha512-iqc3nOxvNb5FxbhJozt8wNmHgjlmk4zzba512jMEXVwHCEBCbGAj49eGfy5PI8ts3/LFSFq8siiSNqwfY1AlfQ==}
 
+  iconify-icon@3.0.5:
+    resolution: {integrity: sha512-tApy9Ojh7ZGAuKRiPbUHpqd+hwNwM516al7vwX0dU6f7FoLI11DWGZwl85OYknGIwo4KnWeaqPJvCEMOrnKPWw==}
+
   is-what@4.1.16:
     resolution: {integrity: sha512-ZhMwEosbFJkA0YhFnNDgTM4ZxDRsS6HqTo7qsZM08fehyRYIYa0yHu5R6mgo1n/8MgaPBXiPimPD77baVFYg+A==}
     engines: {node: '>=12.13'}
@@ -2354,6 +2381,21 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
+
+  '@iconify-icon/solid@3.0.6(patch_hash=52eaaa59b313bd35ab64b5c7eec59b398cefadb6215009a4e618807866469ac6)(solid-js@2.0.3)':
+    dependencies:
+      iconify-icon: 3.0.5
+      solid-js: 2.0.3
+
+  '@iconify-json/lucide@1.2.157':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/tabler@1.2.46':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify/types@2.0.0': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -3258,6 +3300,10 @@ snapshots:
   hookable@6.1.2: {}
 
   httpxy@0.5.6: {}
+
+  iconify-icon@3.0.5:
+    dependencies:
+      '@iconify/types': 2.0.0
 
   is-what@4.1.16: {}
 

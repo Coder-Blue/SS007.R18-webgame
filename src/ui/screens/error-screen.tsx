@@ -11,7 +11,7 @@ export const ErrorScreen = (props: {
   <div class="error-screen">
     <div class="error-card">
       <span class="outcome-icon">
-        <Icon name="alert" size={22} />
+        <Icon icon="tabler:alert-triangle" size={22} />
       </span>
       <h1>{t(props.notFound === true ? "error.notFoundTitle" : "error.pageTitle")}</h1>
       <p>{t(props.notFound === true ? "error.notFoundBody" : "error.pageBody")}</p>

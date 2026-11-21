@@ -130,7 +130,7 @@ export const SaveMenu = (props: {
             <p class="eyebrow">{t("app.title")}</p>
             <DialogTitle class="modal-title">{t("save.title")}</DialogTitle>
           </div>
-          <IconButton icon="close" label={t("save.close")} onClick={props.onClose} />
+          <IconButton icon="lucide:x" label={t("save.close")} onClick={props.onClose} />
         </div>
         <DialogDescription class="modal-desc">{t("save.slots")}</DialogDescription>
         <div class="slot-list">
@@ -172,7 +172,7 @@ export const SaveMenu = (props: {
                       when={confirmDelete() === slot}
                       fallback={
                         <IconButton
-                          icon="trash"
+                          icon="lucide:trash"
                           label={t("action.delete")}
                           onClick={() => setConfirmDelete(slot)}
                           disabled={meta === null}
@@ -216,13 +216,13 @@ export const SaveMenu = (props: {
             <ActionButton
               size="sm"
               variant="secondary"
-              icon="download"
+              icon="lucide:download"
               onClick={() => download(actions.exportJson())}
             >
               {t("action.export")}
             </ActionButton>
             <label class="file-button">
-              <Icon name="upload" size={16} />
+              <Icon icon="lucide:upload" size={16} />
               <span>{t("action.importFile")}</span>
               <input
                 type="file"
@@ -233,7 +233,7 @@ export const SaveMenu = (props: {
             <ActionButton
               size="sm"
               variant="ghost"
-              icon="play"
+              icon="lucide:play"
               onClick={() => {
                 actions.newGame();
                 props.onLoaded();
@@ -271,7 +271,7 @@ export const SaveMenu = (props: {
           <ActionButton
             size="sm"
             variant="danger"
-            icon="trash"
+            icon="lucide:trash"
             onClick={() => {
               clearAllSaves();
               actions.newGame();

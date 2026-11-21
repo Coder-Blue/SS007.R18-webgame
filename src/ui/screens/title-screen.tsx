@@ -17,7 +17,7 @@ export const TitleScreen = (props: {
     <div class="title-content">
       <div class="title-kicker">
         <span class="brand-seal">
-          <Icon name="rice" size={18} />
+          <Icon icon="tabler:wheat" size={18} />
         </span>
         <span>{t("app.yearSpan")}</span>
         <Badge tone="gold">SS007.R18</Badge>
@@ -26,22 +26,22 @@ export const TitleScreen = (props: {
       <p class="title-sub">{t("app.subtitle")}</p>
       <p class="title-tagline">{t("app.tagline")}</p>
       <div class="title-role">
-        <Icon name="landmark" size={16} />
+        <Icon icon="lucide:landmark" size={16} />
         <span>{t("app.role")}</span>
       </div>
       <div class="title-actions">
-        <ActionButton variant="gold" size="lg" icon="play" onClick={props.onStart}>
+        <ActionButton variant="gold" size="lg" icon="lucide:play" onClick={props.onStart}>
           {t("app.newGame")}
         </ActionButton>
         <Show when={props.hasSave}>
-          <ActionButton variant="primary" size="lg" icon="clock" onClick={props.onContinue}>
+          <ActionButton variant="primary" size="lg" icon="lucide:clock" onClick={props.onContinue}>
             {t("app.continue")}
           </ActionButton>
         </Show>
-        <ActionButton variant="secondary" size="lg" icon="save" onClick={props.onOpenLoad}>
+        <ActionButton variant="secondary" size="lg" icon="lucide:save" onClick={props.onOpenLoad}>
           {t("app.loadGame")}
         </ActionButton>
-        <ActionButton variant="ghost" size="lg" icon="book" onClick={props.onTutorial}>
+        <ActionButton variant="ghost" size="lg" icon="lucide:book-open" onClick={props.onTutorial}>
           {t("app.howTo")}
         </ActionButton>
       </div>

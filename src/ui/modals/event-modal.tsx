@@ -59,7 +59,7 @@ export const EventModal = (): JSX.Element => {
                         <strong>{t(choice.titleKey)}</strong>
                         <span>{t(choice.bodyKey)}</span>
                       </span>
-                      <Icon name="chevron-right" size={18} />
+                      <Icon icon="lucide:chevron-right" size={18} />
                     </button>
                   )}
                 </For>
@@ -76,7 +76,7 @@ export const EventModal = (): JSX.Element => {
             <DialogBackdrop class="modal-backdrop" />
             <DialogContent class="modal outcome-modal">
               <span class="outcome-icon">
-                <Icon name="check" size={22} />
+                <Icon icon="lucide:check" size={22} />
               </span>
               <DialogTitle class="modal-title">{current().title}</DialogTitle>
               <DialogDescription class="modal-desc">{current().body}</DialogDescription>

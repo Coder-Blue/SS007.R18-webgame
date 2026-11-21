@@ -23,7 +23,7 @@ export const Panel = (props: {
       <header class="panel-head">
         <div class="panel-heading">
           {props.icon === undefined ? null : (
-            <Icon name={props.icon} size={18} class="panel-icon" />
+            <Icon icon={props.icon} size={18} class="panel-icon" />
           )}
           <div>
             {props.kicker === undefined ? null : <p class="panel-kicker">{props.kicker}</p>}
@@ -48,7 +48,7 @@ export const Stat = (props: {
   <div class={cx("stat", props.class)} data-tone={props.tone ?? "neutral"}>
     <div class="stat-top">
       <span class="stat-label">{props.label}</span>
-      {props.icon === undefined ? null : <Icon name={props.icon} size={16} class="stat-icon" />}
+      {props.icon === undefined ? null : <Icon icon={props.icon} size={16} class="stat-icon" />}
     </div>
     <span class="stat-value">{props.value}</span>
     {props.hint === undefined ? null : <span class="stat-hint">{props.hint}</span>}
@@ -105,7 +105,7 @@ export const IconButton = (props: {
     onClick={props.onClick}
     disabled={props.disabled}
   >
-    <Icon name={props.icon} size={18} />
+    <Icon icon={props.icon} size={18} />
   </button>
 );
 
@@ -130,7 +130,7 @@ export const ActionButton = (props: {
     aria-label={props.ariaLabel}
   >
     {props.icon === undefined ? null : (
-      <Icon name={props.icon} size={props.size === "sm" ? 15 : 18} />
+      <Icon icon={props.icon} size={props.size === "sm" ? 15 : 18} />
     )}
     <span>{props.children}</span>
   </button>
@@ -156,7 +156,7 @@ export const EmptyState = (props: {
   readonly icon?: IconName;
 }): JSX.Element => (
   <div class="empty-state">
-    <Icon name={props.icon ?? "info"} size={26} />
+    <Icon icon={props.icon ?? "lucide:info"} size={26} />
     <strong>{props.title}</strong>
     {props.body === undefined ? null : <span>{props.body}</span>}
   </div>

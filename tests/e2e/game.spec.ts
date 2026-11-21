@@ -23,6 +23,13 @@ const expectMonth = async (page: Page, label: string): Promise<void> => {
   await expect(page.locator(".mobile-date")).toContainText(label);
 };
 
+test("registers the Iconify custom element for the rendered icons", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("iconify-icon").first()).toHaveCount(1);
+  const registered = await page.evaluate(() => customElements.get("iconify-icon") !== undefined);
+  expect(registered).toBe(true);
+});
+
 test("title, tutorial, and first month on every viewport", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: /Độc Quyền Kinh Tế/i })).toBeVisible();
