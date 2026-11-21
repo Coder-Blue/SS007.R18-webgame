@@ -54,6 +54,8 @@ export default defineHandler(async (event) => {
   const fonts = [
     font(origin, "be-vietnam-pro-600-vietnamese.woff2", 600),
     font(origin, "be-vietnam-pro-600-latin.woff2", 600),
+    font(origin, "be-vietnam-pro-700-vietnamese.woff2", 700),
+    font(origin, "be-vietnam-pro-700-latin.woff2", 700),
     font(origin, "be-vietnam-pro-800-vietnamese.woff2", 800),
     font(origin, "be-vietnam-pro-800-latin.woff2", 800),
   ];
