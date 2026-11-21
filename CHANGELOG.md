@@ -7,8 +7,8 @@ the project uses semantic versioning for save-compatible releases.
 
 ### Changed
 
-- Self-hosted Be Vietnam Pro TTF weights replace the Latin and Vietnamese WOFF2
-  subsets across the UI, preload manifest and Open Graph image.
+- Self-hosted Be Vietnam Pro WOFF2 subsets serve the UI and preload manifest;
+  full TTF weights remain for the Open Graph image.
 
 ## [1.0.0] - 2026-11-21
 
