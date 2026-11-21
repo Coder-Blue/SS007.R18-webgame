@@ -77,7 +77,7 @@ export const Bar = (props: {
       aria-valuenow={current()}
       aria-valuetext={`${current()} trên ${max}`}
     >
-      <span class="bar-fill" style={{ width: `${ratio() * 100}%` }} />
+      <span class="bar-fill" style={{ transform: `scaleX(${ratio()})` }} />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 .overview-hero {
-  @apply flex items-stretch justify-between gap-[14px];
+  @apply flex items-stretch justify-between gap-[16px];
 }
 
 .overview-copy {
@@ -11,15 +11,15 @@
 }
 
 .hero-chips {
-  @apply mt-[2px] flex flex-wrap gap-[5px];
+  @apply mt-[2px] flex flex-wrap gap-[4px];
 }
 
 .overview-score {
-  @apply flex flex-[0_0_120px] flex-col gap-[5px] rounded-[6px] border-2 border-gold-dark/70 bg-forest-800 p-[10px] text-paper;
+  @apply flex flex-[0_0_120px] flex-col gap-[4px] rounded-[8px] border border-paper/15 bg-forest-800 p-3 text-paper;
 }
 
 .overview-score .score-label {
-  @apply text-[0.58rem] tracking-[0.08em] text-gold-light uppercase;
+  @apply text-[0.68rem] tracking-normal text-paper/70;
 }
 
 .overview-score strong {
@@ -31,7 +31,7 @@
 }
 
 .pillar-card {
-  @apply flex flex-col gap-[7px] border-b border-line px-0 py-[9px];
+  @apply flex flex-col gap-[8px] border-b border-line px-0 py-[8px];
 }
 
 .pillar-top {
@@ -39,7 +39,7 @@
 }
 
 .pillar-icon {
-  @apply grid h-8 w-8 shrink-0 place-items-center rounded-[4px] border border-outline bg-forest-800 text-gold-light;
+  @apply grid h-8 w-8 shrink-0 place-items-center rounded-[6px] border border-paper/15 bg-forest-800 text-paper/60;
 }
 
 .pillar-top div {
@@ -47,15 +47,15 @@
 }
 
 .pillar-top strong {
-  @apply text-[0.76rem];
+  @apply text-[0.8rem] font-semibold;
 }
 
 .pillar-top span {
-  @apply text-[0.62rem] text-ink-soft;
+  @apply text-[0.68rem] text-ink-soft;
 }
 
 .pillar-detail {
-  @apply text-[0.64rem] text-ink-soft;
+  @apply text-[0.68rem] text-ink-soft;
 }
 
 .goal-list {
@@ -63,11 +63,11 @@
 }
 
 .goal {
-  @apply flex items-start gap-2 border-b border-line px-0 py-[7px];
+  @apply flex items-start gap-2 border-b border-line px-0 py-[8px];
 }
 
 .goal-check {
-  @apply grid h-5 w-5 shrink-0 place-items-center rounded-[3px] border-2 border-line-strong text-ink-faint;
+  @apply grid h-5 w-5 shrink-0 place-items-center rounded-[4px] border border-line-strong text-ink-faint;
 }
 
 .goal-check.is-done {
@@ -79,28 +79,28 @@
 }
 
 .goal strong {
-  @apply text-[0.72rem];
+  @apply text-[0.78rem] font-medium;
 }
 
 .goal span {
-  @apply text-[0.62rem] text-ink-soft;
+  @apply text-[0.68rem] text-ink-soft;
 }
 
 .guide-list {
-  @apply flex flex-col gap-[5px] pl-1;
+  @apply flex flex-col gap-[4px] pl-1;
 }
 
 .guide-list li {
-  @apply relative pl-[14px] text-[0.7rem] leading-[1.55] text-ink-soft;
+  @apply relative pl-[16px] text-[0.74rem] leading-[1.55] text-ink-soft;
 }
 
 .guide-list li::before {
-  @apply absolute top-[0.55em] left-[2px] h-[5px] w-[5px] rounded-full bg-gold;
+  @apply absolute top-[0.55em] left-[2px] h-[4px] w-[4px] rounded-full bg-forest-600;
   content: "";
 }
 
 .supply-mix {
-  @apply flex flex-col gap-[5px];
+  @apply flex flex-col gap-[4px];
 }
 
 .supply-mix-bar {
@@ -116,11 +116,11 @@
 }
 
 .supply-mix-legend {
-  @apply flex justify-between text-[0.62rem] text-ink-soft;
+  @apply flex justify-between text-[0.68rem] text-ink-soft;
 }
 
 .dot {
-  @apply mr-[3px] inline-block h-[7px] w-[7px] rounded-full;
+  @apply mr-[4px] inline-block h-[8px] w-[8px] rounded-full;
 }
 
 .dot-self {

@@ -4,12 +4,12 @@
 }
 
 .modal {
-  @apply fixed inset-0 z-[61] m-auto w-[min(92vw,620px)] overflow-y-auto overscroll-contain rounded-[var(--radius)] border-2 border-outline bg-paper p-[20px] text-ink shadow-deep outline-none;
+  @apply fixed inset-0 z-[61] m-auto w-[min(92vw,620px)] overflow-y-auto overscroll-contain rounded-[var(--radius)] border border-outline bg-paper p-[20px] text-ink shadow-deep outline-none;
   max-height: min(90dvh, 880px);
 }
 
 .modal-title {
-  @apply text-[1.18rem] leading-[1.2] font-extrabold tracking-[0.01em] text-forest-900 uppercase;
+  @apply text-[1.24rem] leading-[1.2] font-semibold tracking-normal text-forest-900;
 }
 
 .modal-desc {
@@ -17,11 +17,11 @@
 }
 
 .modal-actions {
-  @apply mt-[14px] flex justify-end gap-2;
+  @apply mt-[16px] flex justify-end gap-2;
 }
 
 .modal-hint {
-  @apply mt-3 flex items-center gap-[5px] text-[0.62rem] text-ink-faint;
+  @apply mt-3 flex items-center gap-[4px] text-[0.68rem] text-ink-faint;
 }
 
 .event-modal {
@@ -33,7 +33,7 @@
 }
 
 .event-date {
-  @apply text-[0.66rem] font-bold tracking-[0.08em] text-gold-ink;
+  @apply text-[0.7rem] font-medium tracking-normal text-ink-soft;
 }
 
 .event-choices {
@@ -41,15 +41,15 @@
 }
 
 .event-choice {
-  @apply flex min-h-[60px] w-full items-center gap-[11px] rounded-[6px] border-2 border-outline/20 bg-paper-2 px-3 py-[11px] text-left transition-[border-color,background-color,transform] duration-150 ease-[var(--ease-out)];
+  @apply flex min-h-[60px] w-full items-center gap-[12px] rounded-[6px] border border-outline/20 bg-paper-2 px-3 py-[12px] text-left transition-[border-color,background-color,transform] duration-150 ease-[var(--ease-out)];
 }
 
 .event-choice:hover {
-  @apply translate-x-[2px] border-gold-dark bg-gold/15;
+  @apply border-line-strong bg-paper-3;
 }
 
 .choice-index {
-  @apply grid h-[30px] w-[30px] shrink-0 place-items-center rounded-[4px] border border-outline bg-forest-800 text-[0.72rem] font-extrabold text-gold-light;
+  @apply grid h-[32px] w-[32px] shrink-0 place-items-center rounded-[6px] border border-outline bg-forest-800 text-[0.76rem] font-semibold text-paper/70;
 }
 
 .choice-copy {
@@ -57,11 +57,11 @@
 }
 
 .choice-copy strong {
-  @apply text-[0.8rem];
+  @apply text-[0.84rem] font-medium;
 }
 
 .choice-copy span {
-  @apply text-[0.7rem] leading-[1.5] text-ink-soft;
+  @apply text-[0.74rem] leading-[1.5] text-ink-soft;
 }
 
 .outcome-modal {
@@ -70,7 +70,7 @@
 
 .outcome-icon,
 .tutorial-icon {
-  @apply grid h-[46px] w-[46px] place-items-center rounded-[6px] border-2 border-gold-dark/70 bg-forest-800 text-gold-light;
+  @apply grid h-[48px] w-[48px] place-items-center rounded-[8px] border border-paper/15 bg-forest-800 text-paper/70;
 }
 
 .tutorial-modal {
@@ -78,7 +78,7 @@
 }
 
 .tutorial-head {
-  @apply flex items-center gap-[11px];
+  @apply flex items-center gap-[12px];
 }
 
 .tutorial-head > div {
@@ -86,15 +86,15 @@
 }
 
 .tutorial-progress {
-  @apply flex gap-[5px];
+  @apply flex gap-[4px];
 }
 
 .tutorial-dot {
-  @apply h-[5px] w-[22px] rounded-[1px] bg-ink/15 transition-colors duration-200;
+  @apply h-[4px] w-[24px] rounded-[2px] bg-ink/15 transition-colors duration-200;
 }
 
 .tutorial-dot[data-active="true"] {
-  @apply bg-gold-dark;
+  @apply bg-forest-700;
 }
 
 .save-modal {
@@ -106,7 +106,7 @@
 }
 
 .slot-list {
-  @apply flex flex-col gap-[7px];
+  @apply flex flex-col gap-[8px];
 }
 
 .slot-card {
@@ -114,7 +114,7 @@
 }
 
 .slot-card[data-current="true"] {
-  @apply border-gold-dark;
+  @apply border-forest-700;
 }
 
 .slot-main {
@@ -122,15 +122,15 @@
 }
 
 .slot-main strong {
-  @apply text-[0.78rem];
+  @apply text-[0.82rem] font-medium;
 }
 
 .slot-main span {
-  @apply text-[0.64rem] text-ink-soft;
+  @apply text-[0.68rem] text-ink-soft;
 }
 
 .slot-stats {
-  @apply text-gold-ink!;
+  @apply text-forest-900! tabular-nums;
 }
 
 .slot-actions {
@@ -152,7 +152,7 @@
 
 .save-tools strong,
 .settings-row strong {
-  @apply text-[0.76rem];
+  @apply text-[0.8rem] font-medium;
 }
 
 .save-tool-actions {
@@ -160,7 +160,7 @@
 }
 
 .file-button {
-  @apply inline-flex min-h-11 cursor-pointer items-center gap-[6px] rounded-[4px] border-2 border-outline/30 bg-paper-2 px-[11px] text-[0.68rem] font-extrabold uppercase;
+  @apply inline-flex min-h-11 cursor-pointer items-center gap-[6px] rounded-[8px] border border-outline/20 bg-paper-2 px-[12px] text-[0.72rem] font-medium;
 }
 
 .file-button input {
@@ -176,7 +176,7 @@
 }
 
 [data-slot="switch"] {
-  @apply relative inline-flex h-7 w-12 rounded-[4px] border-2 border-outline/30 bg-paper-3 p-[3px] transition-colors duration-200;
+  @apply relative inline-flex h-8 w-12 rounded-[6px] border border-outline/20 bg-paper-3 p-[4px] transition-colors duration-200;
 }
 
 [data-slot="switch"][data-checked] {
@@ -184,7 +184,7 @@
 }
 
 [data-slot="switch-thumb"] {
-  @apply block h-[18px] w-[18px] rounded-[2px] bg-paper shadow-[0_1px_0_oklch(19.39%_0.0246_156.24_/_0.35)] transition-transform duration-200 ease-[var(--ease-out)];
+  @apply block h-[20px] w-[20px] rounded-[4px] bg-paper shadow-[0_1px_2px_oklch(19.39%_0.0246_156.24_/_0.2)] transition-transform duration-200 ease-[var(--ease-out)];
 }
 
 [data-slot="switch"][data-checked] [data-slot="switch-thumb"] {
@@ -200,16 +200,16 @@
 }
 
 .workspace-tabs {
-  @apply flex gap-1 overflow-x-auto border-b-2 border-outline/20 pb-1;
+  @apply flex gap-1 overflow-x-auto border-b border-outline/20 pb-1;
 }
 
 [data-slot="tabs-tab"] {
-  @apply min-h-[40px] shrink-0 rounded-t-[4px] border-0 border-b-2 border-transparent px-3 text-[0.68rem] font-extrabold tracking-[0.03em] text-ink-soft uppercase;
+  @apply min-h-[40px] shrink-0 rounded-t-[6px] border-0 border-b border-transparent px-3 text-[0.74rem] font-medium tracking-normal text-ink-soft;
   background: transparent;
 }
 
 [data-slot="tabs-tab"][data-selected] {
-  @apply border-b-gold-dark bg-gold/12 text-forest-900;
+  @apply border-b-forest-700 bg-forest-700/8 text-forest-900;
 }
 
 [data-slot="tabs-panel"] {

@@ -1,6 +1,6 @@
 @media (max-width: 1100px) {
   .panel-body {
-    @apply p-[11px];
+    @apply p-[12px];
   }
 
   .stat-grid {
@@ -36,17 +36,17 @@
   }
 
   .pillar-grid {
-    @apply gap-[7px];
+    @apply gap-[8px];
   }
 
   .title-role {
-    @apply text-[0.66rem];
+    @apply text-[0.7rem];
   }
 }
 
 @media (max-width: 767px) {
   body {
-    @apply text-[14px];
+    @apply text-[16px];
   }
 
   .top-bar {
@@ -132,15 +132,15 @@
   }
 
   .modal {
-    @apply w-[calc(100vw_-_16px)] p-[14px];
+    @apply w-[calc(100vw_-_16px)] p-[16px];
   }
 
   .event-choice {
-    @apply p-[9px];
+    @apply p-[8px];
   }
 
   .choice-index {
-    @apply h-[26px] w-[26px];
+    @apply h-[28px] w-[28px];
   }
 }
 
@@ -178,17 +178,17 @@
   }
 
   .mobile-nav {
-    @apply absolute right-0 bottom-0 left-0 z-[25] grid grid-cols-5 border-t-2 border-gold-dark/80 bg-forest-950 px-2 pt-2;
+    @apply absolute right-0 bottom-0 left-0 z-[25] grid grid-cols-5 border-t border-paper/15 bg-forest-950 px-2 pt-2;
     padding-bottom: calc(8px + var(--safe-bottom));
   }
 
   .mobile-tab {
-    @apply flex min-h-12 flex-col items-center justify-center gap-[3px] rounded-[4px] border-0 text-[0.56rem] font-bold tracking-[0.02em] text-paper/70 uppercase;
+    @apply flex min-h-12 flex-col items-center justify-center gap-[4px] rounded-[6px] border-0 text-[0.68rem] font-medium tracking-normal text-paper/70;
     background: transparent;
   }
 
   .mobile-tab:active {
-    @apply bg-gold text-forest-950;
+    @apply bg-paper/10 text-paper;
   }
 
   .scene-badges {
@@ -201,7 +201,7 @@
   }
 
   .top-bar {
-    @apply top-[calc(8px+var(--safe-top))] right-2 left-2 flex-wrap gap-2 px-[9px] py-[7px];
+    @apply top-[calc(8px+var(--safe-top))] right-2 left-2 flex-wrap gap-2 px-[8px] py-[8px];
   }
 
   .brand-copy span,
@@ -218,19 +218,19 @@
   }
 
   .brand-copy strong {
-    @apply text-[0.74rem];
+    @apply text-[0.8rem];
   }
 
   .top-actions {
-    @apply gap-[5px];
+    @apply gap-[4px];
   }
 
   .top-actions .advance-btn {
-    @apply min-h-11 px-[10px] text-[0.68rem];
+    @apply min-h-11 px-[10px] text-[0.72rem];
   }
 
   .mobile-status {
-    @apply flex w-full items-center gap-[10px] border-t border-gold-light/14 pt-1 text-[0.64rem] text-paper/76;
+    @apply flex w-full items-center gap-[10px] border-t border-paper/15 pt-1 text-[0.68rem] text-paper/70;
   }
 
   .mobile-status span {
@@ -240,18 +240,16 @@
   .title-screen {
     @apply items-end px-[16px] pt-6;
     padding-bottom: calc(24px + var(--safe-bottom));
-    background:
-      linear-gradient(
-        to top,
-        oklch(18.39% 0.0272 154.77 / 0.96) 0%,
-        oklch(19.21% 0.0278 156.29 / 0.72) 55%,
-        oklch(19.21% 0.0278 156.29 / 0.25) 100%
-      ),
-      radial-gradient(80% 70% at 30% 30%, oklch(76.03% 0.1236 82.19 / 0.16), transparent 55%);
+    background: linear-gradient(
+      to top,
+      oklch(18.39% 0.0272 154.77 / 0.96) 0%,
+      oklch(19.21% 0.0278 156.29 / 0.7) 55%,
+      oklch(19.21% 0.0278 156.29 / 0.2) 100%
+    );
   }
 
   .title-content {
-    @apply gap-[10px];
+    @apply gap-[12px];
   }
 
   .title-main {
@@ -263,7 +261,7 @@
   }
 
   .title-tagline {
-    @apply text-[0.84rem];
+    @apply text-[0.88rem];
   }
 
   .title-actions .btn {
@@ -277,7 +275,7 @@
   }
 
   .mobile-tab {
-    @apply text-[0.54rem];
+    @apply text-[0.68rem];
   }
 
   .scene-badges {

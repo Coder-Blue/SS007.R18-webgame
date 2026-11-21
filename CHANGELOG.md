@@ -20,6 +20,12 @@ the project uses semantic versioning for save-compatible releases.
 - Canonical, Open Graph locale/site metadata, a crawlable `sitemap.xml` and a
   dynamic `robots.txt` for the public deployment.
 
+### Design
+
+- Applied the unslop pass to the title, HUD, docks, panels, tables, modals and
+  mobile sheet: quieter chrome, 4px spacing, sentence-case labels, metric-weight
+  type, hairline borders, named meter values and reduced decorative motion.
+
 ## [1.0.0] - 2026-11-21
 
 ### Added
