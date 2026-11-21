@@ -62,9 +62,11 @@ select `.#musl` through `.envrc`.
 
 ## Deployment
 
-Vercel builds with `pnpm build` and serves `.output/public`. The SPA fallback
-rewrites unknown paths to `index.html`. `vercel.json` is the deployment source
-of truth. Preview deployments do not share browser storage with production.
+`vercel.json` selects the official `tanstack-start` framework preset and nothing
+else. Vercel runs the detected `pnpm build` command and consumes the Nitro Build
+Output API, including the `/og.png` server route. Do not add a manual
+`installCommand` or `buildCommand`; the preset owns them. Preview deployments do
+not share browser storage with production.
 
 ## Post-merge
 
