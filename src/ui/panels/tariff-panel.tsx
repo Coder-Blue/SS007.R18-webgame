@@ -73,7 +73,7 @@ export const TariffPanel = (): JSX.Element => {
   };
 
   return (
-    <div class="stack-lg">
+    <div class="stack-lg" data-tutorial="tariff-panel">
       <Panel title="Biểu giá bán lẻ" kicker="Bước 3 · Phân phối" icon="tabler:scale">
         <p class="panel-lead">
           Sáu bậc lũy tiến cho hộ dân, một giá trợ cấp cho khu công nghiệp. Tăng đến{" "}

@@ -12,6 +12,7 @@ export type PowerScene = {
   readonly update: (state: GameState, running: boolean) => void;
   readonly resize: () => void;
   readonly resetView: () => void;
+  readonly focusSelection: (selection: SceneSelection | null) => void;
   readonly dispose: () => void;
   readonly selected: () => SceneSelection | null;
 };
@@ -92,6 +93,15 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
   const grid = createGrid();
   const weather = createWeather(scene, terrain.water);
 
+  const tourRing = new THREE.Mesh(
+    new THREE.TorusGeometry(1.15, 0.08, 8, 36),
+    new THREE.MeshBasicMaterial({ color: 0x8fe9ff, transparent: true, opacity: 0.9 }),
+  );
+
+  tourRing.rotation.x = -Math.PI / 2;
+  tourRing.visible = false;
+  scene.add(tourRing);
+
   const progressBeacons = Array.from({ length: 3 }, () => {
     const beacon = new THREE.Mesh(
       new THREE.CylinderGeometry(0.09, 0.09, 1, 6),
@@ -157,6 +167,22 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
     highlight(hit.object);
     cameraRig.focus(hit.point, options.reducedMotion());
     options.onSelect?.(selection);
+  };
+
+  const selectionPoint = (selection: SceneSelection): THREE.Vector3 => {
+    if (selection === "hydro") return new THREE.Vector3(-9, 1.2, -3.5);
+
+    if (selection === "thermal") return new THREE.Vector3(-1.5, 1.2, -7.2);
+
+    if (selection === "renewable") return new THREE.Vector3(7, 1.2, 2.6);
+
+    if (selection === "urban") return new THREE.Vector3(4.2, 1.2, 5.4);
+
+    if (selection === "industrial") return new THREE.Vector3(8.2, 1.2, -1.2);
+
+    if (selection === "rural") return new THREE.Vector3(-7.2, 1.2, 6.2);
+
+    return new THREE.Vector3(0, 1.2, 0.4);
   };
 
   const focusForEvent = (state: GameState): void => {
@@ -274,6 +300,20 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
       cameraRig.reset(options.reducedMotion());
       highlight(null);
       selected = null;
+      tourRing.visible = false;
+    },
+    focusSelection: (selection) => {
+      if (selection === null) {
+        tourRing.visible = false;
+
+        return;
+      }
+
+      const point = selectionPoint(selection);
+
+      tourRing.position.set(point.x, 1.1, point.z);
+      tourRing.visible = true;
+      cameraRig.focus(point, options.reducedMotion());
     },
     selected: () => selected,
     dispose: () => {

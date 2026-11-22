@@ -27,6 +27,7 @@ export const PowerCanvas = (props: {
   let canvas: HTMLCanvasElement | undefined;
   let container: HTMLDivElement | undefined;
   let controller: PowerScene | null = null;
+  let tourTarget: SceneSelection | null = null;
 
   createTrackedEffect(() => {
     if (!ready()) return;
@@ -67,6 +68,8 @@ export const PowerCanvas = (props: {
 
           controller = next;
           setReady(true);
+
+          if (tourTarget !== null) next.focusSelection(tourTarget);
         })
         .catch((error) => {
           if (cancelled) return;
@@ -94,10 +97,20 @@ export const PowerCanvas = (props: {
       timer = setTimeout(load, FALLBACK_DELAY_MS);
     };
 
+    const onTour = (event: Event): void => {
+      // SAFETY: only the tutorial dispatches this event, always with a SceneSelection or null.
+      const selection = (event as CustomEvent<SceneSelection | null>).detail ?? null;
+
+      tourTarget = selection;
+      controller?.focusSelection(selection);
+    };
+
+    window.addEventListener("grid:tour-focus", onTour);
     frame = requestAnimationFrame(schedule);
 
     return () => {
       cancelled = true;
+      window.removeEventListener("grid:tour-focus", onTour);
 
       if (frame !== undefined) cancelAnimationFrame(frame);
 

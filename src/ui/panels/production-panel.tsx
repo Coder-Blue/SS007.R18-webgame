@@ -76,7 +76,7 @@ export const ProductionPanel = (): JSX.Element => {
   };
 
   return (
-    <div class="stack-lg">
+    <div class="stack-lg" data-tutorial="production-panel">
       <Panel title="Mua điện cạnh tranh" kicker="Bước 1 · Thượng nguồn" icon="lucide:handshake">
         <p class="panel-lead">
           Ba nhà cung cấp chào giá gần như tương đương. Chênh lệch nhỏ về giá và công suất là toàn

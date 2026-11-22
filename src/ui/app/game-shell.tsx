@@ -80,6 +80,8 @@ const noticeMessage = (code: string): string => {
 
   if (code.startsWith("notice.project:")) return "Một công trình đã hoàn tất.";
 
+  if (code.startsWith("notice.reform:")) return "Một cải cách cơ cấu đã có hiệu lực.";
+
   return noticeMessages.get(code) ?? code;
 };
 
@@ -339,7 +341,13 @@ export const GameShell = (): JSX.Element => {
         </Loading>
       </Show>
       <Show when={tutorialOpen()}>
-        <TutorialModal open onClose={() => setTutorialOpen(false)} onFinish={finishTutorial} />
+        <TutorialModal
+          open
+          onClose={() => setTutorialOpen(false)}
+          onFinish={finishTutorial}
+          onOpenPanel={openPanel}
+          onClosePanel={() => setWorkspaceOpen(false)}
+        />
       </Show>
       <Show when={toast()}>
         {(current) => (

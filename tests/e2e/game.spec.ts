@@ -139,6 +139,43 @@ test("loads the scene from a deferred production chunk", async ({ page }) => {
   await expect(page.locator(".power-canvas")).toHaveCount(1);
 });
 
+test("walks the tutorial through live panels and map nodes", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Bắt đầu nhiệm kỳ/i }).click();
+  await page.evaluate(() => {
+    window.addEventListener("grid:tour-focus", (event) => {
+      document.body.dataset.tourTarget = event instanceof CustomEvent ? String(event.detail) : "";
+    });
+  });
+
+  const tutorial = page.locator(".tutorial-modal");
+  await expect(tutorial).toBeVisible();
+  const desktop = (page.viewportSize()?.width ?? 0) > 1180;
+
+  await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
+
+  if (desktop) {
+    await expect(page.locator(".workspace-drawer")).toBeVisible();
+    await expect(page.locator('[data-tutorial="production-panel"]')).toBeVisible();
+  }
+
+  await expect.poll(() => page.locator("body").getAttribute("data-tour-target")).toBe("thermal");
+
+  await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
+
+  if (desktop) await expect(page.locator('[data-tutorial="grid-panel"]')).toBeVisible();
+  await expect.poll(() => page.locator("body").getAttribute("data-tour-target")).toBe("rural");
+
+  await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
+
+  if (desktop) await expect(page.locator('[data-tutorial="tariff-panel"]')).toBeVisible();
+  await expect.poll(() => page.locator("body").getAttribute("data-tour-target")).toBe("urban");
+
+  await tutorial.getByRole("button", { name: "Bỏ qua hướng dẫn" }).click();
+  await expect(page.locator(".tutorial-modal")).toHaveCount(0);
+  await expect(page.locator(".workspace-drawer")).toHaveCount(0);
+});
+
 test("keeps the tutorial step when it is reopened", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Bắt đầu nhiệm kỳ/i }).click();

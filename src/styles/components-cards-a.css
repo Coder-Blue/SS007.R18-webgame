@@ -292,3 +292,23 @@
   color: var(--ink-faint);
   font-size: 11px;
 }
+
+.reform-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.reform-head {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.reform-row[data-pending="true"] {
+  background: rgba(57, 215, 255, 0.04);
+}
