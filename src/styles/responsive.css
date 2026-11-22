@@ -359,3 +359,10 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+@media (max-width: 640px) {
+  .title-screen {
+    align-items: flex-start;
+    padding: 28px 14px 36px;
+  }
+}
