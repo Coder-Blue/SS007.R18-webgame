@@ -91,7 +91,10 @@ export const projectMonth = (
 
   const industrialChange =
     state.tariffs.industrial > 0
-      ? Math.abs(((tariffs.industrial - state.tariffs.industrial) / state.tariffs.industrial) * 100)
+      ? Math.max(
+          0,
+          ((tariffs.industrial - state.tariffs.industrial) / state.tariffs.industrial) * 100,
+        )
       : 0;
 
   const change = Math.max(householdChange, industrialChange);

@@ -69,15 +69,23 @@
 }
 
 .slider-thumb {
+  background: transparent;
+  border: 0;
+  height: 44px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+}
+
+.slider-thumb::after {
   background: var(--ink);
   border: 2px solid var(--electric);
   border-radius: 50%;
   box-shadow: 0 0 0 4px rgba(57, 215, 255, 0.12);
-  height: 22px;
+  content: "";
+  inset: 11px;
   position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 22px;
 }
 
 .slider-thumb:has(:focus-visible) {

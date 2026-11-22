@@ -22,6 +22,7 @@ export type GameStore = {
   readonly running: () => boolean;
   readonly speed: () => GameSpeed;
   readonly lastApproval: () => ApprovalResult | null;
+  readonly hold: () => boolean;
   readonly setState: (state: GameState) => void;
   readonly newGame: (seed?: number) => void;
   readonly dispatch: (action: ActionResult) => boolean;
@@ -200,6 +201,7 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
     running,
     speed,
     lastApproval,
+    hold,
     setState: (next) => {
       autoPaused = false;
       setRunningSignal(false);
@@ -244,6 +246,11 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
     clearApprovalResult: () => setLastApproval(null),
     setHold: (value) => {
       setHoldSignal(value);
+
+      if (value && running()) {
+        autoPaused = true;
+        setRunningSignal(false);
+      }
 
       if (!value) syncRunning(state());
     },

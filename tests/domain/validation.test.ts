@@ -18,6 +18,31 @@ describe("validation", () => {
     if (result.ok) expect(result.value.seed).toBe(3);
   });
 
+  it("accepts an older save without recoveredYears", () => {
+    const initial = createInitialState();
+
+    const legacy = {
+      ...initial,
+      finance: {
+        cash: initial.finance.cash,
+        debt: initial.finance.debt,
+        debtLimit: initial.finance.debtLimit,
+        accumulatedLoss: initial.finance.accumulatedLoss,
+        interestRate: initial.finance.interestRate,
+        recoveredTotal: initial.finance.recoveredTotal,
+        monthlyHistory: initial.finance.monthlyHistory,
+        annualHistory: initial.finance.annualHistory,
+      },
+    };
+
+    // SAFETY: the fixture deliberately omits recoveredYears to model a version-2 save.
+    const result = parseGameState(json(legacy as GameState));
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) expect(result.value.finance.recoveredYears).toEqual([]);
+  });
+
   it("rejects a malformed state", () => {
     expect(parseGameState({ version: 1 }).ok).toBe(false);
     const initial = createInitialState();

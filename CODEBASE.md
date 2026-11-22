@@ -37,7 +37,7 @@ module. Randomness is threaded as a seed.
 | `tariffs.ts` | six-tier household billing, industrial tariff, plan validation |
 | `finance.ts` | spend, debt settlement, management/transmission cost, annual reports |
 | `recovery.ts` | N-2 audited-loss recovery formula |
-| `reforms.ts` | DPPA/VREM/NSMO/two-part wheeling revenue |
+| `reforms.ts` | DPPA/VREM/NSMO/two-part wheeling revenue; NSMO is abstracted as a trust/revenue modifier rather than a separate dispatch controller |
 | `infrastructure.ts` | line, plant, substation and decision progress |
 | `missions.ts` | three long-term mission progress and completion |
 | `approval.ts` | autonomous State tariff audit and likelihood |

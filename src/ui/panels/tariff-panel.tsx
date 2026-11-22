@@ -37,12 +37,20 @@ export const TariffPanel = (): JSX.Element => {
 
   const preview = () => tariffPreview(state(), tiers(), industrial());
 
-  const change = () =>
-    preview().before.averageTariff > 0
-      ? ((preview().after.averageTariff - preview().before.averageTariff) /
-          preview().before.averageTariff) *
-        100
-      : 0;
+  const change = () => {
+    const before = preview().before.averageTariff;
+
+    const household = before > 0 ? ((preview().after.averageTariff - before) / before) * 100 : 0;
+
+    const industrialBase = state().tariffs.industrial;
+
+    const industrialChange =
+      industrialBase > 0
+        ? Math.max(0, ((industrial() - industrialBase) / industrialBase) * 100)
+        : 0;
+
+    return Math.max(household, industrialChange);
+  };
 
   const setTier = (index: number, value: number): void => {
     const current = tiers();

@@ -149,6 +149,13 @@ export const ProductionPanel = (): JSX.Element => {
                 </strong>
               </div>
               <div>
+                <span>Niềm tin dân</span>
+                <strong>
+                  {Math.round(supplierView().before.trustBefore)}% →{" "}
+                  {Math.round(supplierView().after.trustAfter)}%
+                </strong>
+              </div>
+              <div>
                 <span>Chấp thuận giá</span>
                 <strong>{Math.round(supplierView().after.approvalLikelihood)}%</strong>
               </div>

@@ -65,7 +65,8 @@ production, grid and tariff panels, and explains the three-mandate loop.
    uncapped prices, throttled unprofitable regions) or continue controlled
    reform.
 4. **2025–2026 revised Electricity Law**: NSMO dispatch separation, DPPA, VREM
-   roadmap and N-2 audited cost recovery.
+   roadmap and N-2 audited cost recovery. In this build NSMO is represented by
+   a trust/revenue modifier; the player remains the dispatcher.
 5. **Recurring media sub-event**: loss/debt/price-hike coverage applies one
    accelerated citizen-trust decay and a pulsing HUD badge.
 

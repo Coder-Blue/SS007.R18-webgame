@@ -29,6 +29,7 @@ export const approvalLikelihood = (
   const inflationDrag = Math.max(0, state.metrics.inflation - 6) * 4;
   const overshoot = Math.max(0, changePct - 5) * 2.5;
   const privateDrag = state.policy.branch === "private" ? 25 : 0;
+  const ceilingDrag = average > state.tariffs.ceiling ? 30 : 0;
 
   return clamp(
     Math.round(
@@ -40,7 +41,8 @@ export const approvalLikelihood = (
         publicMood -
         inflationDrag -
         overshoot -
-        privateDrag,
+        privateDrag -
+        ceilingDrag,
     ),
     5,
     95,

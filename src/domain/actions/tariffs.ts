@@ -29,7 +29,7 @@ export const requestTariffAction = (
   const industrialChange =
     state.tariffs.industrial <= 0
       ? 0
-      : Math.abs(((industrial - state.tariffs.industrial) / state.tariffs.industrial) * 100);
+      : Math.max(0, ((industrial - state.tariffs.industrial) / state.tariffs.industrial) * 100);
 
   const changePct = Math.max(householdChange, industrialChange);
 

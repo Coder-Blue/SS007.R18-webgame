@@ -35,6 +35,7 @@ const errorMessages = new Map<string, string>([
   ["policy.too-early", "Chính sách này chưa mở trong giai đoạn hiện tại."],
   ["policy.already-enabled", "Chính sách đã được áp dụng."],
   ["policy.requires-petition", "Cần hoàn tất kiến nghị chính sách giá trước."],
+  ["policy.requires-law", "Cần ban hành Luật Điện lực sửa đổi trước."],
   ["policy.requires-vrem", "Cần mở VREM trước."],
   ["policy.rate-out-of-range", "Tỷ lệ thu hồi phải từ 30% đến 80%."],
   ["policy.no-authority", "Nhánh tư nhân hóa không còn thẩm quyền chính sách."],
@@ -123,6 +124,7 @@ export const GameShell = (): JSX.Element => {
   const [toast, setToast] = createSignal<ToastState | null>(null);
   const [workspaceOpen, setWorkspaceOpen] = createSignal(false);
   const [workspacePanel, setWorkspacePanel] = createSignal<PanelId>("overview");
+  let tutorialWasRunning = false;
   let toastTimer: ReturnType<typeof setTimeout> | undefined;
 
   const showToast = (next: ToastState): void => {
@@ -206,12 +208,23 @@ export const GameShell = (): JSX.Element => {
     setScreen("game");
     setHasSave(true);
     store.setSpeed(1);
+    tutorialWasRunning = true;
     setTutorialOpen(true);
     showToast({ kind: "notice", text: "Nhiệm kỳ mới bắt đầu. Mô phỏng đang tạm dừng." });
   };
 
   const continueGame = (): void => {
     const latest = latestSave();
+
+    if (latest === null && hasAnySave()) {
+      showToast({
+        kind: "error",
+        text: "Bản lưu hiện có không đọc được. Hãy mở kho lưu để kiểm tra.",
+      });
+      setMenuOpen(true);
+
+      return;
+    }
 
     if (latest !== null) {
       store.setState(latest.state);
@@ -239,10 +252,20 @@ export const GameShell = (): JSX.Element => {
   const onLoaded = (): void => {
     const prefs = readSession();
     const current = store.state();
+    const panel = PANEL_IDS.find((id) => id === prefs.panel);
 
     setScreen("game");
     setHasSave(true);
     store.setSpeed(prefs.speed);
+
+    if (panel !== undefined) setWorkspacePanel(panel);
+
+    if (!prefs.tutorialDone) {
+      tutorialWasRunning = false;
+      setTutorialOpen(true);
+
+      return;
+    }
 
     if (!prefs.paused && current.events.activeId === null && current.approval === null) {
       store.setRunning(true);
@@ -252,7 +275,16 @@ export const GameShell = (): JSX.Element => {
   const finishTutorial = (): void => {
     markTutorial();
     setTutorialOpen(false);
-    store.setRunning(store.state().events.activeId === null && store.state().approval === null);
+    store.setRunning(
+      tutorialWasRunning &&
+        store.state().events.activeId === null &&
+        store.state().approval === null,
+    );
+  };
+
+  const openTutorial = (): void => {
+    tutorialWasRunning = store.running();
+    setTutorialOpen(true);
   };
 
   return (
@@ -274,7 +306,7 @@ export const GameShell = (): JSX.Element => {
             onOpenPanel={openPanel}
             onCloseWorkspace={() => setWorkspaceOpen(false)}
             onOpenMenu={() => setMenuOpen(true)}
-            onOpenTutorial={() => setTutorialOpen(true)}
+            onOpenTutorial={openTutorial}
             onNewGame={startGame}
             onSelect={(selection) => {
               setSelected(selection);
@@ -289,7 +321,10 @@ export const GameShell = (): JSX.Element => {
           onStart={startGame}
           onContinue={continueGame}
           onOpenLoad={() => setMenuOpen(true)}
-          onTutorial={() => setTutorialOpen(true)}
+          onTutorial={() => {
+            tutorialWasRunning = false;
+            setTutorialOpen(true);
+          }}
         />
       </Show>
       <Show when={menuOpen()}>

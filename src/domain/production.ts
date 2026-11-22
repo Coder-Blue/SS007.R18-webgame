@@ -37,7 +37,6 @@ export const availableCapacityMw = (
 ): number =>
   availableHydroMw(generation) +
   generation.thermalCapacityMw +
-  generation.renewableCapacityMw * 0.3 +
   Math.min(importMw, supplierCapacity(market, importMw));
 
 export const supplierCapacity = (market: Market, requestedMw: number): number => {

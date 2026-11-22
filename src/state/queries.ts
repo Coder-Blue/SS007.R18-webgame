@@ -37,7 +37,7 @@ export const useAdvanceMonth = (store: GameStore) => {
 
 export const useAutoPlay = (store: GameStore, advance: () => void): void => {
   createTrackedEffect(() => {
-    if (!store.running()) return;
+    if (!store.running() || store.hold()) return;
 
     if (store.state().phase !== "playing") return;
 

@@ -341,6 +341,8 @@ export const createPlants = (): PlantBuild => {
     const drought = state.market.drought > 0.55;
     const blackout = state.ending !== null && state.ending.id === "collapse";
     const privateBranch = state.policy.branch === "private";
+    const loadShed = state.events.completedDecisions.includes("load-shed");
+    const shifted = state.events.completedDecisions.includes("shift-industry");
     const renewableSpin = delta * (0.6 + state.market.renewableFactor * 2.2);
     const reservoirRatio = clamp(state.generation.reservoir / 100, 0, 1);
 
@@ -357,18 +359,20 @@ export const createPlants = (): PlantBuild => {
       300;
 
     for (const window of centers.cityWindows) {
-      window.emissiveIntensity = blackout ? 0 : 0.35 + coverage * 0.7;
+      window.emissiveIntensity = blackout ? 0 : (0.35 + coverage * 0.7) * (loadShed ? 0.35 : 1);
     }
 
     for (const window of centers.factoryWindows) {
-      window.emissiveIntensity = blackout ? 0 : 0.3 + (state.metrics.industrialOutput / 100) * 0.6;
+      const base = blackout ? 0 : 0.3 + (state.metrics.industrialOutput / 100) * 0.6;
+
+      window.emissiveIntensity = shifted ? Math.min(1.2, base * 1.35) : base;
     }
 
     for (const window of centers.ruralWindows) {
       const rural = state.zones.rural.coverage / 100;
       const flicker = privateBranch && Math.sin(time * 9) > 0.6 ? 0.2 : 1;
 
-      window.emissiveIntensity = blackout ? 0 : rural * 0.9 * flicker;
+      window.emissiveIntensity = blackout ? 0 : rural * 0.9 * flicker * (loadShed ? 0.5 : 1);
     }
 
     for (const insulator of substationBuild.insulators) {

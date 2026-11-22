@@ -250,9 +250,9 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
     const delta = Math.min(0.05, (time - lastTime) / 1000);
 
     lastTime = time;
-    elapsed += delta;
 
     if (currentState !== null && currentRunning) {
+      elapsed += delta;
       plants.update(currentState, elapsed, delta);
       grid.update(currentState, elapsed);
       weather.tick(delta);

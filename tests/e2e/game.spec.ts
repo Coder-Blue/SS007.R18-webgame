@@ -288,6 +288,19 @@ test("mobile navigation opens the tariff sheet with large touch targets", async 
     expect(size.height).toBeGreaterThanOrEqual(43.5);
   }
 
+  const sliders = await page.locator(".mobile-sheet .slider-thumb").evaluateAll((nodes) =>
+    nodes.map((node) => {
+      const box = node.getBoundingClientRect();
+
+      return { height: box.height, width: box.width };
+    }),
+  );
+
+  for (const slider of sliders) {
+    expect(slider.height).toBeGreaterThanOrEqual(43.5);
+    expect(slider.width).toBeGreaterThanOrEqual(43.5);
+  }
+
   await expectNoOverflow(page);
 });
 

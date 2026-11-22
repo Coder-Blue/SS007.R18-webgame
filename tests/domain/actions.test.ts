@@ -174,6 +174,26 @@ describe("tariff actions", () => {
     }
   });
 
+  it("lowers the industrial tariff directly", () => {
+    const result = requestTariffAction(baseState(), baseState().tariffs.tiers, 1_550);
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.approval).toBeNull();
+      expect(result.value.tariffs.industrial).toBe(1_550);
+    }
+  });
+
+  it("opens an audit for an industrial increase", () => {
+    const base = baseState();
+    const result = requestTariffAction(base, base.tariffs.tiers, 1_950);
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) expect(result.value.approval).not.toBeNull();
+  });
+
   it("creates a state audit for a large adjustment", () => {
     const base = baseState();
 

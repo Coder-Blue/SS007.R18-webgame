@@ -278,7 +278,7 @@ export const SaveMenu = (props: {
             variant="danger"
             icon="lucide:trash"
             onClick={() => {
-              actions.newGame();
+              props.onNewGame();
               clearAllSaves();
               reload();
               props.onClose();
