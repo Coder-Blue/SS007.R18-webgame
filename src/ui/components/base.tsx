@@ -96,11 +96,14 @@ export const Badge = (props: {
   readonly tone?: "neutral" | "good" | "warn" | "bad" | "gold" | "dark" | "electric";
   readonly class?: string;
   readonly pulse?: boolean;
+  readonly label?: string;
 }): JSX.Element => (
   <span
     class={cx("badge", props.class)}
     data-tone={props.tone ?? "neutral"}
     data-pulse={props.pulse ? "true" : undefined}
+    aria-label={props.label}
+    role={props.label === undefined ? undefined : "status"}
   >
     {props.children}
   </span>

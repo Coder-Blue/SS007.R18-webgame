@@ -58,8 +58,7 @@
 
 .scene-badge {
   align-items: center;
-  backdrop-filter: blur(8px);
-  background: rgba(7, 22, 29, 0.72);
+  background: rgba(7, 22, 29, 0.92);
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ink-soft);
@@ -84,8 +83,7 @@
 
 .scene-reset {
   align-items: center;
-  backdrop-filter: blur(8px);
-  background: rgba(7, 22, 29, 0.75);
+  background: rgba(7, 22, 29, 0.92);
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ink-soft);
@@ -101,8 +99,7 @@
 }
 
 .scene-hint {
-  backdrop-filter: blur(8px);
-  background: rgba(7, 22, 29, 0.6);
+  background: rgba(7, 22, 29, 0.88);
   border: 1px solid var(--line);
   border-radius: 999px;
   bottom: 92px;
@@ -141,20 +138,17 @@
 
 .paused-banner {
   align-items: center;
-  backdrop-filter: blur(10px);
-  background: rgba(7, 22, 29, 0.82);
+  background: rgba(7, 22, 29, 0.94);
   border: 1px solid rgba(255, 179, 71, 0.45);
   border-radius: 999px;
   color: var(--amber);
   display: flex;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   gap: 8px;
   left: 50%;
-  letter-spacing: 0.12em;
   padding: 8px 14px;
   position: absolute;
-  text-transform: uppercase;
   top: 118px;
   transform: translateX(-50%);
   z-index: 4;
@@ -170,7 +164,6 @@
 
 .scene-selection {
   align-items: center;
-  backdrop-filter: blur(10px);
   background: rgba(7, 22, 29, 0.85);
   border: 1px solid rgba(57, 215, 255, 0.4);
   border-radius: 999px;
@@ -195,13 +188,12 @@
 
 .top-bar {
   align-items: center;
-  backdrop-filter: blur(16px);
-  background: linear-gradient(180deg, rgba(8, 24, 32, 0.94), rgba(7, 20, 27, 0.86));
+  background: #081820;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 12px;
   box-shadow: var(--shadow-panel);
   display: grid;
-  gap: 10px 18px;
+  gap: 10px 16px;
   grid-template-columns: auto auto minmax(0, 1fr) auto;
   left: 14px;
   padding: 9px 12px;
@@ -222,17 +214,43 @@
   min-width: 0;
 }
 
+.top-bar > * {
+  min-width: 0;
+}
+
+.top-gauge-label span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .brand-mark {
   align-items: center;
-  background: linear-gradient(160deg, rgba(57, 215, 255, 0.18), rgba(57, 215, 255, 0.04));
-  border: 1px solid rgba(57, 215, 255, 0.35);
+  background: rgba(57, 215, 255, 0.1);
+  border: 1px solid rgba(57, 215, 255, 0.3);
   border-radius: 10px;
   color: var(--electric);
   display: inline-flex;
   flex: none;
   height: 40px;
   justify-content: center;
+  position: relative;
   width: 40px;
+}
+
+.brand-mark::after {
+  background: var(--green);
+  border: 2px solid #081820;
+  border-radius: 50%;
+  bottom: 4px;
+  content: "";
+  height: 8px;
+  position: absolute;
+  right: 4px;
+  width: 8px;
+}
+
+.top-bar[data-paused="true"] .brand-mark::after {
+  background: var(--amber);
 }
 
 .brand-copy {
@@ -243,18 +261,17 @@
 
 .brand-copy strong {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.01em;
-  line-height: 1.2;
+  line-height: 1.25;
   white-space: nowrap;
 }
 
 .brand-copy span {
   color: var(--ink-faint);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .date-block {
@@ -276,7 +293,7 @@
   color: var(--ink-faint);
   font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
@@ -288,14 +305,14 @@
 }
 
 .top-gauge {
-  background: rgba(4, 14, 19, 0.45);
+  background: rgba(4, 14, 19, 0.55);
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
-  padding: 5px 8px 7px;
+  padding: 6px 8px;
 }
 
 .top-gauge[data-tone="bad"] {
@@ -337,7 +354,7 @@
 
 .pause-btn {
   align-items: center;
-  background: rgba(255, 179, 71, 0.12);
+  background: rgba(255, 179, 71, 0.1);
   border: 1px solid rgba(255, 179, 71, 0.45);
   border-radius: 9px;
   color: var(--amber);

@@ -146,8 +146,9 @@ export const RevenueCostChart = (props: {
                     height={height - pad.bottom - revenueTop()}
                     fill="var(--electric)"
                     class="chart-bar"
+                    opacity={index() === rows().length - 1 ? 1 : 0.58}
                   >
-                    <title>{`${monthLabel(row)} · Doanh thu ${Math.round(totalRevenue())} tỷ`}</title>
+                    <title>{`${monthLabel(row)} · Doanh thu ${Math.round(totalRevenue())} tỷ (100%)`}</title>
                   </rect>
                   <rect
                     x={group()}
@@ -156,8 +157,9 @@ export const RevenueCostChart = (props: {
                     height={otherHeight()}
                     fill="var(--cyan-soft)"
                     class="chart-bar"
+                    opacity={index() === rows().length - 1 ? 1 : 0.58}
                   >
-                    <title>{`${monthLabel(row)} · Doanh thu khác ${Math.round(row.revenueOther)} tỷ`}</title>
+                    <title>{`${monthLabel(row)} · Doanh thu khác ${Math.round(row.revenueOther)} tỷ (${Math.round((row.revenueOther / Math.max(1, totalRevenue())) * 100)}% doanh thu)`}</title>
                   </rect>
                   <rect
                     x={group() + barWidth() + 4}
@@ -166,8 +168,9 @@ export const RevenueCostChart = (props: {
                     height={height - pad.bottom - costTop()}
                     fill="var(--amber)"
                     class="chart-bar"
+                    opacity={index() === rows().length - 1 ? 1 : 0.58}
                   >
-                    <title>{`${monthLabel(row)} · Chi phí ${Math.round(totalCost())} tỷ`}</title>
+                    <title>{`${monthLabel(row)} · Chi phí ${Math.round(totalCost())} tỷ (100%)`}</title>
                   </rect>
                   <rect
                     x={group() + barWidth() + 4}
@@ -176,8 +179,9 @@ export const RevenueCostChart = (props: {
                     height={managementHeight()}
                     fill="var(--rose)"
                     class="chart-bar"
+                    opacity={index() === rows().length - 1 ? 1 : 0.58}
                   >
-                    <title>{`${monthLabel(row)} · Chi phí quản lý ${Math.round(row.costManagement)} tỷ`}</title>
+                    <title>{`${monthLabel(row)} · Chi phí quản lý ${Math.round(row.costManagement)} tỷ (${Math.round((row.costManagement / Math.max(1, totalCost())) * 100)}% chi phí)`}</title>
                   </rect>
                   <rect
                     x={group()}

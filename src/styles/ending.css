@@ -47,7 +47,7 @@
 
 .ending-head h2 {
   font-size: clamp(24px, 4vw, 36px);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.1;
 }

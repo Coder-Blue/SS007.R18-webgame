@@ -22,7 +22,7 @@ export const PANEL_IDS = [
   "finance",
 ] as const satisfies readonly PanelId[];
 
-const mobileTabs = PANEL_TABS;
+const mobileTabs = PANEL_TABS.filter((tab) => tab.id !== "policy");
 
 export const MobileNav = (): JSX.Element => {
   const [open, setOpen] = createSignal(false);
@@ -59,7 +59,7 @@ export const MobileNav = (): JSX.Element => {
             </DrawerClose>
           </div>
           <div class="sheet-tabs">
-            {mobileTabs.map((tab) => (
+            {PANEL_TABS.map((tab) => (
               <button
                 type="button"
                 class="sheet-tab"

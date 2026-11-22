@@ -146,9 +146,9 @@ export const TopBar = (props: {
           </For>
         </div>
         <Show when={state().media.activeMonths > 0}>
-          <Badge tone="bad" pulse class="media-badge">
+          <Badge tone="bad" pulse class="media-badge" label="Truyền thông đưa tin lỗ EVN">
             <Icon icon="tabler:speakerphone" size={14} />
-            Truyền thông lỗ EVN
+            <span class="media-badge-text">Truyền thông lỗ EVN</span>
           </Badge>
         </Show>
         <IconButton
