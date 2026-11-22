@@ -208,7 +208,7 @@ export const GameShell = (): JSX.Element => {
     setScreen("game");
     setHasSave(true);
     store.setSpeed(1);
-    tutorialWasRunning = true;
+    tutorialWasRunning = false;
     setTutorialOpen(true);
     showToast({ kind: "notice", text: "Nhiệm kỳ mới bắt đầu. Mô phỏng đang tạm dừng." });
   };

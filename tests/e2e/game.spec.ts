@@ -56,13 +56,15 @@ test("reserves the continue action and keeps settings reachable on mobile", asyn
 test("pauses, resumes and advances a month at three times speed", async ({ page }) => {
   await startGame(page);
   await expectMonth(page, "Tháng 1/2022");
-
-  await page.getByRole("button", { name: "Tạm dừng mô phỏng" }).click();
   await expect(page.locator(".paused-banner")).toBeVisible();
+
   await page.getByRole("button", { name: "Tiếp tục mô phỏng" }).click();
   await expect(page.locator(".paused-banner")).toHaveCount(0);
+  await page.getByRole("button", { name: "Tạm dừng mô phỏng" }).click();
+  await expect(page.locator(".paused-banner")).toBeVisible();
 
   await setSpeed3(page);
+  await page.getByRole("button", { name: "Tiếp tục mô phỏng" }).click();
   await expectMonth(page, "Tháng 2/2022");
 });
 
