@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { advanceReforms, isReformPending, startReform } from "../../src/domain/reform-progress";
 import { baseState } from "./test-helpers";
 import type { PolicyKey } from "../../src/domain/types";
+import { REFORM_MONTHS } from "../../src/domain/constants";
 
 const keys: readonly PolicyKey[] = ["n2", "nsmo", "dppa", "vrem", "twoPart"];
 
@@ -46,6 +47,6 @@ describe("reform progress", () => {
     const step = advanceReforms(started);
 
     expect(step.completed).toHaveLength(0);
-    expect(step.policy.reformProgress[0]?.monthsLeft).toBe(7);
+    expect(step.policy.reformProgress[0]?.monthsLeft).toBe(REFORM_MONTHS.vrem - 1);
   });
 });

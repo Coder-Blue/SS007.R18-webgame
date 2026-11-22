@@ -73,6 +73,30 @@ describe("advanceMonth", () => {
     }
   });
 
+  it("reduces accumulated loss in a profitable month", () => {
+    const base = baseState();
+
+    const state = {
+      ...base,
+      finance: { ...base.finance, accumulatedLoss: 1_000 },
+    };
+
+    const result = advanceMonth({
+      ...state,
+      tariffs: {
+        ...state.tariffs,
+        tiers: [3_500, 3_500, 3_500, 3_500, 3_500, 3_500],
+        industrial: 3_500,
+      },
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (!result.ok) return;
+    expect(result.value.ledger.netResult).toBeGreaterThan(0);
+    expect(result.value.state.finance.accumulatedLoss).toBeLessThan(state.finance.accumulatedLoss);
+  });
+
   it("completes a reform project and emits a notice", () => {
     const state = baseState();
 

@@ -21,11 +21,11 @@ export const RECOVERY_RATE_MAX = 0.8;
 export const RECOVERY_RATE_DEFAULT = 0.55;
 
 export const REFORM_MONTHS = {
-  n2: 4,
-  nsmo: 6,
-  dppa: 5,
-  vrem: 8,
-  twoPart: 4,
+  n2: 3,
+  nsmo: 4,
+  dppa: 4,
+  vrem: 5,
+  twoPart: 3,
 } as const;
 
 export const TARIFF_WEIGHTS = [0.15, 0.17, 0.19, 0.2, 0.17, 0.12] as const;

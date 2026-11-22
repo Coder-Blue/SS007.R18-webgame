@@ -83,12 +83,20 @@ const PolicySchema = v.object({
   branch: v.picklist(["state", "private"] as const),
   priceCap: v.boolean(),
   reformProgress: v.optional(
-    v.array(
-      v.object({
-        key: v.picklist(["n2", "nsmo", "dppa", "vrem", "twoPart"] as const),
-        monthsLeft: nonNegative,
-        totalMonths: nonNegative,
-      }),
+    v.pipe(
+      v.array(
+        v.pipe(
+          v.object({
+            key: v.picklist(["n2", "nsmo", "dppa", "vrem", "twoPart"] as const),
+            monthsLeft: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(24)),
+            totalMonths: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(24)),
+          }),
+          v.check((project) => project.monthsLeft <= project.totalMonths),
+        ),
+      ),
+      v.check(
+        (projects) => new Set(projects.map((project) => project.key)).size === projects.length,
+      ),
     ),
     [],
   ),

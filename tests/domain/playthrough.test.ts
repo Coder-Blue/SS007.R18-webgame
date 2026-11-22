@@ -4,6 +4,7 @@ import {
   buildLineAction,
   createInitialState,
   enableN2Action,
+  enablePolicyAction,
   requestTariffAction,
   resolveApprovalAction,
   resolveEvent,
@@ -86,6 +87,14 @@ const play = (): GameState => {
       const enabled = enableN2Action(state);
 
       if (enabled.ok) state = enabled.value;
+    }
+
+    if (state.events.flags.includes("event:revised-law:enact-law")) {
+      for (const key of ["nsmo", "dppa", "vrem", "twoPart"] as const) {
+        const enabled = enablePolicyAction(state, key);
+
+        if (enabled.ok) state = enabled.value;
+      }
     }
 
     const summer = state.clock.month >= 4 && state.clock.month <= 8;

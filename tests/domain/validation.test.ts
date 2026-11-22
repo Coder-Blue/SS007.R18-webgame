@@ -21,8 +21,11 @@ describe("validation", () => {
   it("accepts an older save without recoveredYears", () => {
     const initial = createInitialState();
 
+    const { reformProgress: _reformProgress, ...legacyPolicy } = initial.policy;
+
     const legacy = {
       ...initial,
+      policy: legacyPolicy,
       finance: {
         cash: initial.finance.cash,
         debt: initial.finance.debt,
@@ -53,6 +56,23 @@ describe("validation", () => {
     expect(
       parseGameState(json({ ...initial, metrics: { ...initial.metrics, citizenTrust: 200 } })).ok,
     ).toBe(false);
+  });
+
+  it("rejects impossible reform progress", () => {
+    const initial = createInitialState();
+
+    const reform = (monthsLeft: number, totalMonths: number) =>
+      json({
+        ...initial,
+        policy: {
+          ...initial.policy,
+          reformProgress: [{ key: "n2" as const, monthsLeft, totalMonths }],
+        },
+      });
+
+    expect(parseGameState(reform(2, 0)).ok).toBe(false);
+    expect(parseGameState(reform(5, 4)).ok).toBe(false);
+    expect(parseGameState(reform(1.5, 4)).ok).toBe(false);
   });
 
   it("decodes a valid save file", () => {

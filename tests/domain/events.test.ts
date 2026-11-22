@@ -148,6 +148,25 @@ describe("event resolution", () => {
     expect(resolveEvent(active, "missing").ok).toBe(false);
   });
 
+  it("unlocks the revised-law reforms without enabling them instantly", () => {
+    const state = {
+      ...baseState(),
+      events: { ...baseState().events, activeId: "revised-law" as const },
+    };
+
+    const result = resolveEvent(state, "enact-law");
+
+    expect(result.ok).toBe(true);
+
+    if (!result.ok) return;
+    expect(result.value.events.flags).toContain("event:revised-law:enact-law");
+    expect(result.value.policy.n2Enabled).toBe(false);
+    expect(result.value.policy.nsmo).toBe(false);
+    expect(result.value.policy.dppa).toBe(false);
+    expect(result.value.policy.vrem).toBe(false);
+    expect(result.value.policy.reformProgress).toEqual([]);
+  });
+
   it("sets media cooldown when acknowledging the media event", () => {
     const state = {
       ...baseState(),
