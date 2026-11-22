@@ -30,17 +30,17 @@ Observed sub-results:
 Line budget: OK (owned source files <= 500 lines; 36 vendored files exempt)
 Emoji audit: OK (159 text files scanned)
 Domain boundary: OK (31 pure files)
-Test Files  21 passed (21)
-Tests       162 passed (162)
+Test Files  22 passed (22)
+Tests       170 passed (170)
 
-Statements   : 100% (825/825)
+Statements   : 100% (828/828)
 Branches     : 100% (470/470)
-Functions    : 100% (158/158)
-Lines        : 100% (708/708)
+Functions    : 100% (161/161)
+Lines        : 100% (710/710)
 ```
 
 The deterministic 60-month playthrough test completes at full coverage with a
-cumulative result near `-44,000 tỷ` and debt near `88,000 tỷ`, below the
+cumulative result near `-45,740 tỷ` and debt near `89,690 tỷ`, below the
 `100,000 tỷ` failure cap.
 
 ## Bundle
@@ -51,7 +51,7 @@ pnpm check:bundle
 ```
 
 All 15 client chunks are below 500 kB minified. The initial shell preloads
-623.3 kB minified / 209.9 kB gzip and contains no Three.js or GSAP. The deferred
+624.2 kB minified / 210.1 kB gzip and contains no Three.js or GSAP. The deferred
 `create-power-scene-*.js` chunk is loaded only after the game starts.
 
 ## Browser matrix
@@ -65,7 +65,8 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
 The skipped checks are desktop-only workspace/overlap tests on mobile projects
 and the production-chunk test in dev mode. The suite covers `1440x900`,
 `768x1024`, `390x844` and `360x740`, no horizontal overflow, 44 px controls,
-mobile speed selectors and reserve, pause/resume, month advance, tutorial reset,
+mobile speed selectors and reserve, pause/resume, month advance, tutorial panel
+tours with an uncovered scene focus anchor, tutorial reset,
 save/reload/continue, scene chunk deferral and failure recovery, named meters,
 Iconify without API calls, OG metadata, chart/table overlap assertions and
 screenshots.

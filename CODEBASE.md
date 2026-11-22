@@ -38,7 +38,7 @@ module. Randomness is threaded as a seed.
 | `finance.ts` | spend, debt settlement, management/transmission cost, annual reports |
 | `recovery.ts` | N-2 audited-loss recovery formula |
 | `reforms.ts` | DPPA/VREM/NSMO/two-part wheeling revenue; NSMO is abstracted as a trust/revenue modifier rather than a separate dispatch controller |
-| `reform-progress.ts` | 0–100% execution bar for N-2, NSMO, DPPA, VREM and two-part wheeling: start, monthly countdown and completion |
+| `reform-progress.ts` | 0–100% execution bar for N-2 (3 months), NSMO and DPPA (4), VREM (5) and two-part wheeling (3): start, monthly countdown and completion |
 | `infrastructure.ts` | line, plant, substation and decision progress |
 | `missions.ts` | three long-term mission progress and completion |
 | `approval.ts` | autonomous State tariff audit and likelihood |
@@ -80,8 +80,11 @@ speed selectors and five live gauges. Side rails show long-term missions, press
 pressure, MW balance and project progress. The bottom dock opens an accessible
 right drawer with six panels: overview, production, grid, tariffs, policy and
 finance. The five-step tutorial opens the production, grid and tariff panels on
-desktop, spotlights their tutorial anchors and dispatches `grid:tour-focus` so
-the scene rings and centers the matching thermal, rural or urban node. Charts are dependency-free SVG. All iconography comes from Lucide and
+wide desktop (1340 px and up), narrows the drawer to keep the map visible,
+spotlights the panel anchors and dispatches `grid:tour-focus`. The scene pans
+the matching thermal, rural or urban node into the gap between the mission rail
+and the drawer, rings it and labels it; the final step closes the drawer before
+pointing at the pause and speed controls. Charts are dependency-free SVG. All iconography comes from Lucide and
 Tabler through `@iconify-icon/solid`; `icon-names.ts` is the build-time subset.
 
 ## Economy
@@ -139,7 +142,7 @@ likelihood is deterministic and the request is accepted at 55 or above.
 | 9 | Global fuel crisis (2022) | opens five executive decisions |
 | 16 | Summer drought and heatwave (2023) | opens five response decisions |
 | 36 | Public skepticism (2024–2025) | privatization or reform path |
-| 44 | Revised Electricity Law (2025) | NSMO, DPPA, VREM, N-2 on the reform path |
+| 44 | Revised Electricity Law (2025) | unlocks NSMO, DPPA, VREM and N-2; each then runs its execution bar |
 | conditional | Media coverage of EVN losses | one effect: faster citizen-trust decay |
 
 The media event recurs after an eight-month cooldown when monthly losses, debt
