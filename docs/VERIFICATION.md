@@ -31,12 +31,12 @@ Line budget: OK (owned source files <= 500 lines; 36 vendored files exempt)
 Emoji audit: OK (159 text files scanned)
 Domain boundary: OK (31 pure files)
 Test Files  20 passed (20)
-Tests       153 passed (153)
+Tests       156 passed (156)
 
-Statements   : 100% (797/797)
-Branches     : 100% (456/456)
+Statements   : 100% (798/798)
+Branches     : 100% (458/458)
 Functions    : 100% (152/152)
-Lines        : 100% (686/686)
+Lines        : 100% (687/687)
 ```
 
 The deterministic 60-month playthrough test completes at full coverage with a

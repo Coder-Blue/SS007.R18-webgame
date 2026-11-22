@@ -77,6 +77,15 @@ test("loads every Be Vietnam Pro WOFF2 subset without a failed font request", as
     );
     await document.fonts.ready;
 
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      const loaded = [...document.fonts].filter(
+        (face) => face.family === "Be Vietnam Pro" && face.status === "loaded",
+      );
+
+      if (loaded.length >= requestedWeights.length) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
     const loadedWeights = [
       ...new Set(
         [...document.fonts].flatMap((face) =>
