@@ -31,6 +31,10 @@ const valueOf = (ledger: MonthlyLedger, key: string): number => {
 
   if (key === "costManagement") return ledger.costManagement;
 
+  if (key === "citizenTrust") return ledger.citizenTrust;
+
+  if (key === "institutionalTrust") return ledger.institutionalTrust;
+
   return 0;
 };
 

@@ -54,6 +54,7 @@ export const effects = (overrides: Partial<EventEffects> = {}): EventEffects => 
   thermalCapacityDelta: 0,
   renewableCapacityDelta: 0,
   coverageDelta: 0,
+  gridStrengthDelta: 0,
   demandDelta: 0,
   mediaMonths: 0,
   unlockDecisions: [],

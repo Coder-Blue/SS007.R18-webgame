@@ -151,7 +151,9 @@ export const GridPanel = (): JSX.Element => {
         <For each={state().operations.projects}>
           {(project) => {
             const progress = () =>
-              ((project.totalMonths - project.monthsLeft) / Math.max(1, project.totalMonths)) * 100;
+              (Math.min(project.totalMonths, project.totalMonths - project.monthsLeft + 1) /
+                Math.max(1, project.totalMonths)) *
+              100;
 
             const name =
               project.kind === "line"

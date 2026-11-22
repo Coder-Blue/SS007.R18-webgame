@@ -8,8 +8,8 @@ import {
   DialogTitle,
 } from "@ui-sdk/solid/dialog";
 import { ActionButton, Badge } from "../components/base";
+import { useGame } from "../game-context";
 import { Icon, type IconName } from "../components/icons";
-import type { PanelId } from "../mobile/mobile-nav";
 
 type Step = {
   readonly kicker: string;
@@ -17,8 +17,6 @@ type Step = {
   readonly body: string;
   readonly targets: readonly string[];
   readonly icon: IconName;
-  readonly panel?: PanelId;
-  readonly panelLabel?: string;
 };
 
 const briefing =
@@ -36,28 +34,22 @@ const steps: readonly Step[] = [
     kicker: "Bước 1 · Sản xuất & mua điện cạnh tranh",
     title: "Chọn nguồn nhập điện và nhiên liệu",
     body: "Ba nhà cung cấp IPP, BOT và than chào giá gần như tương đương. Chọn nhà cung cấp, đặt mức nhập khẩu và huy động thủy điện/nhiệt điện để giữ chi phí thấp mà vẫn đủ nguồn.",
-    targets: ["scene", "cash"],
+    targets: ["production", "scene"],
     icon: "tabler:bolt",
-    panel: "production",
-    panelLabel: "Mở bảng sản xuất",
   },
   {
     kicker: "Bước 2 · Truyền tải",
     title: "Cân đối phụ tải và mở rộng lưới",
     body: "Theo dõi MW cung cầu, biên dự phòng và độ tin cậy. Nối các tuyến 500kV/220kV tới đô thị, khu công nghiệp và vùng nông thôn để tiến tới phủ điện 100%.",
-    targets: ["scene", "reserve"],
+    targets: ["grid", "scene"],
     icon: "lucide:utility-pole",
-    panel: "grid",
-    panelLabel: "Mở bảng truyền tải",
   },
   {
     kicker: "Bước 3 · Phân phối",
     title: "Điều tiết biểu giá và theo dõi báo cáo",
     body: "Sáu bậc giá hộ dân và giá công nghiệp trợ cấp quyết định doanh thu và niềm tin. Tăng trên 5% phải trình Nhà nước. Xem dự đoán trước → sau trước khi xác nhận.",
-    targets: ["trust", "pause"],
+    targets: ["tariffs", "trust"],
     icon: "tabler:scale",
-    panel: "tariffs",
-    panelLabel: "Mở bảng biểu giá",
   },
   {
     kicker: "Sẵn sàng",
@@ -92,12 +84,18 @@ export const TutorialModal = (props: {
   readonly open: boolean;
   readonly onClose: () => void;
   readonly onFinish: () => void;
-  readonly onOpenPanel: (panel: PanelId) => void;
 }): JSX.Element => {
+  const { store } = useGame();
   const [step, setStep] = createSignal(0);
+  let wasOpen = false;
   const current = () => steps[step()] ?? steps[0];
 
   createTrackedEffect(() => {
+    store.setHold(props.open);
+
+    if (props.open && !wasOpen) setStep(0);
+    wasOpen = props.open;
+
     if (!props.open) {
       cleanupSpotlight?.();
       cleanupSpotlight = null;
@@ -108,17 +106,14 @@ export const TutorialModal = (props: {
     spotlight(current()?.targets ?? []);
   });
 
-  onCleanup(() => cleanupSpotlight?.());
+  onCleanup(() => {
+    cleanupSpotlight?.();
+    store.setHold(false);
+  });
 
   const finish = (): void => {
     props.onFinish();
     props.onClose();
-  };
-
-  const openPanel = (): void => {
-    const panel = current()?.panel;
-
-    if (panel !== undefined) props.onOpenPanel(panel);
   };
 
   return (
@@ -136,11 +131,20 @@ export const TutorialModal = (props: {
                 <DialogTitle class="modal-title">{view().title}</DialogTitle>
                 <DialogDescription class="modal-desc">{view().body}</DialogDescription>
               </div>
-              <div class="tutorial-progress" aria-label="Tiến độ hướng dẫn">
+              <div
+                class="tutorial-progress"
+                role="progressbar"
+                aria-label="Tiến độ hướng dẫn"
+                aria-valuemin={1}
+                aria-valuemax={steps.length}
+                aria-valuenow={step() + 1}
+                aria-valuetext={`Bước ${step() + 1} trên ${steps.length}`}
+              >
                 <For each={steps}>
                   {(_, index) => (
                     <span
                       class="tutorial-dot"
+                      aria-hidden="true"
                       data-active={index() === step() ? "true" : "false"}
                       data-done={index() < step() ? "true" : "false"}
                     />
@@ -152,16 +156,6 @@ export const TutorialModal = (props: {
                   Bỏ qua hướng dẫn
                 </ActionButton>
                 <div class="tutorial-next">
-                  <Show when={view().panel !== undefined}>
-                    <ActionButton
-                      variant="secondary"
-                      size="sm"
-                      icon="lucide:arrow-right"
-                      onClick={openPanel}
-                    >
-                      {view().panelLabel ?? "Mở bảng"}
-                    </ActionButton>
-                  </Show>
                   <Show
                     when={step() < steps.length - 1}
                     fallback={

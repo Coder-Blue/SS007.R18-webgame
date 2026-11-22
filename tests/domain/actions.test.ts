@@ -193,6 +193,18 @@ describe("tariff actions", () => {
     }
   });
 
+  it("handles a zero industrial baseline", () => {
+    const state = baseState();
+
+    expect(
+      requestTariffAction(
+        { ...state, tariffs: { ...state.tariffs, industrial: 0 } },
+        [1_806, 1_866, 2_167, 2_729, 3_050, 3_117],
+        0,
+      ).ok,
+    ).toBe(false);
+  });
+
   it("rejects invalid plans and the private branch", () => {
     expect(
       requestTariffAction(baseState(), [1_000, 1_866, 2_167, 2_729, 3_050, 3_117], 1_750).ok,
@@ -307,20 +319,26 @@ describe("policy actions", () => {
   });
 
   it("enables policy reforms with prerequisites", () => {
-    const state = { ...baseState(), clock: { year: 2025, month: 1, tick: 36 } };
+    const base = baseState();
 
-    expect(enablePolicyAction(state, "nsmo").ok).toBe(true);
-    expect(enablePolicyAction(state, "twoPart").ok).toBe(false);
+    const reviewed = {
+      ...base,
+      clock: { year: 2025, month: 1, tick: 36 },
+      events: { ...base.events, flags: ["event:revised-law:enact-law"] },
+    };
+
+    const state = { ...reviewed, events: { ...reviewed.events, flags: [] } };
+
+    expect(enablePolicyAction(state, "nsmo").ok).toBe(false);
+    expect(enablePolicyAction(reviewed, "nsmo").ok).toBe(true);
+    expect(enablePolicyAction(reviewed, "twoPart").ok).toBe(false);
     expect(
-      enablePolicyAction({ ...state, policy: { ...state.policy, vrem: true } }, "twoPart").ok,
+      enablePolicyAction({ ...reviewed, policy: { ...reviewed.policy, vrem: true } }, "twoPart").ok,
     ).toBe(true);
-    expect(enablePolicyAction(state, "dppa").ok).toBe(true);
-    expect(enablePolicyAction(state, "vrem").ok).toBe(true);
+    expect(enablePolicyAction(reviewed, "dppa").ok).toBe(true);
+    expect(enablePolicyAction(reviewed, "vrem").ok).toBe(true);
     expect(
-      enablePolicyAction({ ...state, policy: { ...state.policy, nsmo: true } }, "nsmo").ok,
-    ).toBe(false);
-    expect(
-      enablePolicyAction({ ...state, clock: { year: 2024, month: 1, tick: 24 } }, "nsmo").ok,
+      enablePolicyAction({ ...reviewed, policy: { ...reviewed.policy, nsmo: true } }, "nsmo").ok,
     ).toBe(false);
     expect(
       enablePolicyAction({ ...state, policy: { ...state.policy, branch: "private" } }, "dppa").ok,

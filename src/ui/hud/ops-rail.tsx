@@ -4,7 +4,16 @@ import { useGame } from "../game-context";
 import { Bar, Badge, Panel, Stat } from "../components/base";
 import { Icon } from "../components/icons";
 import { formatBillion, formatEnergy, formatPower, formatSignedBillion } from "~/state/format";
-import { DECISIONS, LINE_PROJECTS, PLANT_PROJECTS, type Project, type ZoneId } from "~/domain";
+import {
+  DECISIONS,
+  LINE_PROJECTS,
+  PLANT_PROJECTS,
+  computeSupply,
+  dispatchWithinCaps,
+  zoneDemand,
+  type Project,
+  type ZoneId,
+} from "~/domain";
 import type { PanelId } from "../mobile/mobile-nav";
 
 const projectName = (project: Project): string => {
@@ -69,8 +78,35 @@ export const OpsRail = (props: { readonly onOpenPanel: (panel: PanelId) => void 
   const state = store.state;
   const last = () => state().finance.monthlyHistory[state().finance.monthlyHistory.length - 1];
   const activeProjects = () => state().operations.projects;
-  const supplyMw = () => last()?.supplyMw ?? 0;
-  const demandMw = () => last()?.demandMw ?? 0;
+
+  const projected = () => {
+    const demand = zoneDemand(state().zones, state().market, state().metrics);
+
+    const dispatch = dispatchWithinCaps(
+      state().operations.dispatch,
+      state().generation,
+      state().market,
+      state().operations.supplierId,
+    );
+
+    const supplier =
+      state().market.suppliers.find((row) => row.id === state().operations.supplierId) ??
+      state().market.suppliers[0];
+
+    return {
+      demand: demand.total,
+      supply: computeSupply(
+        state().generation,
+        dispatch,
+        state().market,
+        supplier?.priceVndPerKwh ?? 2_450,
+        supplier?.capacityMw ?? 0,
+      ).supplyMw,
+    };
+  };
+
+  const supplyMw = () => last()?.supplyMw ?? projected().supply;
+  const demandMw = () => last()?.demandMw ?? projected().demand;
   const balance = () => (demandMw() > 0 ? Math.min(100, (supplyMw() / demandMw()) * 100) : 100);
 
   return (
@@ -139,7 +175,8 @@ export const OpsRail = (props: { readonly onOpenPanel: (panel: PanelId) => void 
             <For each={activeProjects()}>
               {(project) => {
                 const progress = () =>
-                  ((project.totalMonths - project.monthsLeft) / Math.max(1, project.totalMonths)) *
+                  (Math.min(project.totalMonths, project.totalMonths - project.monthsLeft + 1) /
+                    Math.max(1, project.totalMonths)) *
                   100;
 
                 return (

@@ -40,6 +40,7 @@ export const MobileNav = (): JSX.Element => {
           <button
             type="button"
             class="mobile-tab"
+            data-tutorial={tab.id}
             aria-haspopup="dialog"
             aria-expanded={open() && panel() === tab.id ? "true" : "false"}
             onClick={() => openPanel(tab.id)}

@@ -23,6 +23,7 @@ export const GameView = (props: {
   readonly onOpenMenu: () => void;
   readonly onOpenTutorial: () => void;
   readonly onSelect: (selection: SceneSelection) => void;
+  readonly onNewGame: () => void;
 }): JSX.Element => {
   const { store } = useGame();
 
@@ -47,7 +48,7 @@ export const GameView = (props: {
       <MobileNav />
       <EventModal />
       <ApprovalModal />
-      <EndingScreen />
+      <EndingScreen onNewGame={props.onNewGame} />
       <MonthlyReport />
       <SummaryModal />
       <WorkspaceDrawer

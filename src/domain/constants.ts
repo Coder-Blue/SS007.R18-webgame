@@ -151,6 +151,7 @@ const noEffects = {
   thermalCapacityDelta: 0,
   renewableCapacityDelta: 0,
   coverageDelta: 0,
+  gridStrengthDelta: 0,
   demandDelta: 0,
   mediaMonths: 0,
   unlockDecisions: [],
@@ -200,7 +201,12 @@ export const DECISIONS: readonly DecisionDefinition[] = [
     id: "load-shed",
     cost: 0,
     months: 1,
-    effects: { ...noEffects, citizenTrustDelta: -10, institutionalTrustDelta: -2 },
+    effects: {
+      ...noEffects,
+      citizenTrustDelta: -10,
+      institutionalTrustDelta: -2,
+      demandDelta: -0.03,
+    },
   },
   {
     id: "fossil-ramp",
@@ -212,7 +218,7 @@ export const DECISIONS: readonly DecisionDefinition[] = [
     id: "grid-maintenance",
     cost: 900,
     months: 4,
-    effects: { ...noEffects, coverageDelta: 0, institutionalTrustDelta: 1 },
+    effects: { ...noEffects, gridStrengthDelta: 8, institutionalTrustDelta: 1 },
   },
 ] as const;
 
@@ -288,6 +294,7 @@ export const createInitialState = (seed: number = 7): GameState => ({
     accumulatedLoss: 0,
     interestRate: INTEREST_RATE,
     recoveredTotal: 0,
+    recoveredYears: [],
     monthlyHistory: [],
     annualHistory: [],
   },

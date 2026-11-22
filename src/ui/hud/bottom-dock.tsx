@@ -22,7 +22,12 @@ export const BottomDock = (props: {
   <nav class="bottom-dock desktop-only" aria-label="Bảng điều hành">
     <For each={PANEL_TABS}>
       {(tab) => (
-        <button type="button" class="dock-tab" onClick={() => props.onOpenPanel(tab.id)}>
+        <button
+          type="button"
+          class="dock-tab"
+          data-tutorial={tab.id}
+          onClick={() => props.onOpenPanel(tab.id)}
+        >
           <Icon icon={tab.icon} size={18} />
           <span>{tab.label}</span>
         </button>

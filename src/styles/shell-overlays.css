@@ -29,9 +29,17 @@
   max-width: min(420px, calc(100vw - 28px));
   padding: 10px 14px;
   position: fixed;
-  right: 16px;
+  right: 330px;
   top: 100px;
   z-index: 70;
+}
+
+@media (max-width: 1180px) {
+  .toast {
+    left: 8px;
+    right: 8px;
+    top: 152px;
+  }
 }
 
 .toast[data-kind="error"] {
@@ -76,9 +84,9 @@
 }
 
 .monthly-head .icon-btn {
-  height: 32px;
-  min-height: 32px;
-  width: 32px;
+  height: 44px;
+  min-height: 44px;
+  width: 44px;
 }
 
 .monthly-grid {

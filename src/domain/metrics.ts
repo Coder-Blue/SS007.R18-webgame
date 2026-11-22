@@ -140,7 +140,6 @@ export const advanceMetrics = (context: MetricContext): MetricStep => {
   const institutional = clamp(
     context.previous.institutionalTrust +
       (institutionalTarget(context, inflation) - context.previous.institutionalTrust) * 0.2 -
-      mediaDecay * 0.25 -
       lossDecay,
     0,
     100,

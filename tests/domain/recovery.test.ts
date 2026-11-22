@@ -44,6 +44,7 @@ describe("recovery", () => {
     const finance = {
       ...state.finance,
       recoveredTotal: 12_000,
+      recoveredYears: [{ year: 2022, amount: 12_000 }],
       annualHistory: [
         {
           year: 2022,
@@ -70,6 +71,7 @@ describe("recovery", () => {
     const finance = {
       ...state.finance,
       recoveredTotal: 11_999,
+      recoveredYears: [{ year: 2022, amount: 11_999 }],
       annualHistory: [
         {
           year: 2022,

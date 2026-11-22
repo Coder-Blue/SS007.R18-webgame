@@ -222,7 +222,15 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
     setDispatch,
     setSupplier,
     togglePause: () => {
-      if (state().ending !== null) return;
+      if (
+        state().ending !== null ||
+        state().events.activeId !== null ||
+        state().approval !== null ||
+        hold()
+      ) {
+        return;
+      }
+
       autoPaused = false;
       setRunningSignal(!running());
     },

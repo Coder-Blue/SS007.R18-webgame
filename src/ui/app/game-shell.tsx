@@ -15,7 +15,7 @@ import { Icon } from "../components/icons";
 import { hasAnySave, latestSave, readSession, writeSession } from "~/state/persistence";
 import type { SceneSelection } from "~/scene/create-power-scene";
 import { TutorialModal } from "../modals/tutorial-modal";
-import type { PanelId } from "../mobile/mobile-nav";
+import { PANEL_IDS, type PanelId } from "../mobile/mobile-nav";
 
 const GameView = lazy(() => import("./game-view"), { export: "GameView" });
 const SaveMenu = lazy(() => import("../modals/save-menu"), { export: "SaveMenu" });
@@ -174,7 +174,8 @@ export const GameShell = (): JSX.Element => {
     };
 
     window.addEventListener("keydown", onKey);
-    onCleanup(() => window.removeEventListener("keydown", onKey));
+
+    return () => window.removeEventListener("keydown", onKey);
   });
 
   createTrackedEffect(() => {
@@ -218,9 +219,16 @@ export const GameShell = (): JSX.Element => {
       setScreen("game");
       showToast({ kind: "notice", text: "Đã tải nhiệm kỳ đang lưu." });
 
-      if (!readSession().tutorialDone) setTutorialOpen(true);
+      const prefs = readSession();
+      const panel = PANEL_IDS.find((id) => id === prefs.panel);
+
+      if (panel !== undefined) setWorkspacePanel(panel);
+
+      if (!prefs.tutorialDone) setTutorialOpen(true);
       else
-        store.setRunning(latest.state.events.activeId === null && latest.state.approval === null);
+        store.setRunning(
+          !prefs.paused && latest.state.events.activeId === null && latest.state.approval === null,
+        );
 
       return;
     }
@@ -229,9 +237,16 @@ export const GameShell = (): JSX.Element => {
   };
 
   const onLoaded = (): void => {
+    const prefs = readSession();
+    const current = store.state();
+
     setScreen("game");
     setHasSave(true);
-    store.setSpeed(readSession().speed);
+    store.setSpeed(prefs.speed);
+
+    if (!prefs.paused && current.events.activeId === null && current.approval === null) {
+      store.setRunning(true);
+    }
   };
 
   const finishTutorial = (): void => {
@@ -260,6 +275,7 @@ export const GameShell = (): JSX.Element => {
             onCloseWorkspace={() => setWorkspaceOpen(false)}
             onOpenMenu={() => setMenuOpen(true)}
             onOpenTutorial={() => setTutorialOpen(true)}
+            onNewGame={startGame}
             onSelect={(selection) => {
               setSelected(selection);
               showToast({ kind: "notice", text: `Đã chọn ${selectionLabel(selection)}` });
@@ -283,6 +299,7 @@ export const GameShell = (): JSX.Element => {
             onClose={() => setMenuOpen(false)}
             onNotice={(message) => showToast({ kind: "notice", text: message })}
             onLoaded={onLoaded}
+            onNewGame={startGame}
           />
         </Loading>
       </Show>
@@ -290,7 +307,6 @@ export const GameShell = (): JSX.Element => {
         open={tutorialOpen()}
         onClose={() => setTutorialOpen(false)}
         onFinish={finishTutorial}
-        onOpenPanel={openPanel}
       />
       <Show when={toast()}>
         {(current) => (

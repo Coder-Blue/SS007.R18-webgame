@@ -9,7 +9,7 @@ the project uses semantic versioning for save-compatible releases.
 
 - Self-hosted Be Vietnam Pro WOFF2 subsets serve the UI and preload manifest;
   full TTF weights remain for the Open Graph image.
-- The title screen uses a lightweight village poster and renders the Three.js
+- The title screen uses a lightweight CSS/SVG poster and renders the Three.js
   scene only during play, so the first visit does not pay for the renderer.
 - The game surface, save menu and tutorial are lazy chunks; the title route now
   preloads 372.6 kB of JavaScript instead of 644.0 kB.

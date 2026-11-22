@@ -102,6 +102,15 @@ describe("preview", () => {
     expect(preview.revenue).toBeGreaterThan(0);
   });
 
+  it("handles an empty industrial tariff in the preview", () => {
+    const state = baseState();
+    const zero = { ...state, tariffs: { ...state.tariffs, industrial: 0 } };
+
+    expect(
+      projectMonth(zero, zero.operations.dispatch, zero.tariffs, "coal-quang-ninh").revenue,
+    ).toBeGreaterThan(0);
+  });
+
   it("previews a tariff plan and its average", () => {
     const state = baseState();
     const tiers = [1_806, 2_000, 2_300, 2_800, 3_100, 3_200] as const;

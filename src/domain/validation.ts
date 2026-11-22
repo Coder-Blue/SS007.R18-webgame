@@ -153,6 +153,7 @@ const FinanceSchema = v.object({
   accumulatedLoss: nonNegative,
   interestRate: nonNegative,
   recoveredTotal: nonNegative,
+  recoveredYears: v.array(v.object({ year: finiteNumber, amount: nonNegative })),
   monthlyHistory: v.array(LedgerSchema),
   annualHistory: v.array(AnnualSchema),
 });

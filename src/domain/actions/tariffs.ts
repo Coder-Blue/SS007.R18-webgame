@@ -22,12 +22,25 @@ export const requestTariffAction = (
   industrial: number,
 ): Result<GameState> => {
   if (!state.policy.priceCap) return err("tariff.no-authority");
-  const validated = validateTariffs({ tiers, industrial }, state.tariffs.ceiling);
-
-  if (!validated.ok) return validated;
   const currentAverage = averageHouseholdTariff(state.tariffs);
   const average = averageOfTiers(tiers);
-  const changePct = tariffChangePct(currentAverage, average);
+  const householdChange = tariffChangePct(currentAverage, average);
+
+  const industrialChange =
+    state.tariffs.industrial <= 0
+      ? 0
+      : Math.abs(((industrial - state.tariffs.industrial) / state.tariffs.industrial) * 100);
+
+  const changePct = Math.max(householdChange, industrialChange);
+
+  // A large change always opens the State audit, even when the current ceiling
+  // cannot hold it; the audit may still refuse on the ceiling at resolution.
+  const structural = validateTariffs(
+    { tiers, industrial },
+    changePct > DIRECT_TARIFF_CAP_PCT ? Number.POSITIVE_INFINITY : state.tariffs.ceiling,
+  );
+
+  if (!structural.ok) return structural;
 
   if (changePct > DIRECT_TARIFF_CAP_PCT) {
     const audit = auditTariffRequest(state, average, changePct);
@@ -44,7 +57,7 @@ export const requestTariffAction = (
     });
   }
 
-  return ok(applyTariffs(state, validated.value));
+  return ok(applyTariffs(state, structural.value));
 };
 
 export const resolveApprovalAction = (state: GameState): Result<GameState> => {

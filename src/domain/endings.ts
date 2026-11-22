@@ -35,6 +35,7 @@ export const evaluateFinalEnding = (state: GameState): Ending => {
   const legitimate =
     state.metrics.institutionalTrust >= 50 &&
     state.metrics.citizenTrust >= 45 &&
+    state.metrics.industrialOutput >= 100 &&
     reformsEnabled(state) >= 3;
 
   if (state.policy.branch === "private") return ending(state, "collapse", "privatization");
