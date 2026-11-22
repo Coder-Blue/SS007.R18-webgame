@@ -338,11 +338,9 @@ export const GameShell = (): JSX.Element => {
           />
         </Loading>
       </Show>
-      <TutorialModal
-        open={tutorialOpen()}
-        onClose={() => setTutorialOpen(false)}
-        onFinish={finishTutorial}
-      />
+      <Show when={tutorialOpen()}>
+        <TutorialModal open onClose={() => setTutorialOpen(false)} onFinish={finishTutorial} />
+      </Show>
       <Show when={toast()}>
         {(current) => (
           <div class="toast" data-kind={current().kind} role="status" aria-live="polite">
