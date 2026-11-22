@@ -225,7 +225,7 @@ const loadCenters = (smokeGeometry: THREE.SphereGeometry) => {
   const group = new THREE.Group();
   const cityWindows: THREE.MeshStandardMaterial[] = [];
   const factoryWindows: THREE.MeshStandardMaterial[] = [];
-  const villageWindows: THREE.MeshStandardMaterial[] = [];
+  const ruralWindows: THREE.MeshStandardMaterial[] = [];
 
   for (let index = 0; index < 6; index += 1) {
     const height = 1.2 + (index % 3) * 0.7;
@@ -286,12 +286,12 @@ const loadCenters = (smokeGeometry: THREE.SphereGeometry) => {
 
     light.position.set(x, 1.02, z + 0.36);
     group.add(light);
-    villageWindows.push(windowMaterial);
+    ruralWindows.push(windowMaterial);
   }
 
   group.userData.selection = "urban";
 
-  return { group, cityWindows, factoryWindows, villageWindows, stacks };
+  return { group, cityWindows, factoryWindows, ruralWindows, stacks };
 };
 
 export const createPlants = (): PlantBuild => {
@@ -364,7 +364,7 @@ export const createPlants = (): PlantBuild => {
       window.emissiveIntensity = blackout ? 0 : 0.3 + (state.metrics.industrialOutput / 100) * 0.6;
     }
 
-    for (const window of centers.villageWindows) {
+    for (const window of centers.ruralWindows) {
       const rural = state.zones.rural.coverage / 100;
       const flicker = privateBranch && Math.sin(time * 9) > 0.6 ? 0.2 : 1;
 

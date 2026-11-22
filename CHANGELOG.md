@@ -11,8 +11,8 @@ the project uses semantic versioning for save-compatible releases.
   full TTF weights remain for the Open Graph image.
 - The title screen uses a lightweight CSS/SVG poster and renders the Three.js
   scene only during play, so the first visit does not pay for the renderer.
-- The game surface, save menu and tutorial are lazy chunks; the title route now
-  preloads 372.6 kB of JavaScript instead of 644.0 kB.
+- The game surface, save menu and tutorial are lazy chunks; the current initial
+  shell preloads 620.5 kB minified / 209.0 kB gzip with no Three.js or GSAP.
 - The title and HUD reserve their layout, preload the visible font weights, and
   expose named meters, a single main landmark, accessible mobile tabs and the
   reduced-motion switch.
@@ -62,6 +62,8 @@ the project uses semantic versioning for save-compatible releases.
 
 ### Added
 
+- Installed the `ui-ux-pro-max` design skill and applied its data-dense
+  dashboard guidance with the unslop nine-pass polish.
 - Guided Chairman briefing with a five-step spotlight tutorial.
 - Live before/after previews for dispatch, supplier and tariff changes.
 - Stacked revenue/cost breakdown chart, trust trend chart and generation mix.

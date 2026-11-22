@@ -60,7 +60,7 @@ export const HYDRO_VARIABLE_COST = 350;
 export const THERMAL_FUEL_COST = 2_500;
 export const RENEWABLE_PPA_COST = 1_050;
 export const TRANSMISSION_COST_PER_KWH = 380;
-export const MANAGEMENT_BASE_COST = 420;
+export const MANAGEMENT_BASE_COST = 540;
 export const MANAGEMENT_PER_GW = 26;
 export const INTEREST_MONTHS = 12;
 

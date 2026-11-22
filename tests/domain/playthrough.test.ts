@@ -116,9 +116,10 @@ describe("five-year playthrough", () => {
     expect(state.zones.urban.coverage).toBe(100);
     expect(state.zones.industrial.coverage).toBe(100);
     expect(state.zones.rural.coverage).toBe(100);
-    expect(cumulative).toBeLessThan(0);
-    expect(cumulative).toBeGreaterThan(-60_000);
+    expect(cumulative).toBeLessThan(-35_000);
+    expect(cumulative).toBeGreaterThan(-55_000);
     expect(state.finance.debt).toBeLessThan(100_000);
+    expect(state.finance.debt).toBeGreaterThan(75_000);
     expect(state.ending).not.toBeNull();
   });
 

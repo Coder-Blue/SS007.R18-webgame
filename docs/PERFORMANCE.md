@@ -175,3 +175,15 @@ CHROME_PATH=/nix/store/.../bin/chromium npx lighthouse@12.8.2 \
 ```
 
 `pnpm quality` final output: 22 test files / 173 tests passed, lint, format, line budget, emoji, domain boundary, coverage, production build and bundle budget all green. The production Playwright run printed `33 passed`, `3 skipped` across the desktop and mobile projects (`65 passed`, `7 skipped` across all four projects). `pnpm check:bundle` printed 17 chunks, every chunk at or below 500 kB, and `Initial shell: 5 JavaScript preloads, 372.6 kB min / 127.2 kB gzip, no Three.js or GSAP`.
+
+## Grid migration re-check (2026-11-23)
+
+- Production build: 15 client chunks, all below 500 kB minified.
+- Initial shell: 620.5 kB minified / 209.0 kB gzip across 7 preloads, with no
+  Three.js or GSAP.
+- Deferred scene: `create-power-scene-*.js` at 17.5 kB minified / 6.8 kB gzip,
+  loaded only after the game screen starts.
+- Title poster: inline CSS/SVG, no image request and no layout shift.
+- Persistent chrome: no backdrop filters; opaque top bar, docks and sheets.
+- The scene caps pixel ratio at 2 on desktop and 1.5 on coarse pointers, and
+  freezes all animation while the RTS clock is paused.
