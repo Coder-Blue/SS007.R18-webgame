@@ -30,13 +30,13 @@ Observed sub-results:
 Line budget: OK (owned source files <= 500 lines; 36 vendored files exempt)
 Emoji audit: OK (159 text files scanned)
 Domain boundary: OK (31 pure files)
-Test Files  20 passed (20)
-Tests       156 passed (156)
+Test Files  21 passed (21)
+Tests       162 passed (162)
 
-Statements   : 100% (798/798)
-Branches     : 100% (458/458)
-Functions    : 100% (152/152)
-Lines        : 100% (687/687)
+Statements   : 100% (825/825)
+Branches     : 100% (470/470)
+Functions    : 100% (158/158)
+Lines        : 100% (708/708)
 ```
 
 The deterministic 60-month playthrough test completes at full coverage with a
@@ -51,7 +51,7 @@ pnpm check:bundle
 ```
 
 All 15 client chunks are below 500 kB minified. The initial shell preloads
-621.3 kB minified / 209.3 kB gzip and contains no Three.js or GSAP. The deferred
+623.3 kB minified / 209.9 kB gzip and contains no Three.js or GSAP. The deferred
 `create-power-scene-*.js` chunk is loaded only after the game starts.
 
 ## Browser matrix
@@ -59,7 +59,7 @@ All 15 client chunks are below 500 kB minified. The initial shell preloads
 ```
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
   pnpm exec playwright test
-57 passed, 11 skipped
+61 passed, 11 skipped
 ```
 
 The skipped checks are desktop-only workspace/overlap tests on mobile projects
@@ -82,7 +82,7 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
 
 The final `main` push workflow passed both gates: lint in 23 s, and
 `unit and build` plus `browser` in 6m35s. Its production smoke run reported
-12 passed / 1 skipped, and the responsive browser run reported 57 passed /
+12 passed / 1 skipped, and the responsive browser run reported 61 passed /
 11 skipped.
 
 The headless shell exposes no WebGL in this container, so the scene factory

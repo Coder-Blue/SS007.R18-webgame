@@ -38,6 +38,7 @@ module. Randomness is threaded as a seed.
 | `finance.ts` | spend, debt settlement, management/transmission cost, annual reports |
 | `recovery.ts` | N-2 audited-loss recovery formula |
 | `reforms.ts` | DPPA/VREM/NSMO/two-part wheeling revenue; NSMO is abstracted as a trust/revenue modifier rather than a separate dispatch controller |
+| `reform-progress.ts` | 0–100% execution bar for N-2, NSMO, DPPA, VREM and two-part wheeling: start, monthly countdown and completion |
 | `infrastructure.ts` | line, plant, substation and decision progress |
 | `missions.ts` | three long-term mission progress and completion |
 | `approval.ts` | autonomous State tariff audit and likelihood |
@@ -78,7 +79,9 @@ desktop-persistent and mobile-compact. The top bar owns the pause/resume button,
 speed selectors and five live gauges. Side rails show long-term missions, press
 pressure, MW balance and project progress. The bottom dock opens an accessible
 right drawer with six panels: overview, production, grid, tariffs, policy and
-finance. Charts are dependency-free SVG. All iconography comes from Lucide and
+finance. The five-step tutorial opens the production, grid and tariff panels on
+desktop, spotlights their tutorial anchors and dispatches `grid:tour-focus` so
+the scene rings and centers the matching thermal, rural or urban node. Charts are dependency-free SVG. All iconography comes from Lucide and
 Tabler through `@iconify-icon/solid`; `icon-names.ts` is the build-time subset.
 
 ## Economy
@@ -103,7 +106,7 @@ Each month composes:
 6. Variable supply cost, transmission cost, management cost and interest.
 7. Debt settlement, accumulated loss and N-2 recovery credit.
 8. Media pressure, citizen trust, institutional trust, inflation, industrial
-   output and mission rewards.
+   output, mission rewards and reform execution progress.
 9. Annual audit in December, ending checks, event scheduling and clock advance.
 
 ### Structural deficit
