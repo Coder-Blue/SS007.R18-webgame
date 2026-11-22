@@ -88,7 +88,7 @@ The local TBT is dominated by the 3D scene running under software rendering; the
 - Code splitting: Implemented. The scene is game-only plus Three.js/GSAP vendor chunks.
 - CDN: Already handled. Vercel's managed edge CDN was already present and is used.
 - Server-side caching: Not applicable. There are no expensive server reads; static-shell and asset caching cover the surface.
-- Lighthouse audit: Implemented. At revision `a8a3d14`, mobile and desktop run against the live production deployment and the local production build.
+- Lighthouse audit: Implemented. At revision `963eddd`, mobile and desktop run against the live production deployment and the local production build.
 - API payload compression: Already handled. Vercel Brotli/gzip; there is no JSON API.
 - Reduced unnecessary re-renders: Implemented. Solid fine-grained updates and an rAF counter tween; no broad context additions.
 - JS/CSS minification: Implemented. Vite production build.
