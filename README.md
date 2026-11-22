@@ -21,7 +21,8 @@ sống còn.
 
 ## Cách chơi
 
-1. Bắt đầu nhiệm kỳ và hoàn thành hoặc bỏ qua hướng dẫn nhập cuộc.
+1. Bắt đầu nhiệm kỳ và hoàn thành hoặc bỏ qua hướng dẫn nhập cuộc. Nhiệm kỳ
+   mới mở ở trạng thái tạm dừng; bấm Tiếp tục khi bạn sẵn sàng.
 2. Chọn nhà cung cấp, điều chỉnh công suất huy động và áp dụng điều độ.
 3. Mở tuyến mới tới vùng chưa phủ điện; theo dõi tiến độ trong HUD và trên bản
    đồ 3D.
