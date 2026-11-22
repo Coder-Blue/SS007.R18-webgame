@@ -2,11 +2,16 @@ import * as THREE from "three";
 import { gsap } from "gsap";
 import { clamp } from "./motion";
 
+export type ScreenAnchor = {
+  readonly x: number;
+  readonly y: number;
+};
+
 export type CameraRig = {
   readonly camera: THREE.PerspectiveCamera;
   readonly resize: (width: number, height: number) => void;
   readonly reset: (reduced: boolean) => void;
-  readonly focus: (point: THREE.Vector3, reduced: boolean) => void;
+  readonly focus: (point: THREE.Vector3, reduced: boolean, anchor?: ScreenAnchor) => void;
   readonly dispose: () => void;
 };
 
@@ -19,13 +24,28 @@ type View = {
   targetX: number;
   targetZ: number;
   distance: number;
+  offsetX: number;
+  lift: number;
+};
+
+const FOV_DEGREES = 36;
+const RIGHT_X = Math.SQRT1_2;
+const RIGHT_Z = -Math.SQRT1_2;
+
+export const focusShift = (distance: number, aspect: number, anchor: ScreenAnchor) => {
+  const worldHeight = 2 * distance * Math.tan(THREE.MathUtils.degToRad(FOV_DEGREES / 2));
+
+  return {
+    offsetX: -anchor.x * worldHeight * aspect,
+    lift: anchor.y * worldHeight,
+  };
 };
 
 const preventContextMenu = (event: Event): void => event.preventDefault();
 
 export const createCameraRig = (options: CameraRigOptions): CameraRig => {
-  const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 240);
-  const view: View = { targetX: 0, targetZ: 0, distance: 38 };
+  const camera = new THREE.PerspectiveCamera(FOV_DEGREES, 1, 0.1, 240);
+  const view: View = { targetX: 0, targetZ: 0, distance: 38, offsetX: 0, lift: 0 };
   const target = new THREE.Vector3(0, 1, 0);
   const pointers = new Map<number, { x: number; y: number }>();
   let dragging = false;
@@ -37,9 +57,15 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
   let userMovedCamera = false;
 
   const apply = (): void => {
-    target.set(view.targetX, 1, view.targetZ);
     const horizontal = view.distance * 0.68;
-    camera.position.set(view.targetX + horizontal, view.distance * 0.8, view.targetZ + horizontal);
+    const offsetZ = RIGHT_Z * view.offsetX;
+
+    target.set(view.targetX + RIGHT_X * view.offsetX, 1 + view.lift, view.targetZ + offsetZ);
+    camera.position.set(
+      view.targetX + horizontal + RIGHT_X * view.offsetX,
+      view.distance * 0.8 + view.lift,
+      view.targetZ + horizontal + offsetZ,
+    );
     camera.lookAt(target);
   };
 
@@ -48,6 +74,8 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
     userMovedCamera = true;
     view.targetX = clamp(view.targetX - dx * scale - dy * scale * 0.4, -14, 14);
     view.targetZ = clamp(view.targetZ - dy * scale + dx * scale * 0.4, -12, 12);
+    view.offsetX = 0;
+    view.lift = 0;
     apply();
   };
 
@@ -146,16 +174,23 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
         targetX: 0,
         targetZ: 0,
         distance: camera.aspect < 0.85 ? 52 : 38,
+        offsetX: 0,
+        lift: 0,
         duration: reduced ? 0 : 0.9,
         ease: "power2.inOut",
         onUpdate: apply,
       });
     },
-    focus: (point: THREE.Vector3, reduced: boolean) => {
+    focus: (point: THREE.Vector3, reduced: boolean, anchor = { x: 0, y: 0 }) => {
+      const distance = camera.aspect < 0.85 ? 34 : 24;
+      const shift = focusShift(distance, camera.aspect, anchor);
+
       gsap.to(view, {
         targetX: clamp(point.x, -13, 13),
         targetZ: clamp(point.z, -11, 11),
-        distance: camera.aspect < 0.85 ? 34 : 24,
+        distance,
+        offsetX: shift.offsetX,
+        lift: shift.lift,
         duration: reduced ? 0 : 0.9,
         ease: "power2.inOut",
         onUpdate: apply,

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import type { GameState } from "~/domain";
-import { createCameraRig, type CameraRig } from "./camera-rig";
+import { createCameraRig, type CameraRig, type ScreenAnchor } from "./camera-rig";
 import { createTerrain } from "./terrain";
 import { createPlants, type SceneSelection } from "./plants";
 import { createGrid } from "./grid-lines";
@@ -12,7 +12,7 @@ export type PowerScene = {
   readonly update: (state: GameState, running: boolean) => void;
   readonly resize: () => void;
   readonly resetView: () => void;
-  readonly focusSelection: (selection: SceneSelection | null) => void;
+  readonly focusSelection: (selection: SceneSelection | null, anchor?: ScreenAnchor) => void;
   readonly dispose: () => void;
   readonly selected: () => SceneSelection | null;
 };
@@ -302,7 +302,7 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
       selected = null;
       tourRing.visible = false;
     },
-    focusSelection: (selection) => {
+    focusSelection: (selection, anchor) => {
       if (selection === null) {
         tourRing.visible = false;
 
@@ -313,7 +313,7 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
 
       tourRing.position.set(point.x, 1.1, point.z);
       tourRing.visible = true;
-      cameraRig.focus(point, options.reducedMotion());
+      cameraRig.focus(point, options.reducedMotion(), anchor);
     },
     selected: () => selected,
     dispose: () => {

@@ -4,6 +4,8 @@ import { useGame } from "../game-context";
 import { Icon } from "../components/icons";
 import type { PowerScene, SceneSelection } from "~/scene/create-power-scene";
 import { seasonOf } from "~/domain";
+import { selectionLabel } from "./scene-labels";
+import { tourAnchor, type ScreenRect, type TourAnchor } from "./tour-anchor";
 
 type SceneModule = typeof import("~/scene/create-power-scene");
 
@@ -24,10 +26,13 @@ export const PowerCanvas = (props: {
   const [ready, setReady] = createSignal(false);
   const [loadFailed, setLoadFailed] = createSignal(false);
   const [unavailable, setUnavailable] = createSignal(false);
+  const [tourNode, setTourNode] = createSignal<SceneSelection | null>(null);
+  const [tourPoint, setTourPoint] = createSignal<TourAnchor>({ x: 0, y: 0 });
   let canvas: HTMLCanvasElement | undefined;
   let container: HTMLDivElement | undefined;
   let controller: PowerScene | null = null;
   let tourTarget: SceneSelection | null = null;
+  let tourFocus: TourAnchor = { x: 0, y: 0 };
 
   createTrackedEffect(() => {
     if (!ready()) return;
@@ -69,7 +74,7 @@ export const PowerCanvas = (props: {
           controller = next;
           setReady(true);
 
-          if (tourTarget !== null) next.focusSelection(tourTarget);
+          if (tourTarget !== null) next.focusSelection(tourTarget, tourFocus);
         })
         .catch((error) => {
           if (cancelled) return;
@@ -97,12 +102,41 @@ export const PowerCanvas = (props: {
       timer = setTimeout(load, FALLBACK_DELAY_MS);
     };
 
+    const rectOf = (element: Element | null): ScreenRect | null => {
+      if (element === null) return null;
+      const rect = element.getBoundingClientRect();
+
+      return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom };
+    };
+
     const onTour = (event: Event): void => {
       // SAFETY: only the tutorial dispatches this event, always with a SceneSelection or null.
       const selection = (event as CustomEvent<SceneSelection | null>).detail ?? null;
 
       tourTarget = selection;
-      controller?.focusSelection(selection);
+      setTourNode(selection);
+
+      if (selection === null) {
+        tourFocus = { x: 0, y: 0 };
+        setTourPoint(tourFocus);
+        controller?.focusSelection(null);
+
+        return;
+      }
+
+      const drawer = document.querySelector(".workspace-drawer");
+      const tutorial = document.querySelector(".tutorial-modal");
+      const rail = document.querySelector(".dock-left");
+
+      const anchor = tourAnchor(window.innerWidth, window.innerHeight, {
+        drawer: rectOf(drawer),
+        tutorial: rectOf(tutorial),
+        rail: rectOf(rail),
+      });
+
+      tourFocus = anchor;
+      setTourPoint(anchor);
+      controller?.focusSelection(selection, anchor);
     };
 
     window.addEventListener("grid:tour-focus", onTour);
@@ -195,6 +229,24 @@ export const PowerCanvas = (props: {
           <span>Căn lại góc nhìn</span>
         </button>
       </div>
+      <Show when={tourNode()}>
+        {(selection) => (
+          <div
+            class="scene-tour-focus"
+            role="status"
+            data-tour-node={selection()}
+            data-anchor-x={tourPoint().x.toFixed(3)}
+            data-anchor-y={tourPoint().y.toFixed(3)}
+            style={{
+              left: `${(0.5 + tourPoint().x) * 100}%`,
+              top: `${(0.5 + tourPoint().y) * 100}%`,
+            }}
+          >
+            <Icon icon="lucide:target" size={14} />
+            <span>{`Đang xem: ${selectionLabel(selection())}`}</span>
+          </div>
+        )}
+      </Show>
       <p class="scene-hint">Kéo để di chuyển · Lăn chuột để phóng · Chạm công trình để xem</p>
       <Show when={!ready() && !loadFailed() && !unavailable()}>
         <div class="scene-loading" role="status" aria-live="polite">

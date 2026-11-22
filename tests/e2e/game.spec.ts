@@ -150,30 +150,96 @@ test("walks the tutorial through live panels and map nodes", async ({ page }) =>
 
   const tutorial = page.locator(".tutorial-modal");
   await expect(tutorial).toBeVisible();
-  const desktop = (page.viewportSize()?.width ?? 0) > 1180;
+  const desktop = (page.viewportSize()?.width ?? 0) > 1340;
+
+  const expectFreeFocus = async (node: string) => {
+    await expect.poll(() => page.locator("body").getAttribute("data-tour-target")).toBe(node);
+    const focus = page.locator(`.scene-tour-focus[data-tour-node="${node}"]`);
+    await expect(focus).toBeVisible();
+
+    const geometry = await page.evaluate(() => {
+      const chip = document.querySelector<HTMLElement>(".scene-tour-focus");
+
+      if (chip === null) return null;
+      const x = (Number(chip.dataset.anchorX) + 0.5) * window.innerWidth;
+      const y = (Number(chip.dataset.anchorY) + 0.5) * window.innerHeight;
+      const top = document.elementFromPoint(x, y);
+
+      return {
+        x,
+        y,
+        overDrawer: top?.closest(".workspace-drawer") !== null,
+        overTutorial: top?.closest(".tutorial-modal") !== null,
+        overRail: top?.closest(".dock-left") !== null,
+      };
+    });
+
+    expect(geometry).not.toBeNull();
+    expect(geometry?.overDrawer).toBe(false);
+    expect(geometry?.overTutorial).toBe(false);
+    expect(geometry?.overRail).toBe(false);
+
+    return geometry;
+  };
 
   await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
 
   if (desktop) {
     await expect(page.locator(".workspace-drawer")).toBeVisible();
     await expect(page.locator('[data-tutorial="production-panel"]')).toBeVisible();
+  } else {
+    await expect(
+      page.locator('.mobile-nav [data-tutorial="production"][data-tutorial-active="true"]').first(),
+    ).toBeVisible();
   }
 
-  await expect.poll(() => page.locator("body").getAttribute("data-tour-target")).toBe("thermal");
+  const productionFocus = await expectFreeFocus("thermal");
+
+  expect(
+    await page.evaluate(() => document.activeElement?.closest(".tutorial-modal") !== null),
+  ).toBe(true);
+
+  if (desktop) {
+    const drawer = await page.locator(".workspace-drawer").boundingBox();
+    const rail = await page.locator(".dock-left").boundingBox();
+
+    expect(productionFocus?.x).toBeGreaterThan((rail?.x ?? 0) + (rail?.width ?? 0));
+    expect(productionFocus?.x).toBeLessThan(drawer?.x ?? 0);
+  }
 
   await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
 
   if (desktop) await expect(page.locator('[data-tutorial="grid-panel"]')).toBeVisible();
-  await expect.poll(() => page.locator("body").getAttribute("data-tour-target")).toBe("rural");
+  await expectFreeFocus("rural");
 
   await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
 
   if (desktop) await expect(page.locator('[data-tutorial="tariff-panel"]')).toBeVisible();
-  await expect.poll(() => page.locator("body").getAttribute("data-tour-target")).toBe("urban");
+  await expectFreeFocus("urban");
 
-  await tutorial.getByRole("button", { name: "Bỏ qua hướng dẫn" }).click();
-  await expect(page.locator(".tutorial-modal")).toHaveCount(0);
+  await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
   await expect(page.locator(".workspace-drawer")).toHaveCount(0);
+  await expect(page.locator(".scene-tour-focus")).toHaveCount(0);
+  await expect.poll(() => page.locator("body").getAttribute("data-tour-target")).toBe("null");
+
+  const pause = page.getByRole("button", { name: /mô phỏng/i }).first();
+  const pauseBox = await pause.boundingBox();
+
+  expect(pauseBox).not.toBeNull();
+
+  const pauseHit = await page.evaluate(
+    ({ x, y }) =>
+      document.elementFromPoint(x, y)?.closest("button")?.getAttribute("aria-label") ?? null,
+    {
+      x: (pauseBox?.x ?? 0) + (pauseBox?.width ?? 0) / 2,
+      y: (pauseBox?.y ?? 0) + (pauseBox?.height ?? 0) / 2,
+    },
+  );
+
+  expect(pauseHit).toMatch(/mô phỏng/i);
+
+  await tutorial.getByRole("button", { name: "Bắt đầu điều hành" }).click();
+  await expect(page.locator(".tutorial-modal")).toHaveCount(0);
 });
 
 test("keeps the tutorial step when it is reopened", async ({ page }) => {

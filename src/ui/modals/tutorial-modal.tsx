@@ -7,6 +7,8 @@ import { Icon, type IconName } from "../components/icons";
 import type { PanelId } from "../mobile/mobile-nav";
 import type { SceneSelection } from "~/scene/create-power-scene";
 
+const PANEL_TOUR_MIN_WIDTH = 1340;
+
 type Step = {
   readonly kicker: string;
   readonly title: string;
@@ -32,7 +34,7 @@ const steps: readonly Step[] = [
     kicker: "Bước 1 · Sản xuất & mua điện cạnh tranh",
     title: "Chọn nguồn nhập điện và nhiên liệu",
     body: "Ba nhà cung cấp IPP, BOT và than chào giá gần như tương đương. Chọn nhà cung cấp, đặt mức nhập khẩu và huy động thủy điện/nhiệt điện để giữ chi phí thấp mà vẫn đủ nguồn.",
-    targets: ["production-panel", "scene"],
+    targets: ["production", "production-panel", "scene"],
     icon: "tabler:bolt",
     panel: "production",
     node: "thermal",
@@ -41,7 +43,7 @@ const steps: readonly Step[] = [
     kicker: "Bước 2 · Truyền tải",
     title: "Cân đối phụ tải và mở rộng lưới",
     body: "Theo dõi MW cung cầu, biên dự phòng và độ tin cậy. Nối các tuyến 500kV/220kV tới đô thị, khu công nghiệp và vùng nông thôn để tiến tới phủ điện 100%.",
-    targets: ["grid-panel", "scene"],
+    targets: ["grid", "grid-panel", "scene"],
     icon: "lucide:utility-pole",
     panel: "grid",
     node: "rural",
@@ -50,7 +52,7 @@ const steps: readonly Step[] = [
     kicker: "Bước 3 · Phân phối",
     title: "Điều tiết biểu giá và theo dõi báo cáo",
     body: "Sáu bậc giá hộ dân và giá công nghiệp trợ cấp quyết định doanh thu và niềm tin. Tăng trên 5% phải trình Nhà nước. Xem dự đoán trước → sau trước khi xác nhận.",
-    targets: ["tariff-panel", "trust"],
+    targets: ["tariffs", "tariff-panel", "trust"],
     icon: "tabler:scale",
     panel: "tariffs",
     node: "urban",
@@ -94,11 +96,12 @@ export const TutorialModal = (props: {
   const { store } = useGame();
   const [step, setStep] = createSignal(0);
   let wasOpen = false;
-  let spotlightTimer: ReturnType<typeof setTimeout> | undefined;
+  let stepTimer: ReturnType<typeof setTimeout> | undefined;
   const current = () => steps[step()] ?? steps[0];
 
   createTrackedEffect(() => {
     store.setHold(props.open);
+    document.documentElement.dataset.tour = props.open ? "open" : "";
 
     if (props.open && !wasOpen) setStep(0);
     wasOpen = props.open;
@@ -111,25 +114,34 @@ export const TutorialModal = (props: {
     }
 
     const active = current();
+    const wide = window.matchMedia(`(min-width: ${PANEL_TOUR_MIN_WIDTH}px)`).matches;
 
-    if (active?.panel !== undefined && window.matchMedia("(min-width: 1181px)").matches) {
+    if (active?.panel !== undefined && wide) {
       props.onOpenPanel(active.panel);
+      requestAnimationFrame(() =>
+        document.querySelector<HTMLElement>(".tutorial-modal")?.focus({ preventScroll: true }),
+      );
+    } else {
+      props.onClosePanel();
     }
 
-    window.dispatchEvent(
-      new CustomEvent<SceneSelection | null>("grid:tour-focus", {
-        detail: active?.node ?? null,
-      }),
-    );
-
-    if (spotlightTimer !== undefined) clearTimeout(spotlightTimer);
-    spotlightTimer = setTimeout(() => spotlight(active?.targets ?? []), 120);
+    if (stepTimer !== undefined) clearTimeout(stepTimer);
+    stepTimer = setTimeout(() => {
+      spotlight(active?.targets ?? []);
+      window.dispatchEvent(
+        new CustomEvent<SceneSelection | null>("grid:tour-focus", {
+          detail: active?.node ?? null,
+        }),
+      );
+    }, 120);
   });
 
   onCleanup(() => {
     cleanupSpotlight?.();
 
-    if (spotlightTimer !== undefined) clearTimeout(spotlightTimer);
+    if (stepTimer !== undefined) clearTimeout(stepTimer);
+    delete document.documentElement.dataset.tour;
+    window.dispatchEvent(new CustomEvent("grid:tour-focus", { detail: null }));
     store.setHold(false);
   });
 
