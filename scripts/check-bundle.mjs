@@ -51,7 +51,11 @@ const shellPath = join(dirname(assetDirectory), "_shell.html");
 
 if (existsSync(shellPath)) {
   const shell = readFileSync(shellPath, "utf8");
-  const initial = [...shell.matchAll(/\/assets\/([^"']+?\.js)/g)].map((match) => match[1]);
+
+  const initial = [
+    ...new Set([...shell.matchAll(/\/assets\/([^"']+?\.js)/g)].map((match) => match[1])),
+  ];
+
   const deferred = initial.filter((file) => /^(?:three|gsap)/.test(file));
 
   if (deferred.length > 0) {
@@ -61,7 +65,19 @@ if (existsSync(shellPath)) {
     process.exit(1);
   }
 
-  console.log(`\nInitial shell: ${initial.length} JavaScript preloads, no Three.js or GSAP.`);
+  const initialBytes = initial.reduce(
+    (total, file) => total + statSync(join(assetDirectory, file)).size,
+    0,
+  );
+
+  const initialGzip = initial.reduce(
+    (total, file) => total + gzipSync(readFileSync(join(assetDirectory, file))).byteLength,
+    0,
+  );
+
+  console.log(
+    `\nInitial shell: ${initial.length} JavaScript preloads, ${(initialBytes / 1000).toFixed(1)} kB min / ${(initialGzip / 1000).toFixed(1)} kB gzip, no Three.js or GSAP.`,
+  );
 }
 
 console.log(`Bundle budget: OK (${bundles.length} client chunks, every chunk <= 500 kB minified)`);

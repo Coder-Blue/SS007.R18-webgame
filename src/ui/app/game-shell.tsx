@@ -1,21 +1,15 @@
-import { createSignal, createTrackedEffect, onSettled, Show } from "solid-js";
+import { createSignal, createTrackedEffect, lazy, Loading, onSettled, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { TitlePoster } from "../scene/title-poster";
-import { VillageCanvas } from "../scene/village-canvas";
-import { TopBar } from "../hud/top-bar";
-import { LeftDock, RightDock } from "../hud/desktop-dock";
-import { BottomDock } from "../hud/desktop-bottom";
-import { MobileNav, type PanelId } from "../mobile/mobile-nav";
-import { WorkspaceModal } from "../modals/workspace-modal";
-import { SaveMenu } from "../modals/save-menu";
-import { TutorialModal } from "../modals/tutorial-modal";
-import { EventModal } from "../modals/event-modal";
-import { EndingScreen } from "../modals/ending-screen";
 import { TitleScreen } from "../screens/title-screen";
 import { Icon } from "../components/icons";
 import { hasAnySave, latestSave, readSession, writeSession } from "~/state/persistence";
 import type { SceneSelection } from "~/scene/create-village-scene";
+
+const GameView = lazy(() => import("./game-view"));
+const SaveMenu = lazy(() => import("../modals/save-menu"), { export: "SaveMenu" });
+const TutorialModal = lazy(() => import("../modals/tutorial-modal"), { export: "TutorialModal" });
 
 interface CopyDictionary {
   readonly [key: string]: string;
@@ -102,9 +96,8 @@ export const GameShell = (): JSX.Element => {
   const [screen, setScreen] = createSignal<Screen>("title");
   const [hasSave, setHasSave] = createSignal(false);
   const [menuOpen, setMenuOpen] = createSignal(false);
-  const [workspaceOpen, setWorkspaceOpen] = createSignal(false);
-  const [workspacePanel, setWorkspacePanel] = createSignal<PanelId>("overview");
   const [tutorialOpen, setTutorialOpen] = createSignal(false);
+  const [tutorialReady, setTutorialReady] = createSignal(false);
   const [selected, setSelected] = createSignal<SceneSelection | null>(null);
   const [toast, setToast] = createSignal<ToastState | null>(null);
   let toastTimer: ReturnType<typeof setTimeout> | undefined;
@@ -148,11 +141,16 @@ export const GameShell = (): JSX.Element => {
     }
   });
 
+  const openTutorial = (): void => {
+    setTutorialReady(true);
+    setTutorialOpen(true);
+  };
+
   const startGame = (): void => {
     actions.newGame();
     setScreen("game");
     setHasSave(true);
-    setTutorialOpen(true);
+    openTutorial();
     showToast({ kind: "notice", text: "Nhiệm kỳ mới bắt đầu." });
   };
 
@@ -175,11 +173,6 @@ export const GameShell = (): JSX.Element => {
     setHasSave(true);
   };
 
-  const openPanel = (panel: PanelId): void => {
-    setWorkspacePanel(panel);
-    setWorkspaceOpen(true);
-  };
-
   const sceneSelect = (selection: SceneSelection): void => {
     setSelected(selection);
     showToast({ kind: "notice", text: `Đã chọn ${selectionLabel(selection)}` });
@@ -191,19 +184,21 @@ export const GameShell = (): JSX.Element => {
         <TitlePoster />
       </Show>
       <Show when={screen() === "game"}>
-        <VillageCanvas onSelect={sceneSelect} />
-        <h1 class="sr-only">Độc Quyền Kinh Tế</h1>
-        <TopBar onOpenMenu={() => setMenuOpen(true)} onOpenTutorial={() => setTutorialOpen(true)} />
-        <LeftDock
-          selected={selected()}
-          onClearSelected={() => setSelected(null)}
-          onOpenPanel={openPanel}
-        />
-        <RightDock onOpenPanel={openPanel} />
-        <BottomDock onOpenPanel={openPanel} />
-        <MobileNav />
-        <EventModal />
-        <EndingScreen />
+        <Loading
+          fallback={
+            <div class="scene-loading" role="status" aria-live="polite">
+              Đang mở bàn điều hành…
+            </div>
+          }
+        >
+          <GameView
+            selected={selected()}
+            onSelect={sceneSelect}
+            onClearSelected={() => setSelected(null)}
+            onOpenMenu={() => setMenuOpen(true)}
+            onOpenTutorial={openTutorial}
+          />
+        </Loading>
       </Show>
       <Show when={screen() === "title"}>
         <TitleScreen
@@ -211,26 +206,28 @@ export const GameShell = (): JSX.Element => {
           onStart={startGame}
           onContinue={continueGame}
           onOpenLoad={() => setMenuOpen(true)}
-          onTutorial={() => setTutorialOpen(true)}
+          onTutorial={openTutorial}
         />
       </Show>
-      <WorkspaceModal
-        open={workspaceOpen()}
-        panel={workspacePanel()}
-        onPanel={(panel) => setWorkspacePanel(panel)}
-        onClose={() => setWorkspaceOpen(false)}
-      />
-      <SaveMenu
-        open={menuOpen()}
-        onClose={() => setMenuOpen(false)}
-        onNotice={(message) => showToast({ kind: "notice", text: message })}
-        onLoaded={onLoaded}
-      />
-      <TutorialModal
-        open={tutorialOpen()}
-        onClose={() => setTutorialOpen(false)}
-        onFinish={markTutorial}
-      />
+      <Show when={menuOpen()}>
+        <Loading fallback={null}>
+          <SaveMenu
+            open
+            onClose={() => setMenuOpen(false)}
+            onNotice={(message) => showToast({ kind: "notice", text: message })}
+            onLoaded={onLoaded}
+          />
+        </Loading>
+      </Show>
+      <Show when={tutorialReady()}>
+        <Loading fallback={null}>
+          <TutorialModal
+            open={tutorialOpen()}
+            onClose={() => setTutorialOpen(false)}
+            onFinish={markTutorial}
+          />
+        </Loading>
+      </Show>
       <Show when={toast()}>
         {(current) => (
           <div class="toast" data-kind={current().kind} role="status" aria-live="polite">

@@ -42,6 +42,8 @@ The local TBT is dominated by the 3D scene running under software rendering; the
 ### Frontend
 
 - Rendered a 24 kB desktop / 9.2 kB mobile WebP village poster on the title screen and mounted the Three.js scene only during play.
+- Split the game surface (HUD, docks, panels, event/ending screens) into a lazy `game-view` chunk behind a Solid `Loading` boundary; the route chunk fell from 238.2 kB to 8.9 kB minified.
+- Lazy-loaded the save menu and tutorial on first open, removing the dialog/UI SDK foundation from the initial route.
 - Dynamically imported the scene factory after the first paint during idle time, with single-flight loading, disposal on failure and a visible retry action.
 - Removed GSAP from the HUD number tween; `AnimatedNumber` now uses a 550 ms `requestAnimationFrame` quadratic ease.
 - Replaced the five full TTF faces in the UI with ten WOFF2 Latin/Vietnamese subsets; preloaded the 400/600/700/800 pairs used by the title screen.
@@ -108,17 +110,17 @@ Local production build through the same gzip proxy:
 
 | Metric | Before | After | Change |
 |---|---:|---:|---:|
-| Lighthouse Performance, mobile | 47 | 95 | +48 |
+| Lighthouse Performance, mobile | 47 | 94 | +47 |
 | Lighthouse Performance, desktop | 67 | 100 | +33 |
-| LCP, mobile | 6.3 s | 2.9 s | -3.4 s |
+| LCP, mobile | 6.3 s | 3.0 s | -3.3 s |
 | LCP, desktop | 1.1 s | 0.7 s | -0.4 s |
 | TBT, mobile | 142,560 ms | 10 ms | eliminated |
 | TBT, desktop | 19,550 ms | 0 ms | eliminated |
 | CLS, mobile | 0.009 | 0.001 | -0.008 |
 | CLS, desktop | 0 | 0.001 | negligible |
-| Initial JS | 1,268.6 kB min / 384.3 kB gzip | 642.0 kB min / 214.1 kB gzip | -49.4% min / -44.3% gzip |
+| Initial JS | 1,268.6 kB min / 384.3 kB gzip | 372.6 kB min / 127.2 kB gzip | -70.6% min / -66.9% gzip |
 | Deferred game scene | in the initial chunk | 630.0 kB min / 169.9 kB gzip after start | moved off first load |
-| Initial transfer | 933 KiB | 419 KiB | -55% |
+| Initial transfer | 933 KiB | 334 KiB | -64% |
 | Slowest API | none | none | n/a |
 | Slowest DB query | none | none | n/a |
 
@@ -133,14 +135,13 @@ The baseline live run was `54` performance, `4.1 s` LCP, `7,100 ms` TBT and `628
 
 ## 6. Remaining Bottlenecks
 
-- Mobile LCP is 2.2 s on the live Vercel deployment, inside the 2.5 s target. The local gzip harness still measures 2.9 s, about 0.4 s above the target; the remaining lab cost is the 25 kB gzip stylesheet and font startup, so a critical-CSS split is the optional next step.
+- Mobile LCP is 2.2 s on the live Vercel deployment, inside the 2.5 s target. The local gzip harness still measures 3.0 s, about 0.5 s above the target; the remaining lab cost is the 25 kB gzip stylesheet and font startup, so a critical-CSS split is the optional next step.
 - Starting a game still downloads Three.js and GSAP (about 170 kB gzip). This is after user intent and does not affect the title benchmark.
-- The initial route chunk still contains the game panels and HUD because `GameShell` imports them statically. Lighthouse reports unused JavaScript on the title; lazy-loading the game UI after Start is the next safe reduction.
 - Chrome UX Report has no field data for this project yet, so the scores are lab measurements.
 
 ## 7. Files Changed
 
-- `src/ui/scene/title-poster.tsx`, `src/ui/scene/village-canvas.tsx`, `src/ui/app/game-shell.tsx`
+- `src/ui/scene/title-poster.tsx`, `src/ui/scene/village-canvas.tsx`, `src/ui/app/game-shell.tsx`, `src/ui/app/game-view.tsx`
 - `src/ui/components/animated-number.tsx`, `src/ui/components/base.tsx`
 - `src/routes/__root.tsx`, `src/routes/index.tsx`, `src/site.ts`, `routes/sitemap.xml.ts`, `routes/robots.txt.ts`
 - `src/styles/*.css`, `src/state/persistence.ts`
