@@ -77,17 +77,17 @@ const pillar = (kicker: string, title: string) =>
       gap: 2,
       padding: "14px 18px",
       borderRadius: 14,
-      border: "1px solid rgba(242, 212, 139, 0.28)",
-      backgroundColor: "rgba(13, 33, 22, 0.55)",
+      border: "1px solid rgba(57, 215, 255, 0.32)",
+      backgroundColor: "rgba(10, 32, 42, 0.65)",
     },
     children: [
       text(kicker, {
         fontSize: 13,
         fontWeight: 700,
         letterSpacing: 2,
-        color: "#f2d48b",
+        color: "#8fe9ff",
       }),
-      text(title, { fontSize: 20, fontWeight: 700, color: "#f7f0e2" }),
+      text(title, { fontSize: 20, fontWeight: 700, color: "#e7f2f4" }),
     ],
   });
 
@@ -112,9 +112,9 @@ export default defineHandler(async (event) => {
       justifyContent: "space-between",
       padding: "54px 62px",
       fontFamily: "Be Vietnam Pro",
-      color: "#f7f0e2",
+      color: "#e7f2f4",
       backgroundImage:
-        "radial-gradient(circle at 78% 18%, rgba(216, 169, 75, 0.26) 0%, rgba(216, 169, 75, 0) 46%), linear-gradient(135deg, #1d4a32 0%, #0d2116 58%, #050f09 100%)",
+        "radial-gradient(circle at 78% 18%, rgba(57, 215, 255, 0.24) 0%, rgba(57, 215, 255, 0) 46%), linear-gradient(135deg, #0b2a36 0%, #07161e 58%, #040b10 100%)",
       position: "relative",
       overflow: "hidden",
     },
@@ -140,7 +140,7 @@ export default defineHandler(async (event) => {
                       height: 42,
                       borderRadius: 999,
                       border: "2px solid rgba(242, 212, 139, 0.6)",
-                      backgroundColor: "#d8a94b",
+                      backgroundColor: "#39d7ff",
                     },
                     children: [],
                   }),
@@ -148,37 +148,37 @@ export default defineHandler(async (event) => {
                     fontSize: 16,
                     fontWeight: 700,
                     letterSpacing: 3,
-                    color: "#f2d48b",
+                    color: "#8fe9ff",
                   }),
                 ],
               }),
-              text("ĐỘC QUYỀN", {
+              text("ĐIỀU HÀNH", {
                 fontSize: 96,
                 fontWeight: 800,
                 letterSpacing: -3,
                 lineHeight: 1.08,
-                color: "#f7f0e2",
+                color: "#e7f2f4",
               }),
-              text("KINH TẾ", {
+              text("LƯỚI ĐIỆN", {
                 fontSize: 96,
                 fontWeight: 800,
                 letterSpacing: -3,
                 lineHeight: 1.08,
-                color: "#f2d48b",
+                color: "#8fe9ff",
               }),
-              text("THE RICE MONOPOLY", {
+              text("NATIONAL GRID COMMAND", {
                 fontSize: 24,
                 fontWeight: 700,
                 letterSpacing: 10,
                 color: "#d8a94b",
               }),
               text(
-                "Một làng. Một mạng đường. Một giỏ gạo. Giữ cho dân no, xưởng chạy và ngân sách không sụp.",
+                "Một lưới điện, ba khâu, năm năm. Giữ MW ổn định, phủ điện toàn quốc và hai chỉ số niềm tin trên 0%.",
                 {
                   fontSize: 24,
                   fontWeight: 600,
                   lineHeight: 1.45,
-                  color: "rgba(247, 240, 226, 0.84)",
+                  color: "rgba(231, 242, 244, 0.86)",
                   maxWidth: "700px",
                 },
               ),
@@ -190,7 +190,7 @@ export default defineHandler(async (event) => {
               height: 280,
               borderRadius: 999,
               border: "2px solid rgba(242, 212, 139, 0.45)",
-              backgroundColor: "rgba(247, 240, 226, 0.94)",
+              backgroundColor: "rgba(231, 242, 244, 0.96)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -199,23 +199,23 @@ export default defineHandler(async (event) => {
               boxShadow: "0 24px 60px rgba(5, 15, 9, 0.45)",
             },
             children: [
-              text("5", {
+              text("60", {
                 fontSize: 150,
                 fontWeight: 800,
                 lineHeight: 0.9,
-                color: "#1d4a32",
+                color: "#07161e",
               }),
-              text("NĂM NHIỆM KỲ", {
+              text("THÁNG NHIỆM KỲ", {
                 fontSize: 16,
                 fontWeight: 700,
                 letterSpacing: 3,
-                color: "#9f7424",
+                color: "#1a7f96",
               }),
               text("2022 – 2026", {
                 fontSize: 20,
                 fontWeight: 700,
                 letterSpacing: 2,
-                color: "#241d16",
+                color: "#0b2a36",
               }),
             ],
           }),
@@ -224,9 +224,9 @@ export default defineHandler(async (event) => {
       container({
         style: { display: "flex", flexDirection: "row", gap: 14 },
         children: [
-          pillar("SẢN XUẤT", "Ruộng nước và cơ giới"),
-          pillar("TRUYỀN TẢI", "Đường phủ tới từng hộ"),
-          pillar("PHÂN PHỐI", "Bốn bậc giá có trần"),
+          pillar("SẢN XUẤT & MUA ĐIỆN", "IPP, BOT và nhiệt điện"),
+          pillar("TRUYỀN TẢI", "500kV và 220kV"),
+          pillar("PHÂN PHỐI", "Sáu bậc giá có trần"),
         ],
       }),
       container({
@@ -242,13 +242,13 @@ export default defineHandler(async (event) => {
           text("Chơi trực tiếp trên trình duyệt", {
             fontSize: 18,
             fontWeight: 600,
-            color: "rgba(247, 240, 226, 0.72)",
+            color: "rgba(231, 242, 244, 0.74)",
           }),
-          text("ĐỘC QUYỀN KINH TẾ", {
+          text("ĐIỀU HÀNH LƯỚI ĐIỆN QUỐC GIA", {
             fontSize: 18,
             fontWeight: 800,
             letterSpacing: 3,
-            color: "#f2d48b",
+            color: "#8fe9ff",
           }),
         ],
       }),

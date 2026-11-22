@@ -43,3 +43,28 @@ the project uses semantic versioning for save-compatible releases.
 - Nix flakes for glibc and musl, direnv detection, Vercel configuration.
 - Vitest domain suite and Playwright responsive checks.
 - Agent, architecture and contribution documentation.
+
+## [2.0.0] - 2026-11-23
+
+### Changed
+
+- Replaced the village rice economy with the 60-month national power grid
+  simulation: competitive procurement, MW dispatch, 500kV/220kV coverage,
+  six-tier retail tariffs and autonomous State price review.
+- Rebuilt the Three.js scene as a national grid map with hydro dams, thermal
+  stacks, solar/wind farms, pylons, substations and load centers; added fuel
+  crisis, drought, privatization and blackout world states.
+- Reworked the HUD around tactical pause, 1x/2x/3x speed, dual trust gauges,
+  long-term missions, media pressure, project progress and monthly reports.
+- Rewrote the domain catalog with four scripted Big Events, ten post-event
+  decisions, DPPA/VREM/NSMO reforms, N-2 recovery and calibrated structural
+  deficit near `-45,000 tỷ` with debt below `100,000 tỷ`.
+
+### Added
+
+- Guided Chairman briefing with a five-step spotlight tutorial.
+- Live before/after previews for dispatch, supplier and tariff changes.
+- Stacked revenue/cost breakdown chart, trust trend chart and generation mix.
+- State approval dialog with a deterministic audit of fuel, deficit, inflation,
+  debt and public mood.
+- Save schema version 2 with `grid-save` envelopes.

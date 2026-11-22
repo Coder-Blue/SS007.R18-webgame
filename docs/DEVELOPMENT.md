@@ -98,7 +98,7 @@ schema version. Import validates with Valibot and rejects malformed or future
 versions without overwriting a slot.
 
 To reset a save during development, open the browser console and remove keys
-prefixed with `dqkt:`. The UI also offers a reset in Settings.
+prefixed with `dhl:`. The UI also offers a reset in Settings.
 
 ## Balance work
 

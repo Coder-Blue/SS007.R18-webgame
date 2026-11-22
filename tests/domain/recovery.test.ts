@@ -1,73 +1,117 @@
 import { describe, expect, it } from "vitest";
-import { createInitialState } from "../../src/domain/constants";
-import { recoveryFor, recoveryOf, recoveryRateCost } from "../../src/domain/recovery";
-
-const initial = createInitialState();
-
-const finance = {
-  ...initial.finance,
-  annualHistory: [
-    {
-      year: 2022,
-      revenue: 40_000,
-      costs: 60_000,
-      netResult: -20_000,
-      debtEnd: 40_000,
-      coverage: 80,
-      trustAverage: 60,
-      satisfactionAverage: 60,
-      reliability: 90,
-      inflationAverage: 5,
-    },
-  ],
-};
+import { recoveryOf } from "../../src/domain/recovery";
+import { reformRevenue } from "../../src/domain/reforms";
+import { baseState } from "./test-helpers";
 
 describe("recovery", () => {
-  it("returns no credit before the reform or before 2024", () => {
-    expect(recoveryFor(finance, 2024, 0.55, false).monthlyCredit).toBe(0);
-    expect(recoveryFor(finance, 2023, 0.55, true).monthlyCredit).toBe(0);
-    expect(recoveryFor(finance, 2025, 0.55, true).eligibleLoss).toBe(0);
+  it("has no credit without an eligible audited loss", () => {
+    const state = baseState();
+
+    expect(recoveryOf(state.finance, 2022, state.policy).monthlyCredit).toBe(0);
   });
 
-  it("credits the audited N-2 loss at the chosen rate", () => {
-    const result = recoveryFor(finance, 2024, 0.55, true);
-    expect(result.eligibleLoss).toBe(20_000);
-    expect(result.eligibleYear).toBe(2022);
-    expect(result.monthlyCredit).toBeCloseTo((20_000 * 0.55) / 12);
-    expect(result.remaining).toBe(20_000);
-  });
+  it("credits the two-year-old loss at the selected rate", () => {
+    const state = baseState();
 
-  it("stops when the eligible loss is exhausted", () => {
-    const result = recoveryFor({ ...finance, recoveredTotal: 20_000 }, 2024, 0.55, true);
-    expect(result.monthlyCredit).toBe(0);
-    expect(result.remaining).toBe(0);
-  });
-
-  it("reads recovery from a game state", () => {
-    const state = {
-      ...initial,
-      clock: { year: 2024, month: 3, tick: 26 },
-      policy: { ...initial.policy, n2Enabled: true, n2Rate: 0.6 },
-      finance: { ...initial.finance, annualHistory: finance.annualHistory },
+    const finance = {
+      ...state.finance,
+      annualHistory: [
+        {
+          year: 2022,
+          revenue: 10,
+          costs: 20,
+          netResult: -12_000,
+          debtEnd: 40_000,
+          coverage: 80,
+          trustAverage: 50,
+          satisfactionAverage: 50,
+          reliability: 100,
+          inflationAverage: 3,
+        },
+      ],
     };
 
-    expect(recoveryOf(state).rate).toBe(0.6);
-    expect(recoveryOf(state).monthlyCredit).toBeCloseTo((20_000 * 0.6) / 12);
+    const policy = { ...state.policy, n2Enabled: true, n2Rate: 0.5 };
+    const credit = recoveryOf(finance, 2024, policy);
+
+    expect(credit.eligibleLoss).toBe(12_000);
+    expect(credit.monthlyCredit).toBe(500);
   });
 
-  it("falls back to the default rate when the stored rate is zero", () => {
-    const state = {
-      ...initial,
-      clock: { year: 2024, month: 3, tick: 26 },
-      policy: { ...initial.policy, n2Rate: 0, n2Enabled: true },
-      finance: { ...initial.finance, annualHistory: finance.annualHistory },
+  it("stops when the eligible loss is exhausted or disabled", () => {
+    const state = baseState();
+
+    const finance = {
+      ...state.finance,
+      recoveredTotal: 12_000,
+      annualHistory: [
+        {
+          year: 2022,
+          revenue: 10,
+          costs: 20,
+          netResult: -12_000,
+          debtEnd: 40_000,
+          coverage: 80,
+          trustAverage: 50,
+          satisfactionAverage: 50,
+          reliability: 100,
+          inflationAverage: 3,
+        },
+      ],
     };
 
-    expect(recoveryOf(state).rate).toBe(0.55);
+    expect(recoveryOf(finance, 2024, { ...state.policy, n2Enabled: true }).monthlyCredit).toBe(0);
+    expect(recoveryOf(finance, 2024, state.policy).monthlyCredit).toBe(0);
   });
 
-  it("prices a higher recovery rate as a trust cost", () => {
-    expect(recoveryRateCost(0.55)).toBe(0);
-    expect(recoveryRateCost(0.8)).toBeCloseTo(6);
+  it("caps the credit at the remaining balance", () => {
+    const state = baseState();
+
+    const finance = {
+      ...state.finance,
+      recoveredTotal: 11_999,
+      annualHistory: [
+        {
+          year: 2022,
+          revenue: 10,
+          costs: 20,
+          netResult: -12_000,
+          debtEnd: 40_000,
+          coverage: 80,
+          trustAverage: 50,
+          satisfactionAverage: 50,
+          reliability: 100,
+          inflationAverage: 3,
+        },
+      ],
+    };
+
+    const credit = recoveryOf(finance, 2024, { ...state.policy, n2Enabled: true, n2Rate: 0.8 });
+
+    expect(credit.monthlyCredit).toBe(1);
+  });
+});
+
+describe("reforms", () => {
+  it("pays wheeling revenue for each enabled reform", () => {
+    const state = baseState();
+
+    const full = reformRevenue({
+      ...state.policy,
+      dppa: true,
+      vrem: true,
+      nsmo: true,
+      twoPartTariff: true,
+    });
+
+    expect(full.total).toBe(490);
+  });
+
+  it("pays nothing without authority or price cap", () => {
+    const state = baseState();
+
+    expect(reformRevenue(state.policy).total).toBe(0);
+    expect(reformRevenue({ ...state.policy, dppa: true, branch: "private" }).total).toBe(0);
+    expect(reformRevenue({ ...state.policy, dppa: true, priceCap: false }).total).toBe(0);
   });
 });

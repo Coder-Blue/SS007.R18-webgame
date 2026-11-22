@@ -1,0 +1,122 @@
+.title-act strong {
+  font-size: 12px;
+}
+
+.title-act p {
+  color: var(--ink-faint);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.title-footer {
+  color: var(--ink-faint);
+  font-size: 10px;
+  margin-top: 10px;
+}
+/* Toasts and monthly report */
+
+.toast {
+  align-items: center;
+  backdrop-filter: blur(12px);
+  background: rgba(8, 24, 32, 0.94);
+  border: 1px solid rgba(91, 214, 162, 0.35);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lift);
+  color: var(--ink);
+  display: flex;
+  font-size: 12px;
+  gap: 8px;
+  max-width: min(420px, calc(100vw - 28px));
+  padding: 10px 14px;
+  position: fixed;
+  right: 16px;
+  top: 100px;
+  z-index: 70;
+}
+
+.toast[data-kind="error"] {
+  border-color: rgba(255, 107, 107, 0.45);
+}
+
+.toast[data-kind="error"] svg {
+  color: var(--rose);
+}
+
+.toast[data-kind="notice"] svg {
+  color: var(--green);
+}
+
+.monthly-toast {
+  backdrop-filter: blur(14px);
+  background: rgba(8, 24, 32, 0.94);
+  border: 1px solid rgba(57, 215, 255, 0.32);
+  border-radius: var(--radius);
+  bottom: 88px;
+  box-shadow: var(--shadow-lift);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  left: 16px;
+  padding: 12px;
+  position: fixed;
+  width: min(330px, calc(100vw - 32px));
+  z-index: 35;
+}
+
+.monthly-head {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.monthly-head strong {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.monthly-head .icon-btn {
+  height: 32px;
+  min-height: 32px;
+  width: 32px;
+}
+
+.monthly-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.monthly-grid span {
+  align-items: center;
+  color: var(--ink-soft);
+  display: inline-flex;
+  font-size: 10px;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.monthly-grid span[data-tone="good"] {
+  color: var(--green);
+}
+
+.monthly-grid span[data-tone="bad"] {
+  color: var(--rose);
+}
+
+/* Tutorial spotlight */
+
+[data-tutorial-active="true"] {
+  outline: 2px solid var(--electric);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(57, 215, 255, 0.14);
+}
+
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.001ms !important;
+}

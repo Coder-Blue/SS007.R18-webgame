@@ -16,9 +16,17 @@ export * from "./finance";
 
 export * from "./recovery";
 
+export * from "./reforms";
+
 export * from "./infrastructure";
 
 export * from "./metrics";
+
+export * from "./missions";
+
+export * from "./approval";
+
+export * from "./preview";
 
 export * from "./endings";
 

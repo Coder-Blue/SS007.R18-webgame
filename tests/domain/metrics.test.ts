@@ -1,134 +1,114 @@
 import { describe, expect, it } from "vitest";
-import { createInitialState } from "../../src/domain/constants";
 import {
   advanceMetrics,
+  citizenTarget,
+  institutionalTarget,
   nextIndustrialOutput,
   nextInflation,
-  nextSatisfaction,
-  nextTrust,
-  reliabilityOf,
-  type MetricContext,
 } from "../../src/domain/metrics";
+import { baseState } from "./test-helpers";
 
-const initial = createInitialState();
+const context = () => {
+  const state = baseState();
 
-const context = (overrides: Partial<MetricContext> = {}): MetricContext => ({
-  previous: initial.metrics,
-  reliability: 100,
-  infrastructure: initial.infrastructure,
-  tariffs: initial.tariffs,
-  market: initial.market,
-  policy: initial.policy,
-  flags: [],
-  industrialOutput: 100,
-  ...overrides,
-});
+  return {
+    previous: state.metrics,
+    reliability: 98,
+    reserveMargin: 25,
+    coverage: 80,
+    averageTariff: 2_450,
+    previousAverageTariff: 2_440,
+    industrialTariff: 1_750,
+    fuelPriceIndex: 1.05,
+    previousFuelPriceIndex: 1,
+    mediaActive: false,
+    branch: state.policy.branch,
+    completedMissions: 1,
+    missionProgress: 60,
+    netResult: -500,
+    debt: 40_000,
+    policy: state.policy,
+  };
+};
 
 describe("metrics", () => {
-  it("computes reliability and handles empty demand", () => {
-    expect(reliabilityOf(90, 100)).toBe(90);
-    expect(reliabilityOf(120, 100)).toBe(100);
-    expect(reliabilityOf(10, 0)).toBe(100);
-    expect(reliabilityOf(0, 100)).toBe(0);
+  it("moves inflation toward tariff and fuel pressure", () => {
+    expect(nextInflation(3, 2_500, 0, 1, 1, 0.55)).toBeGreaterThan(3);
+    expect(nextInflation(3, 2_400, 2_400, 1, 1, 0.55)).toBeLessThan(20);
+    expect(nextInflation(29, 2_400, 2_400, 1, 1, 0.55)).toBeLessThanOrEqual(30);
   });
 
-  it("smooths inflation from tariff and rice changes", () => {
-    const steady = nextInflation(3, 10.58, 10.58, 12, 12, 0.55);
-    expect(steady).toBeCloseTo(3);
-    const raised = nextInflation(3, 12, 10, 14, 12, 0.8);
-    expect(raised).toBeGreaterThan(3);
-    const unknownBase = nextInflation(3, 10, 0, 12, 0, 0.55);
-    expect(unknownBase).toBe(3);
-  });
+  it("grows industrial output with reliability and reforms", () => {
+    const state = baseState();
 
-  it("grows industrial output with cheap tariff and reliability", () => {
-    const cheap = nextIndustrialOutput(100, 100, 7, initial.policy, 3);
-    const expensive = nextIndustrialOutput(100, 90, 9, initial.policy, 10);
-    expect(cheap).toBeGreaterThan(100);
-    expect(expensive).toBeLessThan(100);
-    expect(nextIndustrialOutput(170, 100, 6, initial.policy, 2)).toBeLessThanOrEqual(175);
-  });
-
-  it("adds reform pull and inflation drag", () => {
-    const reform = {
-      ...initial.policy,
-      dppa: true,
-      vrem: true,
-      nsmo: true,
-    };
-
-    const withReform = nextIndustrialOutput(100, 100, 7.4, reform, 3);
-    const without = nextIndustrialOutput(100, 100, 7.4, initial.policy, 3);
-    expect(withReform).toBeGreaterThan(without);
-    expect(nextIndustrialOutput(100, 100, 7.4, initial.policy, 12)).toBeLessThan(
-      nextIndustrialOutput(100, 100, 7.4, initial.policy, 3),
-    );
-  });
-
-  it("computes satisfaction from coverage, tariff and flags", () => {
-    const base = nextSatisfaction(context());
-
-    const universal = nextSatisfaction(
-      context({
-        infrastructure: { ...initial.infrastructure, coverage: 100, remoteCoverage: 100 },
-      }),
-    );
-
-    const strained = nextSatisfaction(
-      context({
-        reliability: 60,
-        tariffs: { ...initial.tariffs, tiers: [9.4, 11.8, 15.4, 19.5], workshop: 9.2 },
-        flags: ["bribe_accepted"],
-      }),
-    );
-
-    expect(universal).toBeGreaterThan(base);
-    expect(strained).toBeLessThan(base);
+    expect(nextIndustrialOutput(100, 100, 1_700, state.policy, 4)).toBeGreaterThan(100);
+    expect(nextIndustrialOutput(100, 80, 1_900, state.policy, 9)).toBeLessThan(100);
+    expect(nextIndustrialOutput(60, 100, 1_700, state.policy, 4)).toBeGreaterThanOrEqual(55);
     expect(
-      nextSatisfaction(context({ policy: { ...initial.policy, antiSmuggling: true } })),
-    ).toBeGreaterThan(base);
-    expect(nextSatisfaction(context({ flags: ["farmers_helped"] }))).toBeGreaterThan(base);
+      nextIndustrialOutput(
+        160,
+        100,
+        1_700,
+        { ...state.policy, dppa: true, vrem: true, nsmo: true },
+        4,
+      ),
+    ).toBeLessThanOrEqual(165);
   });
 
-  it("computes trust from reforms, debate and scandals", () => {
-    const base = nextTrust({ ...context(), metricsDebate: 50 }, 4);
+  it("derives trust targets from service and legitimacy", () => {
+    const ctx = context();
 
-    const reformed = nextTrust(
-      {
-        ...context({
-          policy: {
-            ...initial.policy,
-            n2Enabled: true,
-            nsmo: true,
-            dppa: true,
-            vrem: true,
-          },
-        }),
-        metricsDebate: 80,
-      },
-      4,
-    );
-
-    const scandal = nextTrust(
-      {
-        ...context({
-          flags: ["bribe_accepted", "smuggling_rampant", "privatization_accepted"],
-        }),
-        metricsDebate: 20,
-      },
-      10,
-    );
-
-    expect(reformed).toBeGreaterThan(base);
-    expect(scandal).toBeLessThan(base);
-    expect(nextTrust({ ...context(), metricsDebate: 50 }, 20)).toBeLessThan(base);
+    expect(citizenTarget(ctx, 4)).toBeGreaterThan(0);
+    expect(citizenTarget({ ...ctx, reliability: 0 }, 30)).toBe(0);
+    expect(institutionalTarget(ctx, 4)).toBeGreaterThan(0);
+    expect(
+      institutionalTarget(
+        { ...ctx, coverage: 0, debt: 200_000, netResult: -5_000, reliability: 0 },
+        30,
+      ),
+    ).toBe(0);
   });
 
-  it("composes the monthly metric step", () => {
-    const step = advanceMetrics(context(), 10.58, 12);
-    expect(step.averageTariff).toBeCloseTo(10.58);
-    expect(step.metrics.reliability).toBe(100);
-    expect(step.metrics.industrialOutput).toBeGreaterThan(100);
-    expect(step.metrics.trust).toBeGreaterThan(0);
+  it("advances trust with media and private-branch decay", () => {
+    const step = advanceMetrics(context());
+
+    expect(step.metrics.reliability).toBe(98);
+    expect(step.metrics.reserveMargin).toBe(25);
+    expect(step.metrics.inflation).toBeGreaterThan(0);
+
+    const media = advanceMetrics({ ...context(), mediaActive: true });
+    const privateBranch = advanceMetrics({ ...context(), branch: "private" });
+
+    expect(media.metrics.citizenTrust).toBeLessThan(step.metrics.citizenTrust);
+    expect(privateBranch.metrics.citizenTrust).toBeLessThan(step.metrics.citizenTrust);
+  });
+
+  it("clamps trust at zero and one hundred", () => {
+    const low = advanceMetrics({
+      ...context(),
+      previous: { ...baseState().metrics, citizenTrust: 0, institutionalTrust: 0 },
+      reliability: 0,
+      reserveMargin: 0,
+      coverage: 0,
+      mediaActive: true,
+      branch: "private",
+      netResult: -5_000,
+      debt: 200_000,
+    });
+
+    expect(low.metrics.citizenTrust).toBe(0);
+    expect(low.metrics.institutionalTrust).toBe(0);
+
+    const high = advanceMetrics({
+      ...context(),
+      previous: { ...baseState().metrics, citizenTrust: 100, institutionalTrust: 100 },
+      reliability: 110,
+      coverage: 120,
+      completedMissions: 3,
+      netResult: 10_000,
+    });
+
+    expect(high.metrics.citizenTrust).toBeLessThanOrEqual(100);
+    expect(high.metrics.institutionalTrust).toBeLessThanOrEqual(100);
   });
 });

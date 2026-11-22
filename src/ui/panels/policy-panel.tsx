@@ -1,255 +1,285 @@
-import { createSignal, createTrackedEffect, Show } from "solid-js";
+import { For, Show, createSignal, createTrackedEffect } from "solid-js";
 import type { JSX } from "@solidjs/web";
-import {
-  Slider,
-  SliderControl,
-  SliderIndicator,
-  SliderThumb,
-  SliderTrack,
-} from "@ui-sdk/solid/slider";
 import { useGame } from "../game-context";
-import { ActionButton, Badge, Bar, Panel, Stat } from "../components/base";
+import { ActionButton, Badge, Bar, Panel, RangeSlider, Stat } from "../components/base";
 import { Icon } from "../components/icons";
 import { formatBillion, formatPercent } from "~/state/format";
-import { N2_RATE_MAX, N2_RATE_MIN, recoveryFor } from "~/domain";
+import {
+  DECISIONS,
+  RECOVERY_RATE_MAX,
+  RECOVERY_RATE_MIN,
+  missionStatus,
+  recoveryOf,
+  type DecisionId,
+} from "~/domain";
+
+const decisionNames: Readonly<Record<DecisionId, string>> = {
+  "keep-fuel": "Tiếp tục nhập nhiên liệu",
+  "cut-staff": "Cắt giảm nhân sự, bộ phận",
+  "max-hydro": "Tăng sản lượng thủy điện",
+  "policy-petition": "Kiến nghị thay đổi chính sách giá",
+  "negotiate-fuel": "Đàm phán hợp đồng nhiên liệu",
+  "save-power": "Tuyên truyền tiết kiệm điện",
+  "shift-industry": "Dịch chuyển giờ công nghiệp",
+  "load-shed": "Cắt điện luân phiên",
+  "fossil-ramp": "Huy động nguồn hóa thạch",
+  "grid-maintenance": "Bảo trì, chống quá tải",
+};
+
+const decisionNotes: Readonly<Record<DecisionId, string>> = {
+  "keep-fuel": "Giữ nhiệt điện nền, chấp nhận chi phí nhiên liệu cao.",
+  "cut-staff": "Giảm chi phí quản lý nhưng mất tín nhiệm thể chế.",
+  "max-hydro": "Dùng nước rẻ trước mùa khô, hồ chứa xuống nhanh.",
+  "policy-petition": "Mở một điều kiện tiên quyết cho cải cách giá.",
+  "negotiate-fuel": "Đàm phán dài hạn để giảm cú sốc nhiên liệu sau này.",
+  "save-power": "Giảm phụ tải đỉnh bằng truyền thông tiết kiệm.",
+  "shift-industry": "Dời giờ sản xuất ra ngoài cao điểm, ảnh hưởng niềm tin.",
+  "load-shed": "Cắt điện luân phiên để giữ lưới, mất niềm tin dân.",
+  "fossil-ramp": "Tăng công suất nhiệt, đẩy lạm phát.",
+  "grid-maintenance": "Củng cố lưới, giảm rủi ro quá tải.",
+};
+
+const reforms = [
+  {
+    key: "n2",
+    name: "N-2 · Thu hồi chi phí kiểm toán",
+    detail: "Chỉ sau kiến nghị chính sách và từ 2024.",
+  },
+  { key: "nsmo", name: "NSMO · Tách điều độ hệ thống", detail: "Trung tâm điều độ độc lập." },
+  {
+    key: "dppa",
+    name: "DPPA · Hợp đồng mua bán trực tiếp",
+    detail: "Nối nguồn tái tạo tư nhân vào khu công nghiệp.",
+  },
+  {
+    key: "vrem",
+    name: "VREM · Thị trường bán lẻ cạnh tranh",
+    detail: "Lộ trình bán lẻ điện cạnh tranh.",
+  },
+  { key: "twoPart", name: "Biểu giá hai thành phần", detail: "Tách công suất và điện năng." },
+] as const;
 
 export const PolicyPanel = (): JSX.Element => {
   const { store, actions } = useGame();
   const state = store.state;
   const [rate, setRate] = createSignal(state().policy.n2Rate);
+  const recovery = () => recoveryOf(state().finance, state().clock.year, state().policy);
+
   createTrackedEffect(() => {
     setRate(state().policy.n2Rate);
   });
-  const canN2 = () => state().clock.year >= 2024;
-  const preview = () => recoveryFor(state().finance, state().clock.year, rate(), true);
 
-  const reforms = [
-    {
-      key: "nsmo" as const,
-      label: "Tách NSMO",
-      desc: "Tách điều độ khỏi công ty để tăng tính trung lập.",
-      enabled: () => state().policy.nsmo,
-      action: () => actions.enableNsmo(),
-      cost: 250,
-      icon: "lucide:zap" as const,
-    },
-    {
-      key: "dppa" as const,
-      label: "DPPA",
-      desc: "Cho xưởng mua trực tiếp từ nông trại, trả phí đường.",
-      enabled: () => state().policy.dppa,
-      action: () => actions.enableDppa(),
-      cost: 400,
-      icon: "lucide:leaf" as const,
-    },
-    {
-      key: "vrem" as const,
-      label: "VREM",
-      desc: "Thí điểm bán lẻ cạnh tranh trên hạ tầng chung.",
-      enabled: () => state().policy.vrem,
-      action: () => actions.enableVrem(),
-      cost: 350,
-      icon: "lucide:scale" as const,
-    },
-  ];
+  const isActive = (id: DecisionId): boolean =>
+    state().operations.projects.some(
+      (project) => project.kind === "decision" && project.targetId === id,
+    );
 
   return (
     <div class="stack-lg">
-      <Panel
-        title="Quyết định 05/2024 và cải cách"
-        kicker="Quyết định 05/2024, NSMO, DPPA và VREM."
-        icon="lucide:landmark"
-      >
-        <div class="policy-hero">
-          <div>
-            <p class="eyebrow">Điểm tranh luận công khai</p>
-            <strong class="big-number">{Math.round(state().metrics.debateScore)}</strong>
-            <Bar
-              value={state().metrics.debateScore}
-              tone="gold"
-              label="Điểm tranh luận công khai"
-            />
-            <p class="muted">
-              Điểm cao giúp giữ được mô hình độc quyền tự nhiên trước áp lực tư nhân hóa.
-            </p>
-          </div>
-          <div class="policy-role-card">
-            <Icon icon="lucide:landmark" size={26} />
-            <strong>Vai trò và trách nhiệm</strong>
-            <p>
-              Bạn là EVN của làng: vừa phải giữ an sinh, vừa phải trả nợ, vừa phải chuẩn bị cho thị
-              trường cạnh tranh.
-            </p>
-          </div>
+      <Panel title="Nhiệm vụ dài hạn" kicker="Tín nhiệm là phần thưởng" icon="tabler:target">
+        <div class="goal-list">
+          <For each={missionStatus(state())}>
+            {(mission) => (
+              <div class="goal" data-done={mission.done ? "true" : "false"}>
+                <span class="goal-check">
+                  <Icon icon={mission.done ? "lucide:check" : "lucide:clock"} size={15} />
+                </span>
+                <div>
+                  <strong>
+                    {mission.id === "electrification"
+                      ? "Phủ điện đến mọi khu vực"
+                      : mission.id === "market"
+                        ? "Điều hành thị trường điện hợp lý"
+                        : "Đảm bảo an ninh năng lượng"}
+                  </strong>
+                  <span>{mission.detail}</span>
+                </div>
+                <Bar
+                  value={mission.progress}
+                  tone={mission.done ? "good" : "electric"}
+                  label={mission.id}
+                />
+              </div>
+            )}
+          </For>
         </div>
       </Panel>
 
       <Panel
-        title="Thu hồi chi phí N-2"
-        kicker={canN2() ? "Ban hành" : "Chưa đủ dữ liệu N-2"}
-        icon="lucide:scale"
+        title="Quyết định sau sự kiện"
+        kicker={`${state().events.decisions.length} quyết định đã mở`}
+        icon="tabler:checklist"
       >
-        <div class="policy-row">
-          <div>
-            <h4>Thu hồi chi phí N-2</h4>
-            <p class="muted">
-              Đưa khoản lỗ kiểm toán của hai năm trước vào trần giá hiện tại. Chỉ mở từ 2024.
+        <Show
+          when={state().events.decisions.length > 0}
+          fallback={
+            <p class="rail-note">
+              <Icon icon="lucide:clock" size={14} />
+              Các quyết định mở khóa sau sự kiện nhiên liệu 2022 và hạn hán 2023.
             </p>
-            <Show when={!canN2()}>
-              <Badge tone="warn">Chính sách này chỉ mở từ năm 2024.</Badge>
-            </Show>
+          }
+        >
+          <div class="decision-list">
+            <For each={state().events.decisions}>
+              {(id) => {
+                const definition = DECISIONS.find((row) => row.id === id);
+                const completed = state().events.completedDecisions.includes(id);
+
+                return (
+                  <div class="decision-card" data-completed={completed ? "true" : "false"}>
+                    <div class="decision-head">
+                      <strong>{decisionNames[id]}</strong>
+                      <Badge tone={completed ? "good" : isActive(id) ? "electric" : "neutral"}>
+                        {completed ? "Hoàn tất" : isActive(id) ? "Đang chạy" : "Sẵn sàng"}
+                      </Badge>
+                    </div>
+                    <p>{decisionNotes[id]}</p>
+                    <div class="decision-meta">
+                      <span>
+                        <Icon icon="lucide:timer" size={14} />
+                        {definition?.months ?? 0} tháng
+                      </span>
+                      <span>
+                        <Icon icon="lucide:coins" size={14} />
+                        {formatBillion(definition?.cost ?? 0)}
+                      </span>
+                    </div>
+                    <ActionButton
+                      size="sm"
+                      variant="secondary"
+                      icon={completed ? "lucide:check" : "lucide:play"}
+                      disabled={
+                        completed || isActive(id) || state().operations.projects.length >= 3
+                      }
+                      onClick={() => actions.startDecision(id)}
+                    >
+                      {completed ? "Đã thực hiện" : isActive(id) ? "Đang thực hiện" : "Bắt đầu"}
+                    </ActionButton>
+                  </div>
+                );
+              }}
+            </For>
           </div>
-          <ActionButton
-            variant="gold"
-            disabled={!canN2() || state().policy.n2Enabled}
-            onClick={() => actions.enactRecovery()}
-          >
-            {state().policy.n2Enabled ? "Đang áp dụng" : "Ban hành"}
-          </ActionButton>
-        </div>
-        <Show when={state().policy.n2Enabled}>
-          <div class="slider-row">
-            <div class="slider-head">
-              <span>Tỷ lệ thu hồi</span>
-              <strong>{formatPercent(rate() * 100)}</strong>
-            </div>
-            <Slider
-              value={rate()}
-              min={N2_RATE_MIN}
-              max={N2_RATE_MAX}
-              step={0.01}
-              onValueChange={(value) => setRate(Number(value))}
-              aria-label="Tỷ lệ thu hồi"
-            >
-              <SliderControl>
-                <SliderTrack>
-                  <SliderIndicator />
-                  <SliderThumb aria-label="Tỷ lệ thu hồi" />
-                </SliderTrack>
-              </SliderControl>
-            </Slider>
-            <div class="slider-scale">
-              <span>{formatPercent(N2_RATE_MIN * 100)}</span>
-              <span>{formatPercent(N2_RATE_MAX * 100)}</span>
-            </div>
-            <p class="muted">
-              Tỷ lệ cao giúp giảm nợ nhanh nhưng làm lạm phát và tín nhiệm xấu đi.
-            </p>
-          </div>
-          <div class="stat-grid">
-            <Stat
-              label="Lỗ N-2 đủ điều kiện"
-              value={formatBillion(preview().eligibleLoss)}
-              icon="lucide:scale"
-            />
-            <Stat
-              label="Thu hồi tháng này"
-              value={formatBillion(preview().monthlyCredit)}
-              tone="good"
-              icon="lucide:coins"
-            />
-            <Stat
-              label="Còn lại có thể thu hồi"
-              value={formatBillion(preview().remaining)}
-              icon="lucide:clock"
-            />
-            <Stat
-              label="Lạm phát"
-              value={formatPercent(state().metrics.inflation)}
-              tone={state().metrics.inflation > 8 ? "bad" : "warn"}
-              icon="lucide:trending-up"
-            />
-          </div>
-          <ActionButton variant="secondary" onClick={() => actions.setRecoveryRate(rate())}>
-            Áp dụng
-          </ActionButton>
         </Show>
       </Panel>
 
-      <Panel title="Vai trò và trách nhiệm" kicker="Chính sách" icon="lucide:zap">
+      <Panel title="Cải cách cơ cấu" kicker="Luật Điện lực sửa đổi" icon="tabler:gavel">
         <div class="reform-list">
-          {reforms.map((reform) => (
-            <div class="reform-card" data-enabled={reform.enabled()}>
-              <span class="action-icon">
-                <Icon icon={reform.icon} size={18} />
-              </span>
-              <div class="reform-main">
-                <div class="reform-head">
-                  <strong>{reform.label}</strong>
-                  <Badge tone={reform.enabled() ? "good" : "neutral"}>
-                    {reform.enabled() ? "Đang áp dụng" : "Chưa áp dụng"}
-                  </Badge>
+          <For each={reforms}>
+            {(reform) => {
+              const enabled =
+                reform.key === "n2"
+                  ? state().policy.n2Enabled
+                  : reform.key === "nsmo"
+                    ? state().policy.nsmo
+                    : reform.key === "dppa"
+                      ? state().policy.dppa
+                      : reform.key === "vrem"
+                        ? state().policy.vrem
+                        : state().policy.twoPartTariff;
+
+              return (
+                <div class="reform-row" data-enabled={enabled ? "true" : "false"}>
+                  <div>
+                    <strong>{reform.name}</strong>
+                    <span>{reform.detail}</span>
+                  </div>
+                  <div class="reform-actions">
+                    <Badge tone={enabled ? "good" : "neutral"}>
+                      {enabled ? "Đang áp dụng" : "Chưa áp dụng"}
+                    </Badge>
+                    {reform.key === "n2" ? (
+                      <ActionButton
+                        size="sm"
+                        variant="gold"
+                        disabled={enabled}
+                        icon="tabler:report-money"
+                        onClick={actions.enableN2}
+                      >
+                        Ban hành N-2
+                      </ActionButton>
+                    ) : (
+                      <ActionButton
+                        size="sm"
+                        variant="secondary"
+                        disabled={enabled}
+                        icon="tabler:gavel"
+                        onClick={() => actions.enablePolicy(reform.key)}
+                      >
+                        Áp dụng
+                      </ActionButton>
+                    )}
+                  </div>
                 </div>
-                <p class="muted">{reform.desc}</p>
-              </div>
-              <div class="reform-side">
-                <span>{formatBillion(reform.cost)}</span>
-                <ActionButton
-                  size="sm"
-                  variant="secondary"
-                  disabled={reform.enabled()}
-                  onClick={reform.action}
-                >
-                  {reform.enabled() ? "Đang áp dụng" : "Ban hành"}
-                </ActionButton>
-              </div>
-            </div>
-          ))}
-          <div class="reform-card" data-enabled={state().policy.twoPartTariff}>
-            <span class="action-icon">
-              <Icon icon="lucide:gauge" size={18} />
+              );
+            }}
+          </For>
+        </div>
+        <div class="rate-row">
+          <div class="dispatch-head">
+            <span>Tỷ lệ thu hồi N-2</span>
+            <strong>{formatPercent(rate() * 100)}</strong>
+          </div>
+          <RangeSlider
+            value={rate()}
+            min={RECOVERY_RATE_MIN}
+            max={RECOVERY_RATE_MAX}
+            step={0.05}
+            label="Tỷ lệ thu hồi N-2"
+            onInput={(value) => setRate(value)}
+          />
+          <div class="action-row">
+            <ActionButton
+              size="sm"
+              variant="secondary"
+              icon="lucide:check"
+              onClick={() => actions.setRecoveryRate(rate())}
+            >
+              Lưu tỷ lệ
+            </ActionButton>
+            <span class="tier-meta">
+              Thu hồi tháng này: {formatBillion(recovery().monthlyCredit)}
             </span>
-            <div class="reform-main">
-              <div class="reform-head">
-                <strong>Biểu giá hai thành phần</strong>
-                <Badge tone={state().policy.twoPartTariff ? "good" : "neutral"}>
-                  {state().policy.twoPartTariff ? "Đang áp dụng" : "Chưa áp dụng"}
-                </Badge>
-              </div>
-              <p class="muted">Tách phí công suất và phí sử dụng để minh bạch hơn.</p>
-            </div>
-            <div class="reform-side">
-              <span>Miễn phí</span>
-              <ActionButton
-                size="sm"
-                variant="secondary"
-                disabled={state().policy.twoPartTariff || !state().policy.vrem}
-                onClick={() => actions.enableTwoPart()}
-              >
-                {state().policy.vrem ? "Ban hành" : "Cần VREM trước."}
-              </ActionButton>
-            </div>
           </div>
         </div>
+        <Show when={state().policy.branch === "private"}>
+          <div class="callout" data-tone="bad">
+            <Icon icon="tabler:alert-triangle" size={16} />
+            <span>
+              Nhánh tư nhân hóa đã mở. Giá điện mất trần, lưới trùng lặp và niềm tin đang lao dốc.
+              Đây là nhánh giả định dẫn tới thất bại.
+            </span>
+          </div>
+        </Show>
       </Panel>
 
-      <Panel title="Chính sách" kicker="Phân phối" icon="lucide:shield">
-        <div class="policy-actions">
-          <ActionButton
-            variant="secondary"
-            icon="lucide:sparkles"
-            disabled={state().policy.campaignCooldown > 0}
-            onClick={() => actions.invest("campaign")}
-          >
-            Chiến dịch truyền thông
-          </ActionButton>
-          <ActionButton
-            variant="secondary"
-            icon="lucide:shield"
-            disabled={state().policy.antiSmuggling}
-            onClick={() => actions.invest("crackdown")}
-          >
-            Kiểm tra buôn lậu
-          </ActionButton>
-        </div>
-        <p class="muted">Tăng tín nhiệm và hài lòng, nghỉ 6 tháng giữa các chiến dịch.</p>
-        <div class="tag-row">
-          <Badge tone={state().policy.antiSmuggling ? "good" : "warn"}>
-            Chống buôn lậu: {state().policy.antiSmuggling ? "Đang áp dụng" : "Chưa áp dụng"}
-          </Badge>
-          <Badge tone={state().policy.nsmo ? "good" : "neutral"}>NSMO</Badge>
-          <Badge tone={state().policy.dppa ? "good" : "neutral"}>DPPA</Badge>
-          <Badge tone={state().policy.vrem ? "good" : "neutral"}>VREM</Badge>
+      <Panel title="Điều kiện cải cách giá" kicker="Tiền đề chính trị" icon="tabler:file-analytics">
+        <div class="stat-grid">
+          <Stat
+            label="Kiến nghị chính sách"
+            value={state().policy.petitionDone ? "Đã hoàn tất" : "Chưa có"}
+            tone={state().policy.petitionDone ? "good" : "warn"}
+            icon="lucide:file-text"
+          />
+          <Stat
+            label="Năm hiện tại"
+            value={`${state().clock.year}`}
+            hint="N-2 mở từ 2024"
+            icon="lucide:calendar"
+          />
+          <Stat
+            label="Nhánh"
+            value={state().policy.branch === "state" ? "Nhà nước" : "Tư nhân hóa"}
+            tone={state().policy.branch === "state" ? "good" : "bad"}
+            icon="tabler:route"
+          />
+          <Stat
+            label="Giá trần"
+            value={formatPercent(state().policy.priceCap ? 100 : 0)}
+            hint={state().policy.priceCap ? "Đang giữ trần bán lẻ" : "Trần đã bị bãi bỏ"}
+            tone={state().policy.priceCap ? "good" : "bad"}
+            icon="tabler:shield-check"
+          />
         </div>
       </Panel>
     </div>

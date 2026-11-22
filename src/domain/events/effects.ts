@@ -1,52 +1,96 @@
-import type { GameState, Policy } from "../types";
+import type { DecisionId, EventEffects, GameState, PolicyKey, Zone } from "../types";
 import { clamp } from "../clock";
+import { DECISIONS } from "../constants";
 
-export const applyCashDebt = (
-  state: GameState,
-  cashDelta: number,
-  debtDelta: number,
-): GameState => {
-  const cash = state.finance.cash + cashDelta;
-  const borrowed = cash < 0 ? -cash : 0;
+const unique = <T>(items: readonly T[], additions: readonly T[]): readonly T[] => {
+  const seen = new Set(items);
+
+  for (const item of additions) seen.add(item);
+
+  return [...seen];
+};
+
+const applyPolicy = (state: GameState, keys: readonly PolicyKey[]): GameState["policy"] => ({
+  ...state.policy,
+  n2Enabled: state.policy.n2Enabled || keys.includes("n2"),
+  nsmo: state.policy.nsmo || keys.includes("nsmo"),
+  dppa: state.policy.dppa || keys.includes("dppa"),
+  vrem: state.policy.vrem || keys.includes("vrem"),
+  twoPartTariff: state.policy.twoPartTariff || keys.includes("twoPart"),
+});
+
+const shiftZone = (zone: Zone, amount: number): Zone => ({
+  ...zone,
+  coverage: clamp(zone.coverage + amount, 0, 100),
+});
+
+export const applyEffects = (state: GameState, effects: EventEffects): GameState => ({
+  ...state,
+  market: {
+    ...state.market,
+    fuelPriceIndex: clamp(state.market.fuelPriceIndex + effects.fuelPriceDelta, 0.5, 3),
+    demandIndex: clamp(state.market.demandIndex + effects.demandDelta, 0.4, 1.6),
+  },
+  generation: {
+    ...state.generation,
+    reservoir: clamp(state.generation.reservoir + effects.reservoirDelta, 0, 100),
+    hydroCapacityMw: Math.max(0, state.generation.hydroCapacityMw + effects.hydroCapacityDelta),
+    thermalCapacityMw: Math.max(
+      0,
+      state.generation.thermalCapacityMw + effects.thermalCapacityDelta,
+    ),
+    renewableCapacityMw: Math.max(
+      0,
+      state.generation.renewableCapacityMw + effects.renewableCapacityDelta,
+    ),
+  },
+  zones: {
+    urban: shiftZone(state.zones.urban, effects.coverageDelta),
+    industrial: shiftZone(state.zones.industrial, effects.coverageDelta),
+    rural: shiftZone(state.zones.rural, effects.coverageDelta),
+  },
+  finance: {
+    ...state.finance,
+    cash: state.finance.cash + effects.cashDelta,
+    debt: Math.max(0, state.finance.debt + effects.debtDelta),
+  },
+  metrics: {
+    ...state.metrics,
+    citizenTrust: clamp(state.metrics.citizenTrust + effects.citizenTrustDelta, 0, 100),
+    institutionalTrust: clamp(
+      state.metrics.institutionalTrust + effects.institutionalTrustDelta,
+      0,
+      100,
+    ),
+    inflation: clamp(state.metrics.inflation + effects.inflationDelta, 0, 30),
+  },
+  media: {
+    ...state.media,
+    activeMonths: Math.max(state.media.activeMonths, effects.mediaMonths),
+  },
+  policy: {
+    ...applyPolicy(state, effects.enablePolicy),
+    branch: effects.setBranch ?? state.policy.branch,
+    priceCap: effects.disablePriceCap ? false : state.policy.priceCap,
+  },
+  events: {
+    ...state.events,
+    decisions: unique(state.events.decisions, effects.unlockDecisions),
+  },
+});
+
+export const completeDecision = (state: GameState, id: DecisionId): GameState => {
+  const definition = DECISIONS.find((candidate) => candidate.id === id);
+
+  if (definition === undefined) return state;
+  const applied = applyEffects(state, definition.effects);
 
   return {
-    ...state,
-    finance: {
-      ...state.finance,
-      cash: Math.max(0, cash),
-      debt: Math.max(0, state.finance.debt + debtDelta + borrowed),
+    ...applied,
+    events: {
+      ...applied.events,
+      completedDecisions: unique(applied.events.completedDecisions, [id]),
     },
+    policy: id === "policy-petition" ? { ...applied.policy, petitionDone: true } : applied.policy,
   };
 };
-
-export const appendFlags = (
-  flags: readonly string[],
-  additions: readonly string[],
-): readonly string[] => {
-  const merged = [...flags];
-
-  for (const flag of additions) {
-    if (!merged.includes(flag)) merged.push(flag);
-  }
-
-  return merged;
-};
-
-export const applyUnlocks = (
-  policy: Policy,
-  unlocks: readonly ("dppa" | "vrem" | "nsmo" | "antiSmuggling")[],
-  n2Unlock: boolean,
-): Policy => {
-  const next: Policy = {
-    ...policy,
-    dppa: policy.dppa || unlocks.includes("dppa"),
-    vrem: policy.vrem || unlocks.includes("vrem"),
-    nsmo: policy.nsmo || unlocks.includes("nsmo"),
-    antiSmuggling: policy.antiSmuggling || unlocks.includes("antiSmuggling"),
-    n2Enabled: policy.n2Enabled || n2Unlock,
-  };
-
-  return next;
-};
-
-export const clampMetric = (value: number): number => clamp(value, 0, 100);

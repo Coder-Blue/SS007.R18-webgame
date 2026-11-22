@@ -22,11 +22,8 @@ import {
   type SlotId,
 } from "~/state/persistence";
 
-const slotName = (slot: SlotId): string => {
-  if (slot === "autosave") return "Tự động lưu";
-
-  return `Ô ${slot.replace("slot", "")}`;
-};
+const slotName = (slot: SlotId): string =>
+  slot === "autosave" ? "Tự động lưu" : `Ô ${slot.replace("slot", "")}`;
 
 const time = (iso: string): string => {
   try {
@@ -42,7 +39,7 @@ const download = (content: string): void => {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = `doc-quyen-kinh-te-${Date.now()}.json`;
+  anchor.download = `dien-luoi-quoc-gia-${Date.now()}.json`;
   anchor.click();
   URL.revokeObjectURL(url);
 };
@@ -78,7 +75,7 @@ export const SaveMenu = (props: {
   const save = (slot: SlotId): void => {
     if (actions.save(slot)) {
       writeSession({ ...readSession(), activeSlot: slot });
-      props.onNotice("Đã lưu ván chơi.");
+      props.onNotice("Đã lưu nhiệm kỳ.");
       reload();
 
       return;
@@ -90,7 +87,7 @@ export const SaveMenu = (props: {
   const load = (slot: SlotId): void => {
     if (actions.load(slot)) {
       writeSession({ ...readSession(), activeSlot: slot });
-      props.onNotice("Đã tải ván chơi.");
+      props.onNotice("Đã tải nhiệm kỳ.");
       props.onLoaded();
       props.onClose();
 
@@ -126,12 +123,12 @@ export const SaveMenu = (props: {
       <DialogContent class="modal save-modal">
         <div class="save-head">
           <div>
-            <p class="eyebrow">Độc Quyền Kinh Tế</p>
+            <p class="eyebrow">Điều Hành Lưới Điện Quốc Gia</p>
             <DialogTitle class="modal-title">Kho lưu và cài đặt</DialogTitle>
           </div>
           <IconButton icon="lucide:x" label="Đóng" onClick={props.onClose} />
         </div>
-        <DialogDescription class="modal-desc">Ba ô lưu</DialogDescription>
+        <DialogDescription class="modal-desc">Ba ô lưu và một bản tự động.</DialogDescription>
         <div class="slot-list">
           <For each={slots()}>
             {(meta, index) => {
@@ -143,11 +140,13 @@ export const SaveMenu = (props: {
                     <strong>{slotName(slot)}</strong>
                     <Show when={meta !== null} fallback={<span class="muted">Ô trống</span>}>
                       <span>
-                        {`Tháng ${meta!.month}/${meta!.year}`} · {`Lưu lúc ${time(meta!.savedAt)}`}
+                        {`Tháng ${meta?.month ?? 0}/${meta?.year ?? 0}`} ·{" "}
+                        {`Lưu lúc ${time(meta?.savedAt ?? "")}`}
                       </span>
                       <span class="slot-stats">
-                        Dư nợ {Math.round(meta!.debt)} · Tín nhiệm Chairman{" "}
-                        {Math.round(meta!.trust)}%
+                        Nợ {Math.round(meta?.debt ?? 0)} tỷ · Phủ điện{" "}
+                        {Math.round(meta?.coverage ?? 0)}% · Niềm tin dân{" "}
+                        {Math.round(meta?.citizenTrust ?? 0)}%
                       </span>
                     </Show>
                   </div>
@@ -192,10 +191,10 @@ export const SaveMenu = (props: {
             }}
           </For>
         </div>
-        <Show when={autosave()}>
+        <Show when={autosave() !== null}>
           <div class="autosave-row">
             <Badge tone="dark">Tự động lưu</Badge>
-            <span>{`Tháng ${autosave()!.month}/${autosave()!.year}`}</span>
+            <span>{`Tháng ${autosave()?.month ?? 0}/${autosave()?.year ?? 0}`}</span>
             <ActionButton size="sm" variant="secondary" onClick={() => load("autosave")}>
               Tải
             </ActionButton>
@@ -234,7 +233,7 @@ export const SaveMenu = (props: {
                 props.onLoaded();
               }}
             >
-              Ván mới
+              Nhiệm kỳ mới
             </ActionButton>
           </div>
         </div>

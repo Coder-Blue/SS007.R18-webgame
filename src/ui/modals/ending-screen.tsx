@@ -1,155 +1,176 @@
 import type { JSX } from "@solidjs/web";
-import { Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { useGame } from "../game-context";
-import { ActionButton, Badge, Divider, Stat } from "../components/base";
+import { ActionButton, Badge, Panel, Stat } from "../components/base";
 import { Icon } from "../components/icons";
 import { formatBillion, formatPercent } from "~/state/format";
-import { ARCHITECT_DEBT_MAX, type EndingId, type EndingReason } from "~/domain";
+import { missionStatus, type EndingReason } from "~/domain";
 
-const endingCopy = (id: EndingId): string => {
-  if (id === "architect") {
-    return "Bạn giữ được mạng đường chung, phủ tới từng bản xa, đưa lỗ N-2 trở lại trần giá mà không gây sốc, và biến công ty thành trụ cột của một nền kinh tế làng hiện đại. Chairman ghi nhận bạn là người xây nền an ninh quốc gia từ hạ tầng.";
-  }
-
-  if (id === "predator") {
-    return "Ngân quỹ phình ra nhờ giá cao và những thỏa thuận mờ ám. Xưởng vẫn chạy, nhưng hộ nghèo và bản xa ngày càng tụt lại. Bạn thắng về tiền, thua về chính danh.";
-  }
-
-  return "Không thể vừa mua đắt, vừa bán dưới trần, vừa giữ lòng dân. Hệ thống mất cân bằng và Chairman buộc phải cách chức bạn để ổn định làng.";
+const reasonCopy: Readonly<
+  Record<EndingReason, { readonly title: string; readonly body: string }>
+> = {
+  "citizen-trust": {
+    title: "Biểu tình và mất niềm tin",
+    body: "Niềm tin người dân về 0%. Cắt điện luân phiên và hóa đơn không đủ khả năng chi trả đã biến bất mãn thành bất ổn toàn quốc. Chủ tịch đình chỉ nhiệm kỳ.",
+  },
+  "institutional-trust": {
+    title: "Bị cách chức",
+    body: "Tín nhiệm thể chế về 0%. Những khoản lỗ, nợ và scandal điều hành đã bào mòn hoàn toàn sự tín nhiệm của Chủ tịch và Quốc hội.",
+  },
+  debt: {
+    title: "Vỡ nợ",
+    body: "Dư nợ vượt 100.000 tỷ đồng. Tập đoàn mất khả năng thanh toán, các chủ nợ siết tài sản và lưới điện rơi vào trạng thái khẩn cấp.",
+  },
+  privatization: {
+    title: "Lưới điện phân mảnh",
+    body: "Nhánh tư nhân hóa không có cơ chế điều tiết. Các đường dây trùng lặp, giá điện tăng vọt và vùng khó bị cắt điện. An ninh năng lượng quốc gia bị đe dọa.",
+  },
+  blackout: {
+    title: "Sụp đổ hệ thống điện",
+    body: "Độ tin cậy lưới xuống dưới ngưỡng vận hành. Sự cố dây chuyền làm mất điện trên diện rộng, không thể phục hồi trong nhiệm kỳ.",
+  },
+  final: {
+    title: "Hoàn tất nhiệm kỳ",
+    body: "Năm năm điều hành khép lại. Bạn đã giữ được lưới điện vận hành và để lại một hồ sơ cải cách cho giai đoạn phục hồi sau năm 5.",
+  },
 };
 
-const endingTitle = (id: EndingId): string => {
-  if (id === "architect") return "Kiến Trúc Sư An Ninh Quốc Gia";
+const endingTitle = (id: string, reason: EndingReason): string => {
+  if (id === "reformer") return "Nhà cải cách lưới điện";
 
-  if (id === "predator") return "Tư Bản Đỏ Độc Quyền";
+  if (id === "caretaker") return "Người giữ lưới";
 
-  return "Vỡ Trận Thị Trường";
-};
+  if (id === "captured") return "Tập đoàn bị chi phối";
 
-const gradeLabel = (id: EndingId): string => {
-  if (id === "architect") return "Xuất sắc";
+  if (reason === "final") return "Nhiệm kỳ khép lại";
 
-  if (id === "predator") return "Tiêu cực";
-
-  return "Thất bại";
-};
-
-const reasonText = (reason: EndingReason): string => {
-  switch (reason) {
-    case "debt":
-      return "Dư nợ vượt trần cho phép.";
-    case "unrest":
-      return "Bất ổn lan rộng, dân làng nổi giận.";
-    case "deposed":
-      return "Tín nhiệm của Chairman về 0.";
-    case "privatization":
-      return "Tư nhân hóa sớm chia cắt mạng đường và làm sụp hệ thống.";
-    case "california":
-      return "Mô phỏng California 2001 kết thúc bằng vỡ thị trường.";
-    case "texas":
-      return "Mô phỏng Texas 2021 kết thúc bằng khủng hoảng mùa đông.";
-    case "final":
-      return "Nhiệm kỳ kết thúc mà chưa đạt mục tiêu phục hồi.";
-  }
-};
-
-const download = (content: string): void => {
-  if (typeof window === "undefined") return;
-  const blob = new Blob([content], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `doc-quyen-kinh-te-${Date.now()}.json`;
-  anchor.click();
-  URL.revokeObjectURL(url);
+  return "Cách chức & vỡ nợ";
 };
 
 export const EndingScreen = (): JSX.Element => {
   const { store, actions } = useGame();
   const state = store.state;
+  const ending = () => state().ending;
+  const copy = () => (ending() === null ? reasonCopy.final : reasonCopy[ending()!.reason]);
+  const isBad = () => ending()?.id === "collapse" || ending()?.id === "captured";
 
   return (
-    <Show when={state().ending}>
-      {(ending) => (
-        <div
-          class="ending-screen"
-          role="dialog"
-          aria-modal="true"
-          aria-label={endingTitle(ending().id)}
-        >
-          <div class="ending-card">
-            <div class="ending-head">
-              <Badge
-                tone={
-                  ending().id === "architect" ? "good" : ending().id === "predator" ? "gold" : "bad"
-                }
-              >
-                Kết thúc · {gradeLabel(ending().id)}
-              </Badge>
-              <span class="ending-date">
-                {ending().month}/{ending().year}
-              </span>
+    <Show when={ending() !== null}>
+      <div
+        class="ending-overlay"
+        data-tone={isBad() ? "bad" : "good"}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ending-title"
+      >
+        <div class="ending-panel">
+          <div class="ending-head">
+            <Badge tone={isBad() ? "bad" : "good"} pulse={isBad()}>
+              <Icon icon={isBad() ? "tabler:alert-triangle" : "tabler:shield-check"} size={14} />
+              {isBad() ? "Kết thúc thất bại" : "Kết thúc nhiệm kỳ"}
+            </Badge>
+            <h2 id="ending-title">
+              {endingTitle(ending()?.id ?? "caretaker", ending()?.reason ?? "final")}
+            </h2>
+            <p class="ending-reason">{copy().title}</p>
+            <p class="ending-body">{copy().body}</p>
+          </div>
+
+          <div class="ending-stats">
+            <Stat
+              label="Phủ điện"
+              value={formatPercent(
+                (state().zones.urban.coverage +
+                  state().zones.industrial.coverage +
+                  state().zones.rural.coverage) /
+                  3,
+              )}
+              tone="good"
+              icon="lucide:utility-pole"
+            />
+            <Stat
+              label="Niềm tin dân"
+              value={formatPercent(state().metrics.citizenTrust)}
+              tone={state().metrics.citizenTrust > 0 ? "good" : "bad"}
+              icon="tabler:users"
+            />
+            <Stat
+              label="Tín nhiệm"
+              value={formatPercent(state().metrics.institutionalTrust)}
+              tone={state().metrics.institutionalTrust > 0 ? "good" : "bad"}
+              icon="tabler:shield-check"
+            />
+            <Stat
+              label="Dư nợ"
+              value={formatBillion(state().finance.debt)}
+              tone={isBad() ? "bad" : "warn"}
+              icon="tabler:building-bank"
+            />
+          </div>
+
+          <div class="ending-missions">
+            <For each={missionStatus(state())}>
+              {(mission) => (
+                <span class="goal" data-done={mission.done ? "true" : "false"}>
+                  <span class="goal-check">
+                    <Icon icon={mission.done ? "lucide:check" : "lucide:x"} size={14} />
+                  </span>
+                  <strong>
+                    {mission.id === "electrification"
+                      ? "Phủ điện toàn quốc"
+                      : mission.id === "market"
+                        ? "Thị trường điện hợp lý"
+                        : "An ninh năng lượng"}
+                  </strong>
+                </span>
+              )}
+            </For>
+          </div>
+
+          <Panel title="Dấu chân nhiệm kỳ" kicker="Số liệu cuối" icon="tabler:file-analytics">
+            <div class="ending-table">
+              <div>
+                <span>Kết quả lũy kế</span>
+                <strong>
+                  {formatBillion(
+                    state().finance.monthlyHistory.reduce((sum, row) => sum + row.netResult, 0),
+                  )}
+                </strong>
+              </div>
+              <div>
+                <span>Lỗ lũy kế</span>
+                <strong>{formatBillion(state().finance.accumulatedLoss)}</strong>
+              </div>
+              <div>
+                <span>Số tháng điều hành</span>
+                <strong>{state().finance.monthlyHistory.length}</strong>
+              </div>
+              <div>
+                <span>Nhánh</span>
+                <strong>
+                  {state().policy.branch === "state" ? "Nhà nước cải cách" : "Tư nhân hóa"}
+                </strong>
+              </div>
             </div>
-            <h1>{endingTitle(ending().id)}</h1>
-            <p class="ending-body">{endingCopy(ending().id)}</p>
-            <p class="ending-reason">{reasonText(ending().reason)}</p>
-            <Divider />
-            <div class="stat-grid">
-              <Stat
-                label="Dư nợ cuối kỳ"
-                value={formatBillion(state().finance.debt)}
-                tone={state().finance.debt <= ARCHITECT_DEBT_MAX ? "good" : "bad"}
-                icon="lucide:landmark"
-              />
-              <Stat
-                label="Ngân quỹ cuối kỳ"
-                value={formatBillion(state().finance.cash)}
-                tone="gold"
-                icon="lucide:wallet"
-              />
-              <Stat
-                label="Bao phủ cuối kỳ"
-                value={formatPercent(state().infrastructure.coverage)}
-                tone={state().infrastructure.coverage >= 100 ? "good" : "warn"}
-                icon="lucide:road"
-              />
-              <Stat
-                label="Tín nhiệm cuối kỳ"
-                value={formatPercent(state().metrics.trust)}
-                tone={state().metrics.trust >= 55 ? "good" : "bad"}
-                icon="lucide:shield"
-              />
-              <Stat
-                label="Hài lòng cuối kỳ"
-                value={formatPercent(state().metrics.satisfaction)}
-                tone={state().metrics.satisfaction >= 55 ? "good" : "bad"}
-                icon="lucide:users"
-              />
-              <Stat
-                label="Lạm phát"
-                value={formatPercent(state().metrics.inflation)}
-                tone={state().metrics.inflation <= 8 ? "good" : "bad"}
-                icon="lucide:trending-up"
-              />
-            </div>
-            <div class="ending-actions">
-              <ActionButton variant="gold" icon="lucide:play" onClick={() => actions.newGame()}>
-                Chơi lại từ đầu
-              </ActionButton>
-              <ActionButton
-                variant="secondary"
-                icon="lucide:download"
-                onClick={() => download(actions.exportJson())}
-              >
-                Xuất dữ liệu ván chơi
-              </ActionButton>
-            </div>
-            <p class="modal-hint">
-              <Icon icon="lucide:info" size={14} /> Tổng kết nhiệm kỳ
-            </p>
+          </Panel>
+
+          <p class="ending-footnote">
+            {ending()?.id === "reformer"
+              ? "Chế độ phục hồi sau năm 5 được mở: N-2, DPPA và VREM tiếp tục trả dần khoản lỗ cấu trúc."
+              : "Kết quả này được lưu vào hồ sơ nhiệm kỳ. Chơi lại để thử một chiến lược khác."}
+          </p>
+
+          <div class="ending-actions">
+            <ActionButton
+              variant="primary"
+              icon="lucide:rotate-ccw"
+              onClick={() => actions.newGame()}
+            >
+              Nhiệm kỳ mới
+            </ActionButton>
           </div>
         </div>
-      )}
+      </div>
     </Show>
   );
 };

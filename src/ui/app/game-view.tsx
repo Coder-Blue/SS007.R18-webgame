@@ -1,53 +1,61 @@
-import { createSignal } from "solid-js";
 import type { JSX } from "@solidjs/web";
-import { VillageCanvas } from "../scene/village-canvas";
+import { PowerCanvas } from "../scene/power-canvas";
 import { TopBar } from "../hud/top-bar";
-import { LeftDock, RightDock } from "../hud/desktop-dock";
-import { BottomDock } from "../hud/desktop-bottom";
+import { MissionRail } from "../hud/mission-rail";
+import { OpsRail } from "../hud/ops-rail";
+import { BottomDock } from "../hud/bottom-dock";
 import { MobileNav, type PanelId } from "../mobile/mobile-nav";
-import { WorkspaceModal } from "../modals/workspace-modal";
+import { WorkspaceDrawer } from "../modals/workspace-drawer";
 import { EventModal } from "../modals/event-modal";
+import { ApprovalModal } from "../modals/approval-modal";
 import { EndingScreen } from "../modals/ending-screen";
-import type { SceneSelection } from "~/scene/create-village-scene";
+import { MonthlyReport, SummaryModal } from "../modals/monthly-report";
+import type { SceneSelection } from "~/scene/create-power-scene";
+import { Show } from "solid-js";
+import { useGame } from "../game-context";
+import { Icon } from "../components/icons";
 
-const GameView = (props: {
-  readonly selected: SceneSelection | null;
-  readonly onSelect: (selection: SceneSelection) => void;
-  readonly onClearSelected: () => void;
+export const GameView = (props: {
+  readonly workspaceOpen: boolean;
+  readonly workspacePanel: PanelId;
+  readonly onOpenPanel: (panel: PanelId) => void;
+  readonly onCloseWorkspace: () => void;
   readonly onOpenMenu: () => void;
   readonly onOpenTutorial: () => void;
+  readonly onSelect: (selection: SceneSelection) => void;
 }): JSX.Element => {
-  const [workspaceOpen, setWorkspaceOpen] = createSignal(false);
-  const [workspacePanel, setWorkspacePanel] = createSignal<PanelId>("overview");
-
-  const openPanel = (panel: PanelId): void => {
-    setWorkspacePanel(panel);
-    setWorkspaceOpen(true);
-  };
+  const { store } = useGame();
 
   return (
     <>
-      <VillageCanvas onSelect={props.onSelect} />
-      <h1 class="sr-only">Độc Quyền Kinh Tế</h1>
+      <div class="scene-stage" data-tutorial="scene">
+        <PowerCanvas onSelect={props.onSelect} />
+        <div class="scene-veil" aria-hidden="true" />
+        <Show when={!store.running() && store.state().ending === null}>
+          <div class="paused-banner" data-tutorial="pause">
+            <Icon icon="lucide:pause" size={16} />
+            <span>ĐANG TẠM DỪNG</span>
+            <span class="paused-hint">Space để tiếp tục · 1–3 đổi tốc độ</span>
+          </div>
+        </Show>
+      </div>
+      <h1 class="sr-only">Điều Hành Lưới Điện Quốc Gia</h1>
       <TopBar onOpenMenu={props.onOpenMenu} onOpenTutorial={props.onOpenTutorial} />
-      <LeftDock
-        selected={props.selected}
-        onClearSelected={props.onClearSelected}
-        onOpenPanel={openPanel}
-      />
-      <RightDock onOpenPanel={openPanel} />
-      <BottomDock onOpenPanel={openPanel} />
+      <MissionRail onOpenPanel={props.onOpenPanel} />
+      <OpsRail onOpenPanel={props.onOpenPanel} />
+      <BottomDock onOpenPanel={props.onOpenPanel} />
       <MobileNav />
       <EventModal />
+      <ApprovalModal />
       <EndingScreen />
-      <WorkspaceModal
-        open={workspaceOpen()}
-        panel={workspacePanel()}
-        onPanel={(panel) => setWorkspacePanel(panel)}
-        onClose={() => setWorkspaceOpen(false)}
+      <MonthlyReport />
+      <SummaryModal />
+      <WorkspaceDrawer
+        open={props.workspaceOpen}
+        panel={props.workspacePanel}
+        onPanel={props.onOpenPanel}
+        onClose={props.onCloseWorkspace}
       />
     </>
   );
 };
-
-export default GameView;

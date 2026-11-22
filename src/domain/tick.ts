@@ -1,192 +1,246 @@
-import type { AnnualReport, GameState, MonthlyLedger, Result, TickOutcome } from "./types";
+import type { GameState, MissionId, MonthlyLedger, Project, Result, TickOutcome } from "./types";
 import { err, ok } from "./types";
-import { CEILINGS, MONTHS_PER_YEAR } from "./constants";
+import { ceilingFor, MONTHS_PER_YEAR } from "./constants";
 import { actOf, clamp, nextClock } from "./clock";
-import { advanceMarket, computeDemand, growVillage } from "./market";
-import { computeProduction, fleetCost, roadMaintenanceCost, staffCost } from "./production";
-import { computeRevenue } from "./tariffs";
-import { aggregateAnnual, interestForMonth, pushAnnual, pushLedger, settleDebt } from "./finance";
-import { recoveryFor } from "./recovery";
-import { reformRevenue } from "./reforms";
+import { advanceMarket, peakDemandMw, zoneDemand } from "./market";
+import { computeSupply, dispatchWithinCaps, reserveMargin } from "./production";
+import {
+  aggregateAnnual,
+  interestForMonth,
+  managementCost,
+  pushAnnual,
+  pushLedger,
+  settleDebt,
+  transmissionCost,
+} from "./finance";
+import { advanceProjects } from "./infrastructure";
+import { advanceMissions, missionProgressScore } from "./missions";
 import { advanceMetrics } from "./metrics";
-import { scheduleEvents } from "./events";
+import { recoveryOf } from "./recovery";
+import { reformRevenue } from "./reforms";
+import {
+  averageHouseholdTariff,
+  industrialRevenue,
+  lossFactor,
+  residentialRevenue,
+} from "./tariffs";
+import { scheduleEvent } from "./events/schedule";
 import { withEndingCheck, withFinalCheck } from "./endings";
+
+const lastLedger = (state: GameState): MonthlyLedger | undefined =>
+  state.finance.monthlyHistory[state.finance.monthlyHistory.length - 1];
+
+const privateTariffs = (state: GameState): GameState["tariffs"] => {
+  if (state.policy.priceCap) return state.tariffs;
+  const [t1, t2, t3, t4, t5, t6] = state.tariffs.tiers;
+
+  return {
+    ...state.tariffs,
+    tiers: [t1 * 1.025, t2 * 1.025, t3 * 1.025, t4 * 1.025, t5 * 1.025, t6 * 1.025],
+    industrial: state.tariffs.industrial * 1.02,
+  };
+};
 
 export const advanceMonth = (state: GameState): Result<TickOutcome> => {
   if (state.phase !== "playing") return err("tick.not-playing");
 
   if (state.events.activeId !== null) return err("tick.event-pending");
-  const marketStep = advanceMarket(state.market, state.clock, state.metrics.inflation, state.seed);
+
+  if (state.approval !== null) return err("tick.approval-pending");
+
+  const projectStep = advanceProjects(state);
+  const mediaActive = projectStep.state.media.activeMonths > 0;
+
+  const mediaState = {
+    ...projectStep.state.media,
+    activeMonths: Math.max(0, projectStep.state.media.activeMonths - 1),
+    cooldown: Math.max(0, projectStep.state.media.cooldown - 1),
+  };
+
+  const tariffs = privateTariffs(projectStep.state);
+
+  const marketStep = advanceMarket(
+    projectStep.state.market,
+    projectStep.state.clock.month,
+    projectStep.state.metrics,
+    projectStep.state.seed,
+  );
+
   const market = marketStep.market;
+  const base = { ...projectStep.state, tariffs, market };
+  const demand = zoneDemand(base.zones, market, base.metrics);
+  const dispatch = dispatchWithinCaps(base.operations.dispatch, base.generation, market);
 
-  const demand = computeDemand(
-    state.village,
-    state.infrastructure,
-    market,
-    state.metrics,
-    state.clock,
-  );
+  const supplier =
+    market.suppliers.find((row) => row.id === base.operations.supplierId) ?? market.suppliers[0];
 
-  const production = computeProduction(state.production, market, state.metrics);
-  const availableRice = state.production.riceInventory + production.ownProduction;
-  const purchaseNeed = Math.max(0, demand.total - availableRice);
-  const externalPurchase = Math.min(demand.externalOffer, purchaseNeed);
-  const available = availableRice + externalPurchase;
-  const supplied = Math.min(demand.total, available);
-  const shortage = Math.max(0, demand.total - supplied);
-  const inventoryEnd = Math.min(600, Math.max(0, available - supplied));
-  const servedRatio = demand.total > 0 ? supplied / demand.total : 1;
-  const revenue = computeRevenue(demand.household, demand.workshop, state.tariffs, servedRatio);
+  if (supplier === undefined) return err("market.no-supplier");
+  const supplyStep = computeSupply(base.generation, dispatch, market, supplier.priceVndPerKwh);
+  const servedMw = Math.min(demand.total, supplyStep.supplyMw);
+  const shortageMw = Math.max(0, demand.total - servedMw);
+  const reliability = demand.total > 0 ? (servedMw / demand.total) * 100 : 100;
+  const peak = peakDemandMw(demand.total);
+  const reserve = reserveMargin(base.generation, market, peak, dispatch.importMw);
+  const loss = lossFactor(base.infrastructure.gridStrength);
+  const delivered = (servedMw * 720 * (1 - loss)) / 1_000;
 
-  const recovery = recoveryFor(
-    state.finance,
-    state.clock.year,
-    state.policy.n2Rate,
-    state.policy.n2Enabled,
-  );
+  const residentialShare = demand.total > 0 ? (demand.urban + demand.rural) / demand.total : 1;
 
-  const revenueRecovery = recovery.monthlyCredit;
-  const wheeling = reformRevenue(state.policy, state.village);
-  const costProduction = production.productionCost;
+  const residentialEnergy = delivered * residentialShare;
+  const industrialEnergy = delivered * (1 - residentialShare);
+  const average = averageHouseholdTariff(tariffs);
 
-  const costProcurement =
-    externalPurchase * market.ricePrice * (1 + 0.02 * (market.exchangeRate - 1));
+  const revenueElectricity =
+    residentialRevenue(residentialEnergy, average) +
+    industrialRevenue(industrialEnergy, tariffs.industrial);
 
-  const costRoads = roadMaintenanceCost(
-    state.infrastructure.dirtKm,
-    state.infrastructure.cobbleKm,
-    state.infrastructure.asphaltKm,
-  );
+  const recovery = recoveryOf(base.finance, base.clock.year, base.policy);
+  const wheeling = reformRevenue(base.policy);
+  const revenueOther = recovery.monthlyCredit + wheeling.total;
+  const revenueTotal = revenueElectricity + revenueOther;
+  const generatedEnergy = (supplyStep.output.totalMw * 720) / 1_000;
+  const costSupply = supplyStep.costSupplyVariable + transmissionCost(generatedEnergy);
 
-  const costFleet = fleetCost(state.infrastructure.fleet, market);
-  const costStaff = staffCost(state.village.workshopsThousand);
-  const costInterest = interestForMonth(state.finance.debt, state.finance.interestRate);
+  const capacityMw =
+    base.generation.hydroCapacityMw +
+    base.generation.thermalCapacityMw +
+    base.generation.renewableCapacityMw;
 
-  const costTotal =
-    costProduction + costProcurement + costRoads + costFleet + costStaff + costInterest;
+  const costManagement =
+    managementCost(capacityMw) + interestForMonth(base.finance.debt, base.finance.interestRate);
 
-  const revenueTotal = revenue.total + revenueRecovery + wheeling.total;
+  const costTotal = costManagement + costSupply;
   const netResult = revenueTotal - costTotal;
-  const settled = settleDebt(state.finance.cash, state.finance.debt, netResult);
-  const reliability = demand.total > 0 ? clamp((supplied / demand.total) * 100, 0, 100) : 100;
-  const last = state.finance.monthlyHistory[state.finance.monthlyHistory.length - 1];
+  const settled = settleDebt(base.finance.cash, base.finance.debt, netResult);
 
-  const metricStep = advanceMetrics(
-    {
-      previous: state.metrics,
-      reliability,
-      infrastructure: state.infrastructure,
-      tariffs: state.tariffs,
-      market,
-      policy: state.policy,
-      flags: state.events.flags,
-      industrialOutput: state.metrics.industrialOutput,
+  const accumulatedLoss =
+    netResult < 0
+      ? base.finance.accumulatedLoss - netResult
+      : Math.max(0, base.finance.accumulatedLoss - netResult);
+
+  const missionBase: GameState = {
+    ...base,
+    finance: { ...base.finance, cash: settled.cash, debt: settled.debt },
+    metrics: { ...base.metrics, reliability, reserveMargin: reserve },
+    media: mediaState,
+  };
+
+  const missionStep = advanceMissions(missionBase, reserve, reliability);
+
+  const missionState: GameState = {
+    ...missionBase,
+    missions: {
+      ...missionStep.missions,
+      privateMonths: base.policy.branch === "private" ? base.missions.privateMonths + 1 : 0,
     },
-    last?.tariffAverage ?? 11,
-    last?.ricePrice ?? 12,
-  );
+  };
+
+  const missionBonuses = missionStep.completed.length;
+
+  const previousMetrics = {
+    ...missionState.metrics,
+    citizenTrust: clamp(missionState.metrics.citizenTrust + missionBonuses * 3, 0, 100),
+    institutionalTrust: clamp(missionState.metrics.institutionalTrust + missionBonuses * 6, 0, 100),
+  };
+
+  const metricStep = advanceMetrics({
+    previous: previousMetrics,
+    reliability,
+    reserveMargin: reserve,
+    coverage:
+      (base.zones.urban.coverage + base.zones.industrial.coverage + base.zones.rural.coverage) / 3,
+    averageTariff: average,
+    previousAverageTariff: lastLedger(base)?.averageRetailTariff ?? average,
+    industrialTariff: tariffs.industrial,
+    fuelPriceIndex: market.fuelPriceIndex,
+    previousFuelPriceIndex: projectStep.state.market.fuelPriceIndex,
+    mediaActive,
+    branch: base.policy.branch,
+    completedMissions: missionState.missions.completed.length,
+    missionProgress: missionProgressScore(missionState),
+    netResult,
+    debt: settled.debt,
+    policy: base.policy,
+  });
 
   const ledger: MonthlyLedger = {
-    year: state.clock.year,
-    month: state.clock.month,
-    tick: state.clock.tick,
-    householdDemand: demand.household,
-    workshopDemand: demand.workshop,
-    totalDemand: demand.total,
-    ownProduction: production.ownProduction,
-    externalPurchase,
-    supplied,
-    shortage,
-    reliability,
-    inventoryEnd,
-    revenueHousehold: revenue.household,
-    revenueWorkshop: revenue.workshop,
-    revenueRecovery,
-    revenueWheeling: wheeling.total,
+    year: base.clock.year,
+    month: base.clock.month,
+    tick: base.clock.tick,
+    demandMw: demand.total,
+    connectedDemandMw: demand.total,
+    supplyMw: supplyStep.supplyMw,
+    shortageMw,
+    energySoldMillionKwh: delivered,
+    hydroMillionKwh: supplyStep.output.hydroMillionKwh,
+    thermalMillionKwh: supplyStep.output.thermalMillionKwh,
+    renewableMillionKwh: supplyStep.output.renewableMillionKwh,
+    importMillionKwh: supplyStep.output.importMillionKwh,
+    revenueElectricity,
+    revenueOther,
     revenueTotal,
-    costProduction,
-    costProcurement,
-    costRoads,
-    costFleet,
-    costStaff,
-    costInterest,
+    costManagement,
+    costSupply,
     costTotal,
     netResult,
     cash: settled.cash,
     debt: settled.debt,
-    tariffAverage: metricStep.averageTariff,
-    ricePrice: market.ricePrice,
-    satisfaction: metricStep.metrics.satisfaction,
-    trust: metricStep.metrics.trust,
+    accumulatedLoss,
+    averageRetailTariff: average,
+    industrialTariff: tariffs.industrial,
+    reliability,
+    reserveMargin: reserve,
+    citizenTrust: metricStep.metrics.citizenTrust,
+    institutionalTrust: metricStep.metrics.institutionalTrust,
     inflation: metricStep.metrics.inflation,
-    coverage: state.infrastructure.coverage,
+    coverage:
+      (base.zones.urban.coverage + base.zones.industrial.coverage + base.zones.rural.coverage) / 3,
+    mediaActive,
   };
 
-  const monthlyHistory = pushLedger(state.finance.monthlyHistory, ledger);
+  const monthlyHistory = pushLedger(base.finance.monthlyHistory, ledger);
 
-  const annualHistory = addAnnual(
-    state.finance.annualHistory,
-    state.clock.year,
-    state.clock.month,
-    monthlyHistory,
-  );
+  const annualHistory =
+    base.clock.month === MONTHS_PER_YEAR
+      ? pushAnnual(base.finance.annualHistory, aggregateAnnual(base.clock.year, monthlyHistory))
+      : base.finance.annualHistory;
 
   const nextState: GameState = {
-    ...state,
+    ...missionState,
     seed: marketStep.seed,
     market,
-    production: {
-      ...state.production,
-      riceInventory: inventoryEnd,
-    },
+    tariffs,
+    media: mediaState,
+    metrics: metricStep.metrics,
     finance: {
-      ...state.finance,
+      ...base.finance,
       cash: settled.cash,
       debt: settled.debt,
-      accumulatedLoss: Math.max(
-        0,
-        state.finance.accumulatedLoss +
-          (netResult < 0 ? -netResult : -Math.min(netResult, state.finance.accumulatedLoss)),
-      ),
-      recoveredTotal: state.finance.recoveredTotal + revenueRecovery,
+      accumulatedLoss,
+      recoveredTotal: base.finance.recoveredTotal + recovery.monthlyCredit,
       monthlyHistory,
       annualHistory,
     },
-    metrics: metricStep.metrics,
-    events: {
-      ...state.events,
-      flags: state.events.flags,
-    },
   };
 
-  const notices = buildNotices(nextState, shortage, revenueRecovery);
-  const endedEarly = withEndingCheck(nextState);
+  const notices = buildNotices(nextState, ledger, projectStep.completed, missionStep.completed);
+  const ended = withEndingCheck(nextState);
 
-  if (endedEarly.ending !== null) {
-    return ok({ state: endedEarly, ledger, notices });
+  if (ended.ending !== null) {
+    return ok({ state: ended, ledger, notices });
   }
 
-  const final = withFinalCheck(endedEarly);
-
-  if (final.ending !== null) {
-    return ok({ state: final, ledger, notices });
+  if (base.clock.year === 2026 && base.clock.month === 12) {
+    return ok({ state: withFinalCheck(ended), ledger, notices });
   }
 
-  const next = nextClock(state.clock);
+  const clock = nextClock(base.clock);
 
-  const scheduled = scheduleEvents({
-    ...endedEarly,
-    clock: next,
-    act: actOf(next.year, next.month),
-    village: next.month === 1 ? growVillage(endedEarly.village) : endedEarly.village,
-    tariffs: {
-      ...endedEarly.tariffs,
-      ceiling: CEILINGS[next.year]!,
-    },
-    policy: {
-      ...endedEarly.policy,
-      campaignCooldown: Math.max(0, endedEarly.policy.campaignCooldown - 1),
-    },
+  const scheduled = scheduleEvent({
+    ...ended,
+    clock,
+    act: actOf(clock.year, clock.month),
+    tariffs: { ...ended.tariffs, ceiling: ceilingFor(clock.year) },
   });
 
   return ok({
@@ -199,34 +253,30 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
   });
 };
 
-export const addAnnual = (
-  history: readonly AnnualReport[],
-  year: number,
-  month: number,
-  ledgers: readonly MonthlyLedger[],
-): readonly AnnualReport[] =>
-  month === MONTHS_PER_YEAR ? pushAnnual(history, aggregateAnnual(year, ledgers)) : history;
-
 export const buildNotices = (
   state: GameState,
-  shortage: number,
-  recovery: number,
+  ledger: MonthlyLedger,
+  projects: readonly Project[],
+  missions: readonly MissionId[],
 ): readonly string[] => {
   const notices: string[] = [];
 
-  if (shortage > 0.5) notices.push("notice.shortage");
+  if (ledger.shortageMw > 1) notices.push("notice.shortage");
 
-  if (state.finance.debt > state.finance.debtLimit * 0.8) {
-    notices.push("notice.debt");
-  }
+  if (ledger.reliability < 90) notices.push("notice.blackout");
 
-  if (state.metrics.inflation > 8) notices.push("notice.inflation");
+  if (ledger.reserveMargin < 5) notices.push("notice.reserve");
 
-  if (state.infrastructure.coverage >= 100) notices.push("notice.coverage");
+  if (state.finance.debt > 80_000) notices.push("notice.debt");
 
-  if (recovery > 0) notices.push("notice.recovery");
+  if (ledger.mediaActive) notices.push("notice.media");
 
-  if (state.metrics.satisfaction < 30) notices.push("notice.unrest");
+  if (state.policy.branch === "private") notices.push("notice.privatization");
+
+  for (const mission of missions) notices.push(`notice.mission:${mission}`);
+
+  for (const project of projects)
+    notices.push(`notice.project:${project.kind}:${project.targetId}`);
 
   return notices;
 };

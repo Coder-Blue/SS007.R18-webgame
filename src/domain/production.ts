@@ -1,54 +1,121 @@
-import type { Market, Metrics, Production } from "./types";
-import { fertilizerIndex, fuelIndex } from "./market";
+import type { Dispatch, Generation, Market } from "./types";
+import { clamp } from "./clock";
+import {
+  HOURS_PER_MONTH,
+  HYDRO_VARIABLE_COST,
+  RENEWABLE_PPA_COST,
+  THERMAL_FUEL_COST,
+} from "./constants";
 
-export interface ProductionResult {
-  readonly hydro: number;
-  readonly mechanized: number;
-  readonly ownProduction: number;
-  readonly costPerTonne: number;
-  readonly productionCost: number;
-}
+export type GenerationOutput = {
+  readonly hydroMw: number;
+  readonly thermalMw: number;
+  readonly renewableMw: number;
+  readonly importMw: number;
+  readonly totalMw: number;
+  readonly hydroMillionKwh: number;
+  readonly thermalMillionKwh: number;
+  readonly renewableMillionKwh: number;
+  readonly importMillionKwh: number;
+};
 
-export const productionCostPerTonne = (market: Market, rndLevel: number): number =>
-  8.4 *
-  (0.55 + 0.45 * fertilizerIndex(market)) *
-  (0.8 + 0.2 * fuelIndex(market)) *
-  (1 - 0.02 * rndLevel);
+export type SupplyStep = {
+  readonly output: GenerationOutput;
+  readonly supplyMw: number;
+  readonly reserveMargin: number;
+  readonly costSupplyVariable: number;
+};
 
-export const computeProduction = (
-  production: Production,
+export const availableHydroMw = (generation: Generation): number =>
+  generation.hydroCapacityMw *
+  (generation.reservoir / 100) *
+  (0.72 + generation.maintenance * 0.0035);
+
+export const availableCapacityMw = (
+  generation: Generation,
   market: Market,
-  metrics: Metrics,
-): ProductionResult => {
-  const hydro =
-    production.hydroPaddies * 24 * (1 - 0.55 * market.drought) * (1 + 0.02 * production.rndLevel);
+  importMw: number,
+): number =>
+  availableHydroMw(generation) +
+  generation.thermalCapacityMw +
+  generation.renewableCapacityMw * 0.3 +
+  Math.min(importMw, supplierCapacity(market, importMw));
 
-  const fertilizerFactor = Math.max(0.82, 1 - Math.max(0, fertilizerIndex(market) - 1) * 0.18);
+export const supplierCapacity = (market: Market, requestedMw: number): number => {
+  let remaining = requestedMw;
 
-  const mechanized =
-    production.mechanizedPaddies *
-    30 *
-    (1 + 0.05 * production.irrigationLevel) *
-    (1 + 0.03 * production.rndLevel) *
-    fertilizerFactor *
-    Math.max(0.85, Math.min(1.05, metrics.industrialOutput / 100));
+  for (const supplier of market.suppliers) {
+    remaining -= supplier.capacityMw;
 
-  const costPerTonne = productionCostPerTonne(market, production.rndLevel);
-  const ownProduction = hydro + mechanized;
+    if (remaining <= 0) return requestedMw;
+  }
+
+  return Math.max(0, requestedMw - remaining);
+};
+
+export const reserveMargin = (
+  generation: Generation,
+  market: Market,
+  peakMw: number,
+  importMw: number,
+): number => {
+  if (peakMw <= 0) return 100;
+  const capacity = availableCapacityMw(generation, market, importMw);
+
+  return clamp(((capacity - peakMw) / peakMw) * 100, -100, 200);
+};
+
+export const computeSupply = (
+  generation: Generation,
+  dispatch: Dispatch,
+  market: Market,
+  importPriceVndPerKwh: number,
+): SupplyStep => {
+  const hydro = Math.min(dispatch.hydroMw, availableHydroMw(generation));
+  const thermal = Math.min(dispatch.thermalMw, generation.thermalCapacityMw);
+  const renewable = generation.renewableCapacityMw * market.renewableFactor;
+  const importMw = Math.min(dispatch.importMw, supplierCapacity(market, dispatch.importMw));
+  const totalMw = hydro + thermal + renewable + importMw;
+  const millionKwh = (mw: number): number => (mw * HOURS_PER_MONTH) / 1_000;
+
+  const costSupplyVariable =
+    (millionKwh(hydro) * HYDRO_VARIABLE_COST +
+      millionKwh(thermal) * THERMAL_FUEL_COST * market.fuelPriceIndex +
+      millionKwh(renewable) * RENEWABLE_PPA_COST +
+      millionKwh(importMw) * importPriceVndPerKwh) /
+    1_000;
 
   return {
-    hydro,
-    mechanized,
-    ownProduction,
-    costPerTonne,
-    productionCost: ownProduction * costPerTonne,
+    output: {
+      hydroMw: hydro,
+      thermalMw: thermal,
+      renewableMw: renewable,
+      importMw,
+      totalMw,
+      hydroMillionKwh: millionKwh(hydro),
+      thermalMillionKwh: millionKwh(thermal),
+      renewableMillionKwh: millionKwh(renewable),
+      importMillionKwh: millionKwh(importMw),
+    },
+    supplyMw: totalMw,
+    reserveMargin: reserveMargin(generation, market, 0, importMw),
+    costSupplyVariable,
   };
 };
 
-export const fleetCost = (fleet: number, market: Market): number =>
-  fleet * 0.38 * fuelIndex(market);
+export const dispatchWithinCaps = (
+  dispatch: Dispatch,
+  generation: Generation,
+  market: Market,
+): Dispatch => {
+  const importFleet = market.suppliers.reduce(
+    (total, supplier) => Math.max(total, supplier.capacityMw),
+    0,
+  );
 
-export const roadMaintenanceCost = (dirtKm: number, cobbleKm: number, asphaltKm: number): number =>
-  dirtKm * 0.12 + cobbleKm * 0.28 + asphaltKm * 0.5;
-
-export const staffCost = (workshopsThousand: number): number => 280 + workshopsThousand * 3;
+  return {
+    hydroMw: clamp(dispatch.hydroMw, 0, generation.hydroCapacityMw),
+    thermalMw: clamp(dispatch.thermalMw, 0, generation.thermalCapacityMw),
+    importMw: clamp(dispatch.importMw, 0, importFleet),
+  };
+};

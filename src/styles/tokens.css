@@ -1,100 +1,72 @@
 @theme {
   --font-sans: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
-
-  --color-ink: oklch(23.66% 0.0169 66.86);
-  --color-ink-soft: oklch(45.74% 0.0314 74.3);
-  --color-ink-faint: oklch(48% 0.0351 77.95);
-  --color-paper: oklch(95.68% 0.02 84.59);
-  --color-paper-2: oklch(91.96% 0.032 82.77);
-  --color-paper-3: oklch(88.18% 0.0413 81.69);
-  --color-cream: oklch(98.62% 0.0142 84.58);
-  --color-cream-warm: oklch(98.05% 0.0211 85.94);
-  --color-forest-950: oklch(15.14% 0.0201 156.21);
-  --color-forest-900: oklch(22.68% 0.0341 158.05);
-  --color-forest-800: oklch(29.51% 0.0494 158.07);
-  --color-forest-700: oklch(37% 0.0651 157.59);
-  --color-forest-600: oklch(45.22% 0.0793 157.21);
-  --color-forest-500: oklch(52.94% 0.0894 156.52);
-  --color-forest-400: oklch(57.43% 0.0979 157.85);
-  --color-forest-300: oklch(50.96% 0.0876 157.57);
-  --color-gold: oklch(76.03% 0.1236 82.19);
-  --color-gold-light: oklch(87.9% 0.0976 88.02);
-  --color-gold-dark: oklch(58.81% 0.1078 78.74);
-  --color-gold-ink: oklch(48% 0.11 78.74);
-  --color-gold-deep: oklch(65.08% 0.1171 77.13);
-  --color-rust: oklch(54.09% 0.1441 32.94);
-  --color-rust-dark: oklch(41.52% 0.1165 31.42);
-  --color-teal: oklch(54.3% 0.0649 184.45);
-  --color-outline: oklch(19.39% 0.0246 156.24);
-  --color-line: oklch(23.66% 0.0169 66.86 / 0.14);
-  --color-line-strong: oklch(23.66% 0.0169 66.86 / 0.24);
-
-  --shadow-panel: 0 2px 8px oklch(22.24% 0.0289 150.26 / 0.1);
-  --shadow-lift: 0 14px 36px oklch(19.35% 0.026 153.21 / 0.18);
-  --shadow-deep: 0 30px 80px oklch(15.14% 0.0201 156.21 / 0.34);
 }
 
 :root {
-  --paper: var(--color-paper);
-  --paper-2: var(--color-paper-2);
-  --paper-3: var(--color-paper-3);
-  --ink: var(--color-ink);
-  --ink-soft: var(--color-ink-soft);
-  --ink-faint: var(--color-ink-faint);
-  --forest-900: var(--color-forest-900);
-  --forest-800: var(--color-forest-800);
-  --forest-700: var(--color-forest-700);
-  --forest-600: var(--color-forest-600);
-  --forest-500: var(--color-forest-500);
-  --gold: var(--color-gold);
-  --gold-light: var(--color-gold-light);
-  --gold-dark: var(--color-gold-dark);
-  --gold-ink: var(--color-gold-ink);
-  --red: var(--color-rust);
-  --red-dark: var(--color-rust-dark);
-  --teal: var(--color-teal);
-  --line: var(--color-line);
-  --line-strong: var(--color-line-strong);
-  --shadow-sm: var(--shadow-panel);
-  --shadow: var(--shadow-lift);
-  --shadow-lg: var(--shadow-deep);
-  --radius-sm: 6px;
+  color-scheme: dark;
+  --bg: #07121b;
+  --bg-deep: #040b10;
+  --panel: #0d2029;
+  --panel-2: #102833;
+  --panel-3: #14323d;
+  --line: rgba(137, 199, 214, 0.16);
+  --line-strong: rgba(137, 199, 214, 0.3);
+  --ink: #e7f2f4;
+  --ink-soft: #a8bec4;
+  --ink-faint: #759098;
+  --electric: #39d7ff;
+  --electric-soft: #8fe9ff;
+  --cyan-soft: #58b6c8;
+  --amber: #ffb347;
+  --gold: #f2d06b;
+  --lime: #7ee787;
+  --rose: #ff6b6b;
+  --green: #5bd6a2;
+  --shadow-panel: 0 10px 30px rgba(1, 7, 10, 0.28);
+  --shadow-lift: 0 20px 50px rgba(1, 7, 10, 0.42);
   --radius: 12px;
-  --radius-lg: 16px;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --font-ui: var(--font-sans);
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  color-scheme: light;
+  --radius-sm: 8px;
+  --font: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", ui-monospace, monospace;
 }
 
-*,
-*::before,
-*::after {
-  @apply box-border;
+* {
+  box-sizing: border-box;
 }
 
-html {
-  @apply m-0 h-full p-0;
-  background: var(--color-forest-900);
-  font-size: 16px;
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
 }
 
 body {
-  @apply m-0 h-full p-0 font-sans text-ink;
-  background: var(--color-forest-900);
-  font-size: 15px;
-  line-height: 1.55;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(57, 215, 255, 0.08), transparent 55%), var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-body {
-  @apply overflow-hidden overscroll-none;
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+ul,
+ol {
+  margin: 0;
 }
 
-#app {
-  height: 100dvh;
+ul,
+ol {
+  padding: 0;
+  list-style: none;
 }
 
 button,
@@ -106,101 +78,56 @@ textarea {
 }
 
 button {
-  @apply cursor-pointer;
+  cursor: pointer;
 }
 
 button:disabled {
-  @apply cursor-not-allowed opacity-45;
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 a {
-  @apply text-inherit;
-}
-
-h1,
-h2,
-h3,
-h4,
-p {
-  @apply m-0;
-}
-
-h1,
-h2,
-h3,
-h4,
-strong {
-  @apply font-medium tracking-normal;
-}
-
-ul {
-  @apply m-0 list-none p-0;
-}
-
-::selection {
-  @apply bg-gold text-forest-900;
+  color: var(--electric);
 }
 
 :focus-visible {
-  @apply outline-3 outline-offset-2 outline-forest-900;
+  outline: 2px solid var(--electric);
+  outline-offset: 2px;
 }
 
-.top-bar :focus-visible,
-.bottom-dock :focus-visible,
-.mobile-nav :focus-visible,
-.title-screen :focus-visible,
-.scene-wrap :focus-visible,
-.panel-head :focus-visible {
-  @apply outline-gold-light;
+::selection {
+  background: rgba(57, 215, 255, 0.28);
+  color: var(--ink);
 }
 
-[data-motion="reduced"] *,
-[data-motion="reduced"] *::before,
-[data-motion="reduced"] *::after {
-  animation-duration: 0.001ms !important;
-  transition-duration: 0.001ms !important;
-  scroll-behavior: auto !important;
-}
-
-[data-motion="reduced"] .title-prompt {
-  animation: none !important;
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
-  }
-
-  .title-prompt {
-    animation: none !important;
-    opacity: 1;
-  }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .muted {
-  @apply text-[0.84rem] leading-[1.55] text-ink-soft;
-}
-
-.negative {
-  @apply text-rust!;
+  color: var(--ink-soft);
 }
 
 .eyebrow {
-  @apply text-[0.68rem] font-medium tracking-normal text-ink-soft;
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.stack-lg {
-  @apply flex flex-col gap-[16px];
-}
-
-.desktop-only {
-  @apply flex;
-}
-
-.mobile-only {
-  @apply hidden;
+.tabular-nums,
+.data-table,
+.stat-value,
+.top-gauge strong,
+.summary-trust strong {
+  font-variant-numeric: tabular-nums;
 }

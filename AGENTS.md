@@ -1,11 +1,12 @@
 # AGENTS.md
 
-`SS007.R18-webgame` is **Doc Quyen Kinh Te** (*The Rice Monopoly*), a browser
-game about the political economy of a village rice grid. The village is a
-standing allegory for Vietnam's electricity system: farming is generation,
-exclusive roads are transmission, and price-capped rice retail is distribution.
-The player runs the state-backed rice corporation for five years while the
-Chairman enforces universal service and retail ceilings.
+`SS007.R18-webgame` is **Dieu Hanh Luoi Dien Quoc Gia** (*National Grid
+Command*), a browser game about the political economy of Vietnam's electricity
+system. Generation and competitive procurement are upstream, 500kV/220kV
+transmission is the exclusive middle, and six-tier price-capped retail is
+distribution. The player runs the state-backed power corporation for 60 months
+while the State enforces universal service, reserve margins and retail
+ceilings.
 
 The repo is the source of truth for the game, not for the target document.
 `TARGET.md` records the brief. `AGENTS.md`, `CODEBASE.md`, and the config files
@@ -83,6 +84,10 @@ Valibot.
   events keep their keys, and the event modal resolves them through a
   component-local Vietnamese copy map. Code, identifiers, docs, and commits are
   English. The UI must render correctly with Be Vietnam Pro.
+- **RTS controls.** Pause/resume and 1x/2x/3x speeds are first-class. Active
+  pause halts every simulation tick and scene animation while command actions
+  remain interactive. Big events, State approvals and summary modals auto-pause
+  and restore the previous speed.
 - **Responsive parity.** Verify `390x844` and `1440x900` and a `360px` narrow
   viewport. Touch targets are at least 44x44 px. The 3D canvas uses
   `touch-action: none` and both mouse and touch camera controls.

@@ -1,67 +1,82 @@
 import { describe, expect, it } from "vitest";
 import {
   averageHouseholdTariff,
-  computeRevenue,
-  tariffBurden,
+  averageOfTiers,
+  industrialRevenue,
+  lossFactor,
+  residentialRevenue,
+  tariffChangePct,
   validateTariffs,
-  withCeiling,
 } from "../../src/domain/tariffs";
 import { INITIAL_TARIFFS } from "../../src/domain/constants";
-import type { TariffTiers } from "../../src/domain/types";
-
-const tiers: readonly [number, number, number, number] = [8, 10, 12, 15];
 
 describe("tariffs", () => {
-  it("weights the four progressive tiers", () => {
-    expect(averageHouseholdTariff(INITIAL_TARIFFS)).toBeCloseTo(10.58, 2);
-    expect(averageHouseholdTariff({ ...INITIAL_TARIFFS, tiers })).toBeCloseTo(
-      8 * 0.45 + 10 * 0.28 + 12 * 0.18 + 15 * 0.09,
+  it("weights the six progressive tiers", () => {
+    expect(averageHouseholdTariff(INITIAL_TARIFFS)).toBeCloseTo(2_438.19, 1);
+    expect(averageOfTiers([2_000, 2_000, 2_000, 2_000, 2_000, 2_000])).toBe(2_000);
+  });
+
+  it("computes percentage changes without dividing by zero", () => {
+    expect(tariffChangePct(0, 100)).toBe(0);
+    expect(tariffChangePct(100, 105)).toBe(5);
+  });
+
+  it("accepts a progressive plan inside every band", () => {
+    const result = validateTariffs(
+      { tiers: [1_806, 1_900, 2_200, 2_700, 3_050, 3_117], industrial: 1_750 },
+      2_450,
     );
+
+    expect(result.ok).toBe(true);
   });
 
-  it("splits revenue by segment", () => {
-    const revenue = computeRevenue(200, 100, INITIAL_TARIFFS, 0.9);
-    expect(revenue.household).toBeCloseTo(200 * 10.58 * 0.9, 2);
-    expect(revenue.workshop).toBeCloseTo(100 * 7.4 * 0.9);
-    expect(revenue.total).toBeCloseTo(revenue.household + revenue.workshop);
+  it("rejects invalid plans", () => {
+    expect(
+      validateTariffs(
+        { tiers: [1_600, 1_866, 2_167, 2_729, 3_050, 3_117], industrial: 1_750 },
+        2_500,
+      ).ok,
+    ).toBe(false);
+    expect(
+      validateTariffs(
+        { tiers: [1_806, 1_806, 2_167, 2_729, 3_050, 3_117], industrial: 1_750 },
+        2_500,
+      ).ok,
+    ).toBe(false);
+    expect(
+      validateTariffs(
+        { tiers: [1_806, 1_866, 2_167, 2_729, 3_050, 3_117], industrial: 1_000 },
+        2_500,
+      ).ok,
+    ).toBe(false);
+    expect(
+      validateTariffs(
+        { tiers: [1_806, 1_866, 2_167, 2_729, 3_050, 3_117], industrial: 1_750 },
+        1_000,
+      ).ok,
+    ).toBe(false);
+    expect(
+      validateTariffs(
+        { tiers: [1_806, Number.NaN, 2_167, 2_729, 3_050, 3_117], industrial: 1_750 },
+        2_500,
+      ).ok,
+    ).toBe(false);
+    expect(
+      validateTariffs(
+        { tiers: [1_806, 1_866, 2_167, 2_729, 3_050, 3_117], industrial: Number.NaN },
+        2_500,
+      ).ok,
+    ).toBe(false);
   });
 
-  it("accepts a valid in-ceiling tariff", () => {
-    const validated = validateTariffs(tiers, 7.4, 13.8);
-    expect(validated.ok).toBe(true);
-
-    if (validated.ok) {
-      expect(validated.value.tiers).toEqual(tiers);
-      expect(validated.value.workshop).toBe(7.4);
-      expect(validated.value.ceiling).toBe(13.8);
-    }
+  it("converts energy into revenue", () => {
+    expect(residentialRevenue(1_000, 2_500)).toBe(2_500);
+    expect(industrialRevenue(1_000, 1_750)).toBe(1_750);
   });
 
-  it.each([
-    [[7, 10, 12, 15], 7.4, "tariff.out-of-band"],
-    [[9, 9, 12, 15], 7.4, "tariff.not-progressive"],
-    [[8, 10, 12, 15], 5, "tariff.workshop-out-of-band"],
-    [[10.2, 13.2, 18.0, 26.0], 9.2, "tariff.above-ceiling"],
-  ] as const)("rejects invalid tariff input %j / %j", (candidate, workshop, error) => {
-    const result = validateTariffs(candidate, workshop, 13.8);
-
-    expect(result).toEqual({ ok: false, error });
-  });
-
-  it("rejects a malformed tier list defensively", () => {
-    const result = validateTariffs([8, 10, 12], 7.4, 13.8);
-
-    expect(result).toEqual({ ok: false, error: "tariff.missing-tier" });
-  });
-
-  it("updates the ceiling", () => {
-    const updated: TariffTiers = withCeiling(INITIAL_TARIFFS, 15.1);
-    expect(updated.ceiling).toBe(15.1);
-    expect(updated.tiers).toEqual(INITIAL_TARIFFS.tiers);
-  });
-
-  it("computes a tariff burden against income", () => {
-    expect(tariffBurden(11, 1)).toBe(110);
-    expect(tariffBurden(11, 0)).toBe(220);
+  it("reduces losses as the grid strengthens and floors at four percent", () => {
+    expect(lossFactor(0)).toBe(0.09);
+    expect(lossFactor(100)).toBe(0.04);
+    expect(lossFactor(50)).toBeCloseTo(0.065);
   });
 });

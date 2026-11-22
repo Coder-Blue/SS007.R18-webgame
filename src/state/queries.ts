@@ -3,10 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/solid-query";
 import type { GameState, TickOutcome } from "~/domain";
 import type { GameStore } from "./game-store";
 
+export const MONTH_BASE_MS = 8_000;
+
 export const gameKeys = {
-  all: ["game"] as const,
-  snapshot: (tick: number) => ["game", "snapshot", tick] as const,
-  history: (tick: number) => ["game", "history", tick] as const,
+  all: ["grid"] as const,
+  snapshot: (tick: number) => ["grid", "snapshot", tick] as const,
+  history: (tick: number) => ["grid", "history", tick] as const,
 };
 
 export const useGameSnapshot = (store: GameStore) =>
@@ -33,12 +35,18 @@ export const useAdvanceMonth = (store: GameStore) => {
   }));
 };
 
-export const useAutoPlay = (store: GameStore, advance: () => void, delayMs: number): void => {
+export const useAutoPlay = (store: GameStore, advance: () => void): void => {
   createTrackedEffect(() => {
-    if (!store.autoPlay() || store.state().phase !== "playing") return;
+    if (!store.running()) return;
+
+    if (store.state().phase !== "playing") return;
 
     if (store.state().events.activeId !== null) return;
-    const timer = setInterval(advance, delayMs);
+
+    if (store.state().approval !== null) return;
+
+    const interval = MONTH_BASE_MS / store.speed();
+    const timer = setInterval(advance, interval);
 
     return () => clearInterval(timer);
   });

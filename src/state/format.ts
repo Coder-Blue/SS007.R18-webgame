@@ -7,14 +7,26 @@ const oneDecimal = new Intl.NumberFormat("vi-VN", {
   minimumFractionDigits: 1,
 });
 
+const twoDecimal = new Intl.NumberFormat("vi-VN", {
+  maximumFractionDigits: 2,
+  minimumFractionDigits: 2,
+});
+
 export const formatBillion = (value: number): string => `${integer.format(Math.round(value))} tỷ`;
 
-export const formatTonne = (value: number): string =>
-  `${integer.format(Math.round(value))} nghìn tấn`;
+export const formatSignedBillion = (value: number): string =>
+  `${value > 0 ? "+" : ""}${integer.format(Math.round(value))} tỷ`;
 
-export const formatPrice = (value: number): string => `${oneDecimal.format(value)} tr/tấn`;
+export const formatEnergy = (value: number): string =>
+  `${integer.format(Math.round(value))} triệu kWh`;
+
+export const formatPower = (value: number): string => `${integer.format(Math.round(value))} MW`;
+
+export const formatPrice = (value: number): string => `${integer.format(Math.round(value))} đ/kWh`;
 
 export const formatPercent = (value: number): string => `${oneDecimal.format(value)}%`;
+
+export const formatRatio = (value: number): string => `${twoDecimal.format(value)}`;
 
 export const formatDelta = (value: number, unit = "tỷ"): string => {
   const sign = value > 0 ? "+" : "";
@@ -35,15 +47,16 @@ export const seasonLabel = (season: Season): string => {
 };
 
 export const actLabel = (act: Act): string => {
-  if (act === 1) return "Hồi I · Bao phủ và tích lũy lỗ";
+  if (act === 1) return "Chặng 1 · Mua điện cạnh tranh";
 
-  if (act === 2) return "Hồi II · Tranh luận tư nhân hóa";
+  if (act === 2) return "Chặng 2 · Hạn hán và phụ tải đỉnh";
 
-  return "Hồi III · Phục hồi và hiện đại hóa";
+  if (act === 3) return "Chặng 3 · Tranh luận tư nhân hóa";
+
+  return "Chặng 4 · Luật Điện lực sửa đổi";
 };
 
-export const shortActLabel = (act: Act): string =>
-  `Hồi ${act === 1 ? "I" : act === 2 ? "II" : "III"}`;
+export const shortActLabel = (act: Act): string => `Chặng ${act}`;
 
 export const formatSignedPercent = (value: number): string =>
   `${value > 0 ? "+" : ""}${oneDecimal.format(value)}%`;

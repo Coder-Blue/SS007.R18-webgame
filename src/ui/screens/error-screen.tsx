@@ -15,7 +15,7 @@ export const ErrorScreen = (props: {
       <h1>{props.notFound === true ? "Không tìm thấy trang" : "Làng đang gặp trục trặc"}</h1>
       <p>
         {props.notFound === true
-          ? "Đường dẫn này không dẫn đến đâu trong làng."
+          ? "Đường dẫn này không nối vào lưới điện."
           : "Một lỗi ngoài dự kiến đã xảy ra. Bạn có thể thử lại hoặc quay về màn hình đầu."}
       </p>
       <ActionButton variant="gold" onClick={props.onRetry ?? (() => window.location.reload())}>

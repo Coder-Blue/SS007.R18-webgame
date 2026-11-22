@@ -1,191 +1,180 @@
 import { describe, expect, it } from "vitest";
-import { createInitialState } from "../../src/domain/constants";
+import { EVENTS, findEvent } from "../../src/domain/events/catalog";
 import {
-  ALL_EVENTS,
-  EVENT_SCHEDULE,
-  activeEvent,
-  dueEventIds,
-  eventById,
-  scheduleEvents,
-} from "../../src/domain/events";
+  mediaShouldTrigger,
+  scheduleEvent,
+  scriptedEventFor,
+} from "../../src/domain/events/schedule";
 import { resolveEvent } from "../../src/domain/events/resolve";
-import { appendFlags, applyCashDebt, applyUnlocks } from "../../src/domain/events/effects";
-import { DEBT_WARNING_EVENT } from "../../src/domain/events/conditional";
+import { baseState, ledger } from "./test-helpers";
+import type { EventId } from "../../src/domain/types";
 
-const initial = createInitialState();
-const june = { ...initial, clock: { year: 2022, month: 6, tick: 5 } };
+const atTick = (tick: number) => ({
+  ...baseState(),
+  clock: { year: 2022, month: 1, tick },
+});
 
-describe("events", () => {
-  it("catalogues all scheduled and conditional events", () => {
-    expect(EVENT_SCHEDULE.length).toBeGreaterThan(10);
-    expect(ALL_EVENTS.length).toBe(EVENT_SCHEDULE.length + 1);
-    expect(eventById("drought_2022")?.id).toBe("drought_2022");
-    expect(eventById("missing")).toBeUndefined();
+describe("event catalog", () => {
+  it("exposes every scripted event", () => {
+    expect(EVENTS).toHaveLength(5);
+    expect(findEvent("fuel-crisis")?.choices).toHaveLength(2);
+    expect(findEvent("media-losses")?.choices).toHaveLength(1);
+    // SAFETY: the unknown id exercises the defensive lookup branch; the cast is never a valid domain id.
+    expect(findEvent("missing" as EventId)).toBeNull();
+  });
+});
+
+describe("event scheduling", () => {
+  it("places the four scripted milestones on the timeline", () => {
+    expect(scriptedEventFor(atTick(9))).toBe("fuel-crisis");
+    expect(scriptedEventFor(atTick(16))).toBe("summer-drought");
+    expect(scriptedEventFor(atTick(36))).toBe("public-skepticism");
+    expect(scriptedEventFor(atTick(40))).toBeNull();
+    expect(scriptedEventFor(atTick(44))).toBeNull();
   });
 
-  it("schedules the drought in June 2022", () => {
-    expect(dueEventIds(june)).toContain("drought_2022");
-    const scheduled = scheduleEvents(june);
-    expect(scheduled.events.activeId).toBe("drought_2022");
-    expect(activeEvent(scheduled)?.id).toBe("drought_2022");
-  });
-
-  it("handles duplicate queue entries and unknown active ids", () => {
-    const queued = {
-      ...june,
-      events: { ...june.events, queue: ["drought_2022"] },
-    };
-
-    const scheduled = scheduleEvents(queued);
-    expect(scheduled.events.activeId).toBe("drought_2022");
-    expect(scheduled.events.queue).toEqual([]);
-    expect(activeEvent({ ...june, events: { ...june.events, activeId: "missing" } })).toBeNull();
-    expect(activeEvent(initial)).toBeNull();
-  });
-
-  it("does not reschedule resolved or active events", () => {
-    const resolved = { ...june, events: { ...june.events, resolved: ["drought_2022"] } };
-    expect(dueEventIds(resolved)).not.toContain("drought_2022");
-    const active = { ...june, events: { ...june.events, activeId: "drought_2022" } };
-    expect(dueEventIds(active)).not.toContain("drought_2022");
-    expect(activeEvent(active)?.id).toBe("drought_2022");
-  });
-
-  it("queues every due event and activates the earliest unresolved", () => {
-    const state = { ...initial, clock: { year: 2023, month: 10, tick: 21 } };
-    const scheduled = scheduleEvents(state);
-    expect(scheduled.events.activeId).toBe("drought_2022");
-    expect(scheduled.events.queue).toContain("debate_sunk_cost");
-
-    const cleared = scheduleEvents({
-      ...state,
+  it("schedules the revised law only on the reform branch", () => {
+    const reform = {
+      ...atTick(44),
       events: {
-        ...state.events,
-        resolved: ["drought_2022", "fertilizer_2022", "currency_2023"],
+        ...atTick(44).events,
+        flags: ["event:public-skepticism:reform-path"],
       },
-    });
-
-    expect(cleared.events.activeId).toBe("debate_sunk_cost");
-  });
-
-  it("raises a debt warning after month six", () => {
-    const state = {
-      ...june,
-      clock: { year: 2022, month: 8, tick: 7 },
-      finance: { ...june.finance, debt: 50_000 },
     };
 
-    expect(dueEventIds(state)).toContain("debt_warning");
+    expect(scriptedEventFor(reform)).toBe("revised-law");
+  });
 
-    const resolved = scheduleEvents({
+  it("queues a scripted event once", () => {
+    const scheduled = scheduleEvent(atTick(9));
+
+    expect(scheduled.events.activeId).toBe("fuel-crisis");
+    expect(scheduled.events.queue).toHaveLength(0);
+    expect(scheduleEvent(scheduled).events.activeId).toBe("fuel-crisis");
+  });
+
+  it("does not schedule an event that already resolved", () => {
+    const state = atTick(9);
+
+    expect(
+      scheduleEvent({
+        ...state,
+        events: { ...state.events, resolved: ["fuel-crisis"] },
+      }).events.activeId,
+    ).toBeNull();
+  });
+
+  it("triggers media pressure on losses, debt or a tariff jump", () => {
+    const base = baseState();
+
+    const loss = {
+      ...base,
+      finance: { ...base.finance, monthlyHistory: [ledger({ netResult: -500 })] },
+    };
+
+    const debt = {
+      ...base,
+      finance: {
+        ...base.finance,
+        debt: 70_000,
+        monthlyHistory: [ledger({ netResult: 100 })],
+      },
+    };
+
+    const hike = {
+      ...base,
+      finance: {
+        ...base.finance,
+        monthlyHistory: [
+          ledger({ averageRetailTariff: 2_000, netResult: 100 }),
+          ledger({ averageRetailTariff: 2_100, netResult: 100 }),
+        ],
+      },
+    };
+
+    expect(mediaShouldTrigger(loss)).toBe(true);
+    expect(mediaShouldTrigger(debt)).toBe(true);
+    expect(mediaShouldTrigger(hike)).toBe(true);
+    expect(mediaShouldTrigger(base)).toBe(false);
+    expect(mediaShouldTrigger({ ...loss, media: { ...loss.media, cooldown: 2 } })).toBe(false);
+    expect(mediaShouldTrigger({ ...loss, media: { ...loss.media, activeMonths: 2 } })).toBe(false);
+  });
+
+  it("queues media behind an active event", () => {
+    const state = atTick(1);
+
+    const withLoss = {
       ...state,
-      events: { ...state.events, resolved: ["debt_warning"] },
-    });
-
-    expect(activeEvent(resolved)?.id).toBe("drought_2022");
-  });
-
-  it("applies cash, debt and flags while keeping flags unique", () => {
-    const spent = applyCashDebt(
-      { ...initial, finance: { ...initial.finance, cash: 100 } },
-      -500,
-      0,
-    );
-
-    expect(spent.finance.cash).toBe(0);
-    expect(spent.finance.debt).toBe(14_400);
-    expect(appendFlags(["a"], ["a", "b", "b"])).toEqual(["a", "b"]);
-    const unlocked = applyUnlocks(initial.policy, ["dppa", "vrem", "nsmo", "antiSmuggling"], true);
-    expect(unlocked).toMatchObject({
-      dppa: true,
-      vrem: true,
-      nsmo: true,
-      antiSmuggling: true,
-      n2Enabled: true,
-    });
-  });
-
-  it("rejects resolving without an active or valid choice", () => {
-    expect(resolveEvent(initial, "import")).toEqual({
-      ok: false,
-      error: "event.none-active",
-    });
-    expect(resolveEvent(scheduleEvents(june), "missing")).toEqual({
-      ok: false,
-      error: "event.unknown-choice",
-    });
-  });
-
-  it("resolves the drought import and records it", () => {
-    const state = scheduleEvents(june);
-    const resolved = resolveEvent(state, "import");
-    expect(resolved.ok).toBe(true);
-
-    if (resolved.ok) {
-      expect(resolved.value.production.riceInventory).toBe(state.production.riceInventory + 80);
-      expect(resolved.value.events.resolved).toContain("drought_2022");
-      expect(resolved.value.events.activeId).toBeNull();
-      expect(resolved.value.finance.cash).toBeLessThan(state.finance.cash);
-    }
-  });
-
-  it("applies event unlocks and crisis endings", () => {
-    const dppa = {
-      ...initial,
-      clock: { year: 2024, month: 4, tick: 27 },
-      events: { ...initial.events, activeId: "dppa_petition" },
+      finance: { ...state.finance, monthlyHistory: [ledger({ netResult: -500 })] },
     };
 
-    const approved = resolveEvent(dppa, "pilot");
-    expect(approved.ok).toBe(true);
+    const scheduled = scheduleEvent(withLoss);
 
-    if (approved.ok) expect(approved.value.policy.dppa).toBe(true);
+    expect(scheduled.events.activeId).toBe("media-losses");
+  });
+});
 
-    const california = {
-      ...initial,
-      clock: { year: 2023, month: 11, tick: 22 },
-      events: { ...initial.events, activeId: "california_2001" },
-    };
-
-    const collapse = resolveEvent(california, "freeze");
-    expect(collapse.ok).toBe(true);
-
-    if (collapse.ok) {
-      expect(collapse.value.phase).toBe("ended");
-      expect(collapse.value.ending?.reason).toBe("california");
-    }
+describe("event resolution", () => {
+  it("rejects a choice when no event is active", () => {
+    expect(resolveEvent(baseState(), "hedge-crisis").ok).toBe(false);
   });
 
-  it("collapses after the privatization choice", () => {
+  it("resolves a known choice and opens the next queued event", () => {
     const state = {
-      ...initial,
-      clock: { year: 2023, month: 10, tick: 21 },
-      events: { ...initial.events, activeId: "debate_sunk_cost" },
+      ...atTick(9),
+      events: {
+        ...atTick(9).events,
+        activeId: "fuel-crisis" as const,
+        queue: ["media-losses" as const],
+      },
     };
 
-    const resolved = resolveEvent(state, "privatize");
-    expect(resolved.ok).toBe(true);
+    const result = resolveEvent(state, "hedge-crisis");
 
-    if (resolved.ok) {
-      expect(resolved.value.ending?.reason).toBe("privatization");
-      expect(resolved.value.phase).toBe("ended");
+    expect(result.ok).toBe(true);
+
+    if (!result.ok) return;
+    expect(result.value.events.activeId).toBe("media-losses");
+    expect(result.value.events.resolved).toContain("fuel-crisis");
+    expect(result.value.events.decisions).toContain("keep-fuel");
+  });
+
+  it("rejects an unknown choice and an unknown active event", () => {
+    const active = {
+      ...baseState(),
+      events: { ...baseState().events, activeId: "fuel-crisis" as const },
+    };
+
+    expect(resolveEvent(active, "missing").ok).toBe(false);
+  });
+
+  it("sets media cooldown when acknowledging the media event", () => {
+    const state = {
+      ...baseState(),
+      events: { ...baseState().events, activeId: "media-losses" as const },
+    };
+
+    const result = resolveEvent(state, "acknowledge-media");
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.media.activeMonths).toBe(3);
+      expect(result.value.media.cooldown).toBe(8);
     }
   });
 
-  it("resolves the conditional debt warning", () => {
+  it("ends the run immediately if an event pushes trust to zero", () => {
     const state = {
-      ...initial,
-      clock: { year: 2022, month: 8, tick: 7 },
-      finance: { ...initial.finance, debt: 50_000 },
-      events: { ...initial.events, activeId: DEBT_WARNING_EVENT.id },
+      ...baseState(),
+      metrics: { ...baseState().metrics, citizenTrust: 5 },
+      events: { ...baseState().events, activeId: "public-skepticism" as const },
     };
 
-    const resolved = resolveEvent(state, "bailout");
-    expect(resolved.ok).toBe(true);
+    const result = resolveEvent(state, "privatize-grid");
 
-    if (resolved.ok) {
-      expect(resolved.value.finance.debt).toBe(42_000);
-      expect(resolved.value.events.flags).toContain("bailout_taken");
-    }
+    expect(result.ok).toBe(true);
+
+    if (result.ok) expect(result.value.ending?.reason).toBe("citizen-trust");
   });
 });

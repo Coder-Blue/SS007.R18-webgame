@@ -11,24 +11,14 @@ export const seasonOf = (month: number): Season => {
   return "winter";
 };
 
-export const seasonFactor = (month: number): number => {
-  const season = seasonOf(month);
-
-  if (season === "summer") return 1.08;
-
-  if (season === "winter") return 0.96;
-
-  return 1;
-};
-
-export const actOf = (year: number, month: number): Act => {
-  if (year < 2023) return 1;
-
-  if (year === 2023 && month < 10) return 1;
+export const actOf = (year: number, _month: number): Act => {
+  if (year <= 2022) return 1;
 
   if (year === 2023) return 2;
 
-  return 3;
+  if (year === 2024) return 3;
+
+  return 4;
 };
 
 export const nextClock = (clock: Clock): Clock => {
@@ -52,11 +42,6 @@ export const clockOfTick = (tick: number): Clock => ({
   month: monthOfTick(tick),
   tick,
 });
-
-export const isGameOverDate = (clock: Clock): boolean =>
-  clock.year > 2026 || (clock.year === 2026 && clock.month > 12);
-
-export const gameDateLabel = (year: number, month: number): string => `Thang ${month}/${year}`;
 
 export const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));

@@ -1,57 +1,93 @@
-import type { Infrastructure, RoadGrade } from "./types";
-import { ROAD_PROJECTS } from "./constants";
+import type { GameState, Project, ZoneId } from "./types";
 import { clamp } from "./clock";
+import { LINE_PROJECTS, PLANT_PROJECTS, DECISIONS } from "./constants";
+import { completeDecision } from "./events/effects";
 
-export interface RoadBuildResult {
-  readonly infrastructure: Infrastructure;
-  readonly cost: number;
-  readonly km: number;
-}
-
-export const buildRoad = (infrastructure: Infrastructure, grade: RoadGrade): RoadBuildResult => {
-  const project = ROAD_PROJECTS[grade];
-
-  const coverage = clamp(
-    Math.max(
-      infrastructure.coverage + project.coverage,
-      infrastructure.remoteCoverage + project.remoteCoverage,
-    ),
-    0,
-    100,
-  );
-
-  const remoteCoverage = clamp(infrastructure.remoteCoverage + project.remoteCoverage, 0, 100);
-
-  const next: Infrastructure = {
-    ...infrastructure,
-    dirtKm: infrastructure.dirtKm + (grade === "dirt" ? project.km : 0),
-    cobbleKm: infrastructure.cobbleKm + (grade === "cobble" ? project.km : 0),
-    asphaltKm: infrastructure.asphaltKm + (grade === "asphalt" ? project.km : 0),
-    coverage,
-    remoteCoverage,
-  };
-
-  return { infrastructure: next, cost: project.cost, km: project.km };
+export type ProjectStep = {
+  readonly state: GameState;
+  readonly completed: readonly Project[];
 };
 
-export const fleetUpgrade = (infrastructure: Infrastructure, step: number): Infrastructure => ({
-  ...infrastructure,
-  fleet: infrastructure.fleet + step,
-});
+const isZoneId = (value: string): value is ZoneId =>
+  value === "urban" || value === "industrial" || value === "rural";
 
-export const coverageGap = (infrastructure: Infrastructure): number =>
-  Math.max(0, 100 - infrastructure.coverage) + Math.max(0, 100 - infrastructure.remoteCoverage);
+export const completeProject = (state: GameState, project: Project): GameState => {
+  if (project.kind === "line" && isZoneId(project.targetId)) {
+    const plan = LINE_PROJECTS[project.targetId];
+    const zone = state.zones[project.targetId];
 
-export const logisticsEfficiency = (fleet: number): number =>
-  clamp(1 - (fleet - 120) / 2_000, 0.82, 1.05);
+    return {
+      ...state,
+      zones: {
+        ...state.zones,
+        [project.targetId]: {
+          ...zone,
+          coverage: clamp(zone.coverage + plan.coverage, 0, 100),
+        },
+      },
+      infrastructure: {
+        ...state.infrastructure,
+        lineKm500: state.infrastructure.lineKm500 + plan.lineKm500,
+        lineKm220: state.infrastructure.lineKm220 + plan.lineKm220,
+      },
+    };
+  }
 
-export const roadQualityIndex = (infrastructure: Infrastructure): number => {
-  const total = infrastructure.dirtKm + infrastructure.cobbleKm + infrastructure.asphaltKm;
+  if (project.kind === "hydro" || project.kind === "thermal" || project.kind === "renewable") {
+    const plan = PLANT_PROJECTS[project.kind];
 
-  if (total === 0) return 0.4;
+    const key =
+      project.kind === "hydro"
+        ? "hydroCapacityMw"
+        : project.kind === "thermal"
+          ? "thermalCapacityMw"
+          : "renewableCapacityMw";
 
-  return (
-    (infrastructure.dirtKm * 0.4 + infrastructure.cobbleKm * 0.7 + infrastructure.asphaltKm * 1) /
-    total
-  );
+    return {
+      ...state,
+      generation: {
+        ...state.generation,
+        [key]: state.generation[key] + plan.capacityMw,
+      },
+    };
+  }
+
+  if (project.kind === "substation") {
+    return {
+      ...state,
+      infrastructure: {
+        ...state.infrastructure,
+        substations: state.infrastructure.substations + 1,
+        gridStrength: clamp(state.infrastructure.gridStrength + 6, 0, 100),
+      },
+    };
+  }
+
+  const decision = DECISIONS.find((candidate) => candidate.id === project.targetId);
+
+  return decision === undefined ? state : completeDecision(state, decision.id);
+};
+
+export const advanceProjects = (state: GameState): ProjectStep => {
+  const completed: Project[] = [];
+  const remaining: Project[] = [];
+  let current = state;
+
+  for (const project of state.operations.projects) {
+    if (project.monthsLeft > 1) {
+      remaining.push({ ...project, monthsLeft: project.monthsLeft - 1 });
+      continue;
+    }
+
+    completed.push(project);
+    current = completeProject(current, project);
+  }
+
+  return {
+    state: {
+      ...current,
+      operations: { ...current.operations, projects: remaining },
+    },
+    completed,
+  };
 };

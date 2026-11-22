@@ -2,86 +2,75 @@ import * as THREE from "three";
 import { gsap } from "gsap";
 import type { GameState } from "~/domain";
 import { seasonOf } from "~/domain";
-import { wrapRange } from "./motion";
 import { PALETTE } from "./palette";
+import { wrapRange } from "./motion";
 
-export interface WeatherBuild {
+export type WeatherBuild = {
   readonly update: (state: GameState, reduced: boolean) => void;
   readonly tick: (delta: number) => void;
   readonly dispose: () => void;
-  readonly rain: THREE.Points;
-}
-
-const skyFor = (state: GameState): number => {
-  if (state.market.drought > 0.6) return PALETTE.skyDrought;
-  const season = seasonOf(state.clock.month);
-
-  if (season === "summer") return PALETTE.skySummer;
-
-  if (season === "autumn") return PALETTE.skyAutumn;
-
-  if (season === "winter") return PALETTE.skyWinter;
-
-  return PALETTE.skySpring;
+  readonly water: THREE.Mesh;
 };
 
-export const createWeather = (scene: THREE.Scene): WeatherBuild => {
-  scene.background = new THREE.Color(PALETTE.skySpring);
-  scene.fog = new THREE.Fog(PALETTE.fog, 48, 108);
-  const ambient = new THREE.AmbientLight(0xfff2d9, 0.75);
-  const hemisphere = new THREE.HemisphereLight(0xe8f4e2, 0x556b45, 1.1);
-  const sun = new THREE.DirectionalLight(0xffe7b0, 2.1);
-  sun.position.set(12, 20, 8);
+const skyFor = (state: GameState): number => {
+  if (state.ending !== null) return 0x05090d;
+
+  if (state.market.drought > 0.6) return 0x1a1a16;
+
+  if (state.market.fuelPriceIndex > 1.3) return 0x151a1d;
+
+  return PALETTE.background;
+};
+
+export const createWeather = (scene: THREE.Scene, water: THREE.Mesh): WeatherBuild => {
+  scene.background = new THREE.Color(PALETTE.background);
+  scene.fog = new THREE.Fog(PALETTE.fog, 52, 120);
+
+  const ambient = new THREE.AmbientLight(0xbcd8e2, 0.7);
+  const hemisphere = new THREE.HemisphereLight(0x8fd4e0, 0x10201d, 1);
+  const sun = new THREE.DirectionalLight(0xdff5ff, 2);
+  sun.position.set(16, 24, 10);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
-  sun.shadow.camera.left = -20;
-  sun.shadow.camera.right = 20;
-  sun.shadow.camera.top = 20;
-  sun.shadow.camera.bottom = -20;
+  sun.shadow.camera.left = -24;
+  sun.shadow.camera.right = 24;
+  sun.shadow.camera.top = 24;
+  sun.shadow.camera.bottom = -24;
   sun.shadow.camera.near = 1;
-  sun.shadow.camera.far = 60;
+  sun.shadow.camera.far = 80;
   scene.add(ambient, hemisphere, sun);
 
-  const rainCount = 420;
-  const rainXLimit = 15;
-  const rainZLimit = 14;
-  const rainMinY = 0.6;
-  const rainMaxY = 19;
+  const rainCount = 360;
   const positions = new Float32Array(rainCount * 3);
-  const fallSpeeds = new Float32Array(rainCount);
-  const driftX = new Float32Array(rainCount);
-  const driftZ = new Float32Array(rainCount);
+  const speeds = new Float32Array(rainCount);
 
   for (let index = 0; index < rainCount; index += 1) {
-    positions[index * 3] = ((index * 13) % 30) - rainXLimit + (index % 3) * 0.4;
-    positions[index * 3 + 1] = ((index * 5) % 19) + rainMinY;
-    positions[index * 3 + 2] = ((index * 7) % 28) - rainZLimit;
-    fallSpeeds[index] = 8 + ((index * 7) % 9) * 0.55;
-    driftX[index] = 0.55 + ((index * 5) % 7) * 0.09;
-    driftZ[index] = -0.3 + ((index * 11) % 5) * 0.12;
+    positions[index * 3] = ((index * 13) % 36) - 18;
+    positions[index * 3 + 1] = ((index * 7) % 20) + 1;
+    positions[index * 3 + 2] = ((index * 5) % 30) - 15;
+    speeds[index] = 7 + ((index * 3) % 7) * 0.5;
   }
 
-  const rainGeometry = new THREE.BufferGeometry();
-  rainGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
   const rain = new THREE.Points(
-    rainGeometry,
-    new THREE.PointsMaterial({ color: 0x8fb8c2, size: 0.07, transparent: true, opacity: 0 }),
+    geometry,
+    new THREE.PointsMaterial({ color: 0x8fd4e0, size: 0.06, transparent: true, opacity: 0 }),
   );
 
   scene.add(rain);
 
-  let lastUpdateKey = "";
-  let rainIntensity = 0;
+  let lastKey = "";
+  let intensity = 0;
 
   const update = (state: GameState, reduced: boolean): void => {
     const season = seasonOf(state.clock.month);
-    const key = `${season}:${state.market.drought.toFixed(2)}:${reduced}`;
+    const key = `${season}:${state.market.drought.toFixed(2)}:${state.market.fuelPriceIndex.toFixed(2)}:${state.ending === null ? "play" : "end"}:${reduced}`;
 
-    if (key === lastUpdateKey) return;
-    lastUpdateKey = key;
+    if (key === lastKey) return;
+    lastKey = key;
     const sky = new THREE.Color(skyFor(state));
-    const fog = new THREE.Color(PALETTE.fog).lerp(new THREE.Color(sky), 0.25);
     const background = scene.background;
 
     if (background instanceof THREE.Color) {
@@ -89,7 +78,7 @@ export const createWeather = (scene: THREE.Scene): WeatherBuild => {
         r: sky.r,
         g: sky.g,
         b: sky.b,
-        duration: reduced ? 0 : 1.4,
+        duration: reduced ? 0 : 1.6,
         overwrite: "auto",
       });
     }
@@ -98,56 +87,63 @@ export const createWeather = (scene: THREE.Scene): WeatherBuild => {
 
     if (fogObject !== null && fogObject !== undefined) {
       gsap.to(fogObject.color, {
-        r: fog.r,
-        g: fog.g,
-        b: fog.b,
-        duration: reduced ? 0 : 1.4,
+        r: sky.r * 1.2,
+        g: sky.g * 1.2,
+        b: sky.b * 1.2,
+        duration: reduced ? 0 : 1.6,
         overwrite: "auto",
       });
     }
 
-    const isWet = season === "summer" && state.market.drought < 0.45;
+    const drought = state.market.drought > 0.6;
+    const crisis = state.market.fuelPriceIndex > 1.3;
+    const ending = state.ending !== null;
 
-    const sunTarget =
-      state.market.drought > 0.6 ? 2.5 : season === "winter" ? 1.25 : isWet ? 1.6 : 2.1;
-
-    gsap.to(sun, { intensity: sunTarget, duration: reduced ? 0 : 1.2, overwrite: "auto" });
-    gsap.to(ambient, {
-      intensity: season === "winter" ? 0.55 : 0.78,
-      duration: reduced ? 0 : 1.2,
+    gsap.to(sun, {
+      intensity: ending ? 0.35 : drought ? 2.8 : crisis ? 1.5 : 2.1,
+      duration: reduced ? 0 : 1.4,
       overwrite: "auto",
     });
-    rainIntensity = isWet ? 0.55 : 0;
-    const rainMaterial = rain.material;
+    gsap.to(ambient, {
+      intensity: ending ? 0.18 : crisis ? 0.55 : 0.72,
+      duration: reduced ? 0 : 1.4,
+      overwrite: "auto",
+    });
+    sun.color.setHex(drought ? 0xffb060 : crisis ? 0xffc98a : 0xdff5ff);
 
-    if (rainMaterial instanceof THREE.PointsMaterial) {
-      gsap.to(rainMaterial, {
-        opacity: rainIntensity,
-        duration: reduced ? 0 : 1.1,
+    const wet = season === "summer" && state.market.drought < 0.5;
+
+    intensity = wet ? 0.45 : 0;
+
+    if (water.material instanceof THREE.MeshStandardMaterial) {
+      const level = state.generation.reservoir / 100;
+
+      gsap.to(water.position, {
+        y: 0.78 - (1 - level) * 0.35,
+        duration: reduced ? 0 : 1.6,
+        overwrite: "auto",
+      });
+      gsap.to(water.material, {
+        opacity: 0.35 + level * 0.55,
+        duration: reduced ? 0 : 1.2,
         overwrite: "auto",
       });
     }
-
-    sun.color.setHex(state.market.drought > 0.6 ? 0xffc46b : 0xffe7b0);
   };
 
   const tick = (delta: number): void => {
-    if (rainIntensity <= 0) return;
+    if (intensity <= 0) return;
     const step = Math.min(0.05, Math.max(0, delta));
 
     if (step <= 0) return;
-
     const attribute = rain.geometry.getAttribute("position");
 
     if (!(attribute instanceof THREE.BufferAttribute)) return;
 
     for (let index = 0; index < attribute.count; index += 1) {
-      const fallSpeed = fallSpeeds[index] ?? 8;
-      const windX = driftX[index] ?? 0.55;
-      const windZ = driftZ[index] ?? 0;
-      const x = wrapRange(attribute.getX(index) + windX * step, -rainXLimit, rainXLimit);
-      const y = wrapRange(attribute.getY(index) - fallSpeed * step, rainMinY, rainMaxY);
-      const z = wrapRange(attribute.getZ(index) + windZ * step, -rainZLimit, rainZLimit);
+      const x = wrapRange(attribute.getX(index) + 0.15 * step, -18, 18);
+      const y = wrapRange(attribute.getY(index) - (speeds[index] ?? 7) * step, 1, 21);
+      const z = wrapRange(attribute.getZ(index) - 0.1 * step, -15, 15);
 
       attribute.setXYZ(index, x, y, z);
     }
@@ -156,15 +152,12 @@ export const createWeather = (scene: THREE.Scene): WeatherBuild => {
   };
 
   const dispose = (): void => {
-    // SAFETY: createWeather always assigns a THREE.Color background before this dispose path.
-    gsap.killTweensOf(scene.background as object);
-
-    if (scene.fog !== null && scene.fog !== undefined) gsap.killTweensOf(scene.fog.color);
     gsap.killTweensOf(sun);
     gsap.killTweensOf(ambient);
-    // SAFETY: rain.material is always a Material instance created by the rain factory.
-    gsap.killTweensOf(rain.material as object);
+    gsap.killTweensOf(water.position);
+
+    if (water.material instanceof THREE.Material) gsap.killTweensOf(water.material);
   };
 
-  return { update, tick, dispose, rain };
+  return { update, tick, dispose, water };
 };

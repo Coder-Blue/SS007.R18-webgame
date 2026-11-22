@@ -1,273 +1,229 @@
 import { For, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
-import { ActionButton, Badge, Bar, Divider, Panel, Stat } from "../components/base";
-import { LineChart, type Series } from "../components/charts";
+import { Badge, Bar, Panel, Stat } from "../components/base";
 import { Icon } from "../components/icons";
-import { formatBillion, formatDate, formatPercent, formatPrice } from "~/state/format";
+import { RevenueCostChart } from "../components/charts";
+import {
+  formatBillion,
+  formatEnergy,
+  formatPercent,
+  formatPrice,
+  formatSignedBillion,
+} from "~/state/format";
 import { recoveryOf } from "~/domain";
-import { projectFinance } from "~/state/selectors";
 
 export const FinancePanel = (): JSX.Element => {
-  const { store, actions } = useGame();
+  const { store } = useGame();
   const state = store.state;
-  const history = () => state().finance.monthlyHistory.slice(-18);
+  const rows = () => state().finance.monthlyHistory.slice(-12).toReversed();
+  const recovery = () => recoveryOf(state().finance, state().clock.year, state().policy);
   const last = () => state().finance.monthlyHistory[state().finance.monthlyHistory.length - 1];
-  const recovery = () => recoveryOf(state());
-  const projection = () => projectFinance(state());
-
-  const series = (): readonly Series[] => [
-    {
-      label: "Doanh thu",
-      color: "#2f7d5b",
-      values: history().map((row) => row.revenueTotal),
-    },
-    { label: "Chi phí", color: "#b34833", values: history().map((row) => row.costTotal) },
-    { label: "Kết quả tháng", color: "#d8a94b", values: history().map((row) => row.netResult) },
-  ];
-
-  const debtSeries = (): readonly Series[] => [
-    { label: "Dư nợ cuối tháng", color: "#5b4b8a", values: history().map((row) => row.debt) },
-    {
-      label: "Giá bình quân",
-      color: "#2f7d5b",
-      values: history().map((row) => row.tariffAverage * 1000),
-    },
-  ];
 
   return (
     <div class="stack-lg">
-      <Panel
-        title="Báo cáo lãi lỗ tháng"
-        kicker={formatDate(state().clock.year, state().clock.month)}
-        icon="lucide:wallet"
-      >
+      <Panel title="Sổ tài chính" kicker="Doanh thu và chi phí" icon="tabler:report-money">
         <div class="stat-grid">
           <Stat
-            label="Doanh thu"
-            value={formatBillion(last()?.revenueTotal ?? 0)}
-            tone="good"
-            icon="lucide:trending-up"
+            label="Ngân quỹ"
+            value={formatBillion(state().finance.cash)}
+            hint="Thanh khoản cuối tháng"
+            tone="gold"
+            icon="lucide:wallet"
           />
           <Stat
-            label="Chi phí"
-            value={formatBillion(last()?.costTotal ?? 0)}
-            tone="bad"
-            icon="lucide:trending-down"
-          />
-          <Stat
-            label="Kết quả tháng"
-            value={formatBillion(last()?.netResult ?? 0)}
-            tone={(last()?.netResult ?? 0) >= 0 ? "good" : "bad"}
-            icon="lucide:chart-column"
-          />
-          <Stat
-            label="Dư nợ cuối tháng"
+            label="Dư nợ"
             value={formatBillion(state().finance.debt)}
-            tone={projection().isDanger ? "bad" : "warn"}
-            icon="lucide:landmark"
-          />
-        </div>
-        <div class="report-split">
-          <div>
-            <h4>Doanh thu</h4>
-            <div class="report-line">
-              <span>Bán lẻ hộ dân</span>
-              <strong>{formatBillion(last()?.revenueHousehold ?? 0)}</strong>
-            </div>
-            <div class="report-line">
-              <span>Bán lẻ xưởng</span>
-              <strong>{formatBillion(last()?.revenueWorkshop ?? 0)}</strong>
-            </div>
-            <div class="report-line">
-              <span>Thu hồi N-2</span>
-              <strong>{formatBillion(last()?.revenueRecovery ?? 0)}</strong>
-            </div>
-          </div>
-          <div>
-            <h4>Chi phí</h4>
-            <div class="report-line">
-              <span>Sản xuất</span>
-              <strong>{formatBillion(last()?.costProduction ?? 0)}</strong>
-            </div>
-            <div class="report-line">
-              <span>Mua gạo ngoài</span>
-              <strong>{formatBillion(last()?.costProcurement ?? 0)}</strong>
-            </div>
-            <div class="report-line">
-              <span>Bảo trì đường</span>
-              <strong>{formatBillion(last()?.costRoads ?? 0)}</strong>
-            </div>
-            <div class="report-line">
-              <span>Vận chuyển</span>
-              <strong>{formatBillion(last()?.costFleet ?? 0)}</strong>
-            </div>
-            <div class="report-line">
-              <span>Nhân sự</span>
-              <strong>{formatBillion(last()?.costStaff ?? 0)}</strong>
-            </div>
-            <div class="report-line">
-              <span>Lãi vay</span>
-              <strong>{formatBillion(last()?.costInterest ?? 0)}</strong>
-            </div>
-          </div>
-        </div>
-        <Divider />
-        <div class="meter-block">
-          <div class="meter-row">
-            <span>Tỷ lệ nợ / trần</span>
-            <strong>{formatPercent(projection().debtRatio * 100)}</strong>
-          </div>
-          <Bar
-            value={projection().debtRatio * 100}
-            tone={projection().isDanger ? "bad" : "warn"}
-            label="Tỷ lệ nợ / trần"
-          />
-        </div>
-      </Panel>
-
-      <Panel
-        title="Lịch sử tài chính"
-        kicker={`${history().length} tháng gần nhất`}
-        icon="lucide:chart-column"
-      >
-        <Show
-          when={history().length > 0}
-          fallback={
-            <div class="empty-state">
-              <Icon icon="lucide:chart-column" size={24} />
-              <span>Chưa có dữ liệu. Hãy kết thúc tháng đầu tiên.</span>
-            </div>
-          }
-        >
-          <LineChart series={series()} ariaLabel="Lịch sử tài chính" />
-          <LineChart series={debtSeries()} ariaLabel="Dư nợ" grid={2} />
-        </Show>
-      </Panel>
-
-      <Panel
-        title="Thu hồi chi phí N-2"
-        kicker={`Năm kiểm toán ${recovery().eligibleYear}`}
-        icon="lucide:landmark"
-      >
-        <div class="stat-grid">
-          <Stat
-            label="Lỗ N-2 đủ điều kiện"
-            value={formatBillion(recovery().eligibleLoss)}
-            tone={recovery().eligibleLoss > 0 ? "warn" : "neutral"}
-            icon="lucide:scale"
-          />
-          <Stat
-            label="Thu hồi tháng này"
-            value={formatBillion(recovery().monthlyCredit)}
-            tone={recovery().monthlyCredit > 0 ? "good" : "neutral"}
-            icon="lucide:coins"
-          />
-          <Stat
-            label="Đã thu hồi N-2"
-            value={formatBillion(state().finance.recoveredTotal)}
-            icon="lucide:check"
-          />
-          <Stat
-            label="Còn lại có thể thu hồi"
-            value={formatBillion(recovery().remaining)}
-            icon="lucide:clock"
-          />
-        </div>
-        <Badge tone={state().policy.n2Enabled ? "good" : "warn"}>
-          {state().policy.n2Enabled ? "Đang áp dụng" : "Chưa áp dụng"}
-        </Badge>
-        <p class="muted">
-          {recovery().eligibleYear >= 2022
-            ? `Năm kiểm toán ${recovery().eligibleYear}`
-            : "Chưa đủ dữ liệu N-2"}
-          {" · "}Tỷ lệ thu hồi: {formatPercent(state().policy.n2Rate * 100)}
-        </p>
-      </Panel>
-
-      <Panel title="Dự phóng" kicker="Trạng thái làng" icon="lucide:gauge">
-        <div class="stat-grid">
-          <Stat
-            label="Chi phí cố định tháng trước"
-            value={formatBillion(projection().monthlyFixed)}
-            icon="lucide:coins"
-          />
-          <Stat
-            label="Số tháng còn lại trước trần nợ"
-            value={
-              projection().runwayMonths >= 99
-                ? "—"
-                : `${Math.round(projection().runwayMonths)} tháng`
-            }
-            tone={projection().isDanger ? "bad" : "good"}
-            icon="lucide:clock"
-          />
-          <Stat
-            label="Dư nợ cuối tháng"
-            value={formatBillion(state().finance.debt)}
-            hint={`Trần nợ ${formatBillion(state().finance.debtLimit)}`}
-            icon="lucide:landmark"
+            hint={`Trần ${formatBillion(state().finance.debtLimit)}`}
+            tone={state().finance.debt > 80_000 ? "bad" : "warn"}
+            icon="tabler:building-bank"
           />
           <Stat
             label="Lỗ lũy kế"
             value={formatBillion(state().finance.accumulatedLoss)}
+            hint="Mục tiêu cấu trúc 5 năm"
             tone="bad"
             icon="lucide:trending-down"
           />
+          <Stat
+            label="Thu hồi N-2 tháng"
+            value={formatBillion(recovery().monthlyCredit)}
+            hint={`Năm kiểm toán ${recovery().eligibleYear}`}
+            tone="good"
+            icon="tabler:cash-banknote"
+          />
         </div>
-        <div class="inline-actions">
-          <ActionButton
-            variant="danger"
-            size="sm"
-            icon="lucide:shield"
-            disabled={state().policy.bailoutUsed}
-            onClick={() => actions.requestBailout()}
-          >
-            {state().policy.bailoutUsed ? "Đã dùng cứu trợ" : "Xin cứu trợ"}
-          </ActionButton>
-          <span class="muted">Giảm 8.000 tỷ nợ, đổi lại mất tín nhiệm và hài lòng.</span>
+        <RevenueCostChart rows={state().finance.monthlyHistory} />
+        <div class="breakdown-grid">
+          <div class="breakdown-card">
+            <div class="breakdown-head">
+              <span>Doanh thu tháng gần nhất</span>
+              <strong>
+                {formatBillion((last()?.revenueElectricity ?? 0) + (last()?.revenueOther ?? 0))}
+              </strong>
+            </div>
+            <div class="breakdown-row">
+              <span>Doanh thu điện</span>
+              <strong>{formatBillion(last()?.revenueElectricity ?? 0)}</strong>
+            </div>
+            <div class="breakdown-row">
+              <span>Doanh thu khác</span>
+              <strong>{formatBillion(last()?.revenueOther ?? 0)}</strong>
+            </div>
+          </div>
+          <div class="breakdown-card">
+            <div class="breakdown-head">
+              <span>Chi phí tháng gần nhất</span>
+              <strong>
+                {formatBillion((last()?.costSupply ?? 0) + (last()?.costManagement ?? 0))}
+              </strong>
+            </div>
+            <div class="breakdown-row">
+              <span>Chi phí trong cung ứng điện</span>
+              <strong>{formatBillion(last()?.costSupply ?? 0)}</strong>
+            </div>
+            <div class="breakdown-row">
+              <span>Chi phí quản lý</span>
+              <strong>{formatBillion(last()?.costManagement ?? 0)}</strong>
+            </div>
+          </div>
         </div>
       </Panel>
 
-      <Panel title={`Báo cáo năm ${state().clock.year}`} kicker="Lịch sử" icon="lucide:book-open">
-        <Show
-          when={state().finance.annualHistory.length > 0}
-          fallback={
-            <div class="empty-state">
-              <span>Chưa có dữ liệu. Hãy kết thúc tháng đầu tiên.</span>
-            </div>
-          }
-        >
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Năm</th>
-                  <th>Doanh thu năm</th>
-                  <th>Kết quả năm</th>
-                  <th>Nợ cuối năm</th>
-                  <th>Độ ổn định TB</th>
-                </tr>
-              </thead>
-              <tbody>
-                <For each={state().finance.annualHistory}>
-                  {(report) => (
-                    <tr>
-                      <td>{report.year}</td>
-                      <td>{formatBillion(report.revenue)}</td>
-                      <td class={report.netResult < 0 ? "negative" : undefined}>
-                        {formatBillion(report.netResult)}
-                      </td>
-                      <td>{formatBillion(report.debtEnd)}</td>
-                      <td>{formatPercent(report.reliability)}</td>
-                    </tr>
-                  )}
-                </For>
-              </tbody>
-            </table>
-          </div>
+      <Panel title="Báo cáo tháng" kicker="Mười hai tháng gần nhất" icon="tabler:file-analytics">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Tháng</th>
+                <th scope="col">Điện bán</th>
+                <th scope="col">Giá bình quân</th>
+                <th scope="col">Doanh thu</th>
+                <th scope="col">Chi phí</th>
+                <th scope="col">Lãi/lỗ</th>
+                <th scope="col">Nợ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <For each={rows()}>
+                {(row) => (
+                  <tr>
+                    <td>{`T${row.month}/${row.year}`}</td>
+                    <td>{formatEnergy(row.energySoldMillionKwh)}</td>
+                    <td>{formatPrice(row.averageRetailTariff)}</td>
+                    <td>{formatBillion(row.revenueTotal)}</td>
+                    <td>{formatBillion(row.costTotal)}</td>
+                    <td data-tone={row.netResult >= 0 ? "good" : "bad"}>
+                      {formatSignedBillion(row.netResult)}
+                    </td>
+                    <td>{formatBillion(row.debt)}</td>
+                  </tr>
+                )}
+              </For>
+            </tbody>
+          </table>
+        </div>
+        <Show when={rows().length === 0}>
+          <p class="rail-note">
+            <Icon icon="lucide:clock" size={14} />
+            Chưa có tháng nào được ghi sổ.
+          </p>
         </Show>
-        <p class="muted">Giá gạo thị trường: {formatPrice(state().market.ricePrice)}</p>
+      </Panel>
+
+      <Panel title="Kiểm toán năm" kicker="Báo cáo thường niên" icon="tabler:chart-bar">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Năm</th>
+                <th scope="col">Doanh thu</th>
+                <th scope="col">Chi phí</th>
+                <th scope="col">Kết quả</th>
+                <th scope="col">Nợ cuối năm</th>
+                <th scope="col">Phủ điện</th>
+                <th scope="col">Tin cậy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <For each={state().finance.annualHistory}>
+                {(row) => (
+                  <tr>
+                    <td>{row.year}</td>
+                    <td>{formatBillion(row.revenue)}</td>
+                    <td>{formatBillion(row.costs)}</td>
+                    <td data-tone={row.netResult >= 0 ? "good" : "bad"}>
+                      {formatSignedBillion(row.netResult)}
+                    </td>
+                    <td>{formatBillion(row.debtEnd)}</td>
+                    <td>{formatPercent(row.coverage)}</td>
+                    <td>{formatPercent(row.trustAverage)}</td>
+                  </tr>
+                )}
+              </For>
+            </tbody>
+          </table>
+        </div>
+        <Show when={state().finance.annualHistory.length === 0}>
+          <p class="rail-note">
+            <Icon icon="lucide:clock" size={14} />
+            Báo cáo năm đầu tiên được chốt vào tháng 12.
+          </p>
+        </Show>
+      </Panel>
+
+      <Panel title="Cấu trúc lỗ 5 năm" kicker="Chẩn đoán nhiệm kỳ" icon="tabler:activity">
+        <p class="panel-lead">
+          Doanh thu bán lẻ bị giữ bởi trần giá và giá công nghiệp trợ cấp, trong khi chi phí nhiên
+          liệu, truyền tải và lãi vay vẫn tăng. Vì vậy nhiệm kỳ được thiết kế để lỗ có kiểm soát,
+          không phải để có lãi trước năm 2027.
+        </p>
+        <div class="stat-grid">
+          <Stat
+            label="Doanh thu lũy kế"
+            value={formatBillion(
+              state().finance.monthlyHistory.reduce((sum, row) => sum + row.revenueTotal, 0),
+            )}
+            tone="gold"
+            icon="lucide:trending-up"
+          />
+          <Stat
+            label="Chi phí lũy kế"
+            value={formatBillion(
+              state().finance.monthlyHistory.reduce((sum, row) => sum + row.costTotal, 0),
+            )}
+            tone="warn"
+            icon="lucide:trending-down"
+          />
+          <Stat
+            label="Chênh lệch lũy kế"
+            value={formatSignedBillion(
+              state().finance.monthlyHistory.reduce((sum, row) => sum + row.netResult, 0),
+            )}
+            tone="bad"
+            icon="tabler:report-money"
+          />
+          <Stat
+            label="Tỷ lệ nợ"
+            value={formatPercent((state().finance.debt / state().finance.debtLimit) * 100)}
+            tone={state().finance.debt > 80_000 ? "bad" : "warn"}
+            icon="lucide:gauge"
+          />
+        </div>
+        <Bar
+          value={state().finance.debt}
+          max={state().finance.debtLimit}
+          tone="warn"
+          label="Tỷ lệ nợ trên trần"
+        />
+        <div class="callout">
+          <Icon icon="tabler:alert-triangle" size={16} />
+          <span>
+            Nợ vượt 100.000 tỷ hoặc một trong hai chỉ số niềm tin về 0% sẽ kết thúc nhiệm kỳ ngay
+            lập tức.
+          </span>
+        </div>
+        <Badge tone="dark">Chế độ phục hồi sau năm 5 mở khi hoàn tất nhiệm kỳ</Badge>
       </Panel>
     </div>
   );

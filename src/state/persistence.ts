@@ -4,28 +4,34 @@ import { SAVE_VERSION, decodeSaveFile, err, ok } from "~/domain";
 
 export type SlotId = "slot1" | "slot2" | "slot3" | "autosave";
 
+export type GameSpeed = 1 | 2 | 3;
+
 export const SLOT_IDS = ["slot1", "slot2", "slot3"] as const satisfies readonly SlotId[];
 export const ALL_SLOT_IDS = ["autosave", ...SLOT_IDS] as const satisfies readonly SlotId[];
 
-const PREFIX = "dqkt:";
+const PREFIX = "dhl:";
 const SESSION_KEY = `${PREFIX}session`;
 
-export interface SessionPrefs {
+export type SessionPrefs = {
   readonly activeSlot: SlotId | null;
   readonly panel: string;
   readonly tutorialDone: boolean;
   readonly reducedMotion: boolean;
-}
+  readonly speed: GameSpeed;
+  readonly paused: boolean;
+};
 
 const SessionPrefsSchema = v.object({
   activeSlot: v.optional(v.nullable(v.picklist(ALL_SLOT_IDS)), null),
   panel: v.optional(v.string(), "overview"),
   tutorialDone: v.optional(v.boolean(), false),
   reducedMotion: v.optional(v.boolean(), false),
+  speed: v.optional(v.picklist([1, 2, 3] as const), 1),
+  paused: v.optional(v.boolean(), false),
 });
 
 const SaveEnvelopeSchema = v.object({
-  format: v.literal("dqkt-save"),
+  format: v.literal("grid-save"),
   version: v.literal(SAVE_VERSION),
 });
 
@@ -34,19 +40,22 @@ export const DEFAULT_PREFS: SessionPrefs = {
   panel: "overview",
   tutorialDone: false,
   reducedMotion: false,
+  speed: 1,
+  paused: false,
 };
 
-export interface SaveMeta {
+export type SaveMeta = {
   readonly slot: SlotId;
   readonly savedAt: string;
   readonly year: number;
   readonly month: number;
   readonly act: number;
   readonly debt: number;
-  readonly satisfaction: number;
-  readonly trust: number;
+  readonly citizenTrust: number;
+  readonly institutionalTrust: number;
+  readonly coverage: number;
   readonly ended: boolean;
-}
+};
 
 const keyFor = (slot: SlotId): string => `${PREFIX}${slot}`;
 
@@ -56,7 +65,7 @@ const hasStorage = (): boolean =>
 const nowIso = (): string => new Date().toISOString();
 
 export const makeSaveFile = (state: GameState): SaveFile => ({
-  format: "dqkt-save",
+  format: "grid-save",
   version: SAVE_VERSION,
   savedAt: nowIso(),
   state,
@@ -102,6 +111,9 @@ export const slotMeta = (slot: SlotId): SaveMeta | null => {
   if (!decoded.ok) return null;
   const state = decoded.value.state;
 
+  const coverage =
+    (state.zones.urban.coverage + state.zones.industrial.coverage + state.zones.rural.coverage) / 3;
+
   return {
     slot,
     savedAt: decoded.value.savedAt,
@@ -109,8 +121,9 @@ export const slotMeta = (slot: SlotId): SaveMeta | null => {
     month: state.clock.month,
     act: state.act,
     debt: state.finance.debt,
-    satisfaction: state.metrics.satisfaction,
-    trust: state.metrics.trust,
+    citizenTrust: state.metrics.citizenTrust,
+    institutionalTrust: state.metrics.institutionalTrust,
+    coverage,
     ended: state.ending !== null,
   };
 };
@@ -175,7 +188,6 @@ export const readSession = (): SessionPrefs => {
   try {
     const parsed = v.safeParse(SessionPrefsSchema, JSON.parse(raw));
 
-    // Fail closed: one malformed preference must not keep stale UI state alive.
     return parsed.success ? parsed.output : DEFAULT_PREFS;
   } catch {
     return DEFAULT_PREFS;
@@ -188,7 +200,5 @@ export const writeSession = (prefs: SessionPrefs): void => {
 };
 
 export const clearAllSaves = (): void => {
-  for (const slot of ALL_SLOT_IDS) {
-    deleteSlot(slot);
-  }
+  for (const slot of ALL_SLOT_IDS) deleteSlot(slot);
 };

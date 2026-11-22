@@ -1,90 +1,112 @@
-import { createSignal, createTrackedEffect, lazy, Loading, onSettled, Show } from "solid-js";
+import {
+  createSignal,
+  createTrackedEffect,
+  lazy,
+  Loading,
+  onCleanup,
+  onSettled,
+  Show,
+} from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { TitlePoster } from "../scene/title-poster";
 import { TitleScreen } from "../screens/title-screen";
 import { Icon } from "../components/icons";
 import { hasAnySave, latestSave, readSession, writeSession } from "~/state/persistence";
-import type { SceneSelection } from "~/scene/create-village-scene";
+import type { SceneSelection } from "~/scene/create-power-scene";
+import { TutorialModal } from "../modals/tutorial-modal";
+import type { PanelId } from "../mobile/mobile-nav";
 
-const GameView = lazy(() => import("./game-view"));
+const GameView = lazy(() => import("./game-view"), { export: "GameView" });
 const SaveMenu = lazy(() => import("../modals/save-menu"), { export: "SaveMenu" });
-const TutorialModal = lazy(() => import("../modals/tutorial-modal"), { export: "TutorialModal" });
 
-interface CopyDictionary {
-  readonly [key: string]: string;
-}
+const errorMessages = new Map<string, string>([
+  ["finance.insufficient", "Không đủ ngân quỹ hoặc hạn mức nợ."],
+  ["action.at-cap", "Hạng mục này đã đạt mức tối đa."],
+  ["project.queue-full", "Chỉ được chạy tối đa ba công trình cùng lúc."],
+  ["project.pending", "Đã có công trình cùng loại đang chạy."],
+  ["tariff.missing-tier", "Thiếu bậc giá."],
+  ["tariff.invalid-value", "Có bậc giá không hợp lệ."],
+  ["tariff.out-of-band", "Có bậc giá nằm ngoài khung cho phép."],
+  ["tariff.not-progressive", "Các bậc phải tăng dần."],
+  ["tariff.industrial-out-of-band", "Giá công nghiệp nằm ngoài khung."],
+  ["tariff.above-ceiling", "Giá bình quân vượt trần của Nhà nước."],
+  ["tariff.no-authority", "Trần giá đã bị bãi bỏ, bạn không còn quyền điều chỉnh."],
+  ["policy.too-early", "Chính sách này chưa mở trong giai đoạn hiện tại."],
+  ["policy.already-enabled", "Chính sách đã được áp dụng."],
+  ["policy.requires-petition", "Cần hoàn tất kiến nghị chính sách giá trước."],
+  ["policy.requires-vrem", "Cần mở VREM trước."],
+  ["policy.rate-out-of-range", "Tỷ lệ thu hồi phải từ 30% đến 80%."],
+  ["policy.no-authority", "Nhánh tư nhân hóa không còn thẩm quyền chính sách."],
+  ["decision.unavailable", "Quyết định này chưa được mở khóa."],
+  ["decision.completed", "Quyết định đã hoàn tất."],
+  ["decision.pending", "Quyết định đang được thực hiện."],
+  ["decision.unknown", "Quyết định không hợp lệ."],
+  ["supplier.unknown", "Nhà cung cấp không hợp lệ."],
+  ["approval.none-pending", "Không có hồ sơ nào đang chờ."],
+  ["game.not-playing", "Nhiệm kỳ không ở trạng thái hoạt động."],
+  ["game.ended", "Nhiệm kỳ đã kết thúc."],
+  ["event.none-active", "Không có sự kiện nào đang chờ."],
+  ["event.unknown", "Sự kiện không hợp lệ."],
+  ["event.unknown-choice", "Lựa chọn không hợp lệ."],
+  ["tick.event-pending", "Hãy xử lý sự kiện đang chờ trước."],
+  ["tick.approval-pending", "Hãy xử lý hồ sơ giá đang chờ trước."],
+  ["tick.not-playing", "Nhiệm kỳ chưa sẵn sàng."],
+  ["save.empty", "Ô lưu này đang trống."],
+  ["save.invalid-json", "Tệp không phải JSON hợp lệ."],
+  ["save.invalid-format", "Tệp lưu không đúng định dạng."],
+  ["save.invalid-state", "Dữ liệu nhiệm kỳ không hợp lệ."],
+  ["save.storage-unavailable", "Trình duyệt không cho phép lưu trữ."],
+  ["save.write-failed", "Không ghi được vào bộ nhớ trình duyệt."],
+]);
 
-const errorMessages: CopyDictionary = {
-  "finance.insufficient": "Không đủ ngân quỹ hoặc hạn mức nợ.",
-  "action.at-cap": "Hạng mục này đã đạt mức tối đa.",
-  "action.stock-full": "Kho gạo đã đầy.",
-  "tariff.missing-tier": "Thiếu bậc giá.",
-  "tariff.out-of-band": "Có bậc giá nằm ngoài khung cho phép.",
-  "tariff.not-progressive": "Các bậc phải tăng dần.",
-  "tariff.workshop-out-of-band": "Giá xưởng nằm ngoài khung.",
-  "tariff.above-ceiling": "Giá bình quân vượt trần của Chairman.",
-  "policy.too-early": "Chính sách này chỉ mở từ năm 2024.",
-  "policy.already-enabled": "Chính sách đã được áp dụng.",
-  "policy.not-enabled": "Cần ban hành N-2 trước.",
-  "policy.rate-out-of-range": "Tỷ lệ thu hồi phải từ 30% đến 80%.",
-  "policy.requires-vrem": "Cần mở VREM trước.",
-  "policy.bailout-used": "Bạn chỉ được xin cứu trợ một lần.",
-  "game.not-playing": "Ván chơi không ở trạng thái hoạt động.",
-  "game.ended": "Ván chơi đã kết thúc.",
-  "event.none-active": "Không có sự kiện nào đang chờ.",
-  "event.unknown-choice": "Lựa chọn không hợp lệ.",
-  "save.empty": "Ô lưu này đang trống.",
-  "save.invalid-json": "Tệp không phải JSON hợp lệ.",
-  "save.invalid-format": "Tệp lưu không đúng định dạng.",
-  "save.invalid-state": "Dữ liệu ván chơi không hợp lệ.",
-  "save.storage-unavailable": "Trình duyệt không cho phép lưu trữ.",
-  "save.write-failed": "Không ghi được vào bộ nhớ trình duyệt.",
-  "tick.event-pending": "Hãy xử lý sự kiện đang chờ trước.",
-  "tick.not-playing": "Ván chơi chưa sẵn sàng.",
-};
-
-const noticeMessages: CopyDictionary = {
-  "notice.shortage": "Thiếu gạo cục bộ. Hài lòng dân làng giảm.",
-  "notice.debt": "Dư nợ đã vượt 80% trần. Nguy cơ vỡ nợ.",
-  "notice.inflation": "Lạm phát vượt 8%. Chairman đang theo dõi.",
-  "notice.coverage": "Mạng đường đã phủ 100% hộ dân.",
-  "notice.recovery": "Khoản thu hồi N-2 đã được ghi nhận.",
-  "notice.unrest": "Bất ổn gia tăng. Cần ổn định giá và nguồn cung.",
-};
+const noticeMessages = new Map<string, string>([
+  ["notice.shortage", "Thiếu hụt công suất. Độ tin cậy lưới giảm."],
+  ["notice.blackout", "Độ tin cậy xuống dưới 90%. Nguy cơ cắt điện luân phiên."],
+  ["notice.reserve", "Biên dự phòng dưới 5%. Lưới đang rất mỏng."],
+  ["notice.debt", "Dư nợ đã vượt 80% trần. Nguy cơ vỡ nợ."],
+  ["notice.media", "Truyền thông đưa tin lỗ EVN. Niềm tin dân giảm nhanh."],
+  ["notice.privatization", "Nhánh tư nhân hóa: lưới trùng lặp và giá điện mất trần."],
+]);
 
 const errorMessage = (code: string): string =>
-  errorMessages[code] ?? "Thao tác không thực hiện được.";
+  errorMessages.get(code) ?? "Thao tác không thực hiện được.";
 
 const noticeMessage = (code: string): string => {
   if (code.startsWith("notice.event:")) return "Một sự kiện mới cần quyết định.";
 
-  return noticeMessages[code] ?? code;
+  if (code.startsWith("notice.mission:")) return "Hoàn thành một nhiệm vụ dài hạn. Tín nhiệm tăng.";
+
+  if (code.startsWith("notice.project:")) return "Một công trình đã hoàn tất.";
+
+  return noticeMessages.get(code) ?? code;
 };
 
 const selectionLabel = (selection: string): string => {
   switch (selection) {
     case "hydro":
-      return "Ruộng nước";
-    case "mechanized":
-      return "Ruộng cơ giới";
-    case "hut":
-      return "Bản xa";
-    case "workshop":
-      return "Xưởng làng";
-    case "fleet":
-      return "Đoàn xe";
+      return "Cụm thủy điện";
+    case "thermal":
+      return "Nhà máy nhiệt điện";
+    case "renewable":
+      return "Trang trại tái tạo";
+    case "substation":
+      return "Trạm biến áp";
+    case "urban":
+      return "Phụ tải đô thị";
+    case "industrial":
+      return "Khu công nghiệp";
     default:
-      return "Tuyến đường";
+      return "Phụ tải nông thôn";
   }
 };
 
 type Screen = "title" | "game";
 
-interface ToastState {
+type ToastState = {
   readonly kind: "notice" | "error";
   readonly text: string;
-}
+};
 
 const markTutorial = (): void => {
   const prefs = readSession();
@@ -97,16 +119,22 @@ export const GameShell = (): JSX.Element => {
   const [hasSave, setHasSave] = createSignal(false);
   const [menuOpen, setMenuOpen] = createSignal(false);
   const [tutorialOpen, setTutorialOpen] = createSignal(false);
-  const [tutorialReady, setTutorialReady] = createSignal(false);
   const [selected, setSelected] = createSignal<SceneSelection | null>(null);
   const [toast, setToast] = createSignal<ToastState | null>(null);
+  const [workspaceOpen, setWorkspaceOpen] = createSignal(false);
+  const [workspacePanel, setWorkspacePanel] = createSignal<PanelId>("overview");
   let toastTimer: ReturnType<typeof setTimeout> | undefined;
 
   const showToast = (next: ToastState): void => {
     setToast(next);
 
     if (toastTimer !== undefined) clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => setToast(null), 4_200);
+    toastTimer = setTimeout(() => setToast(null), 4_600);
+  };
+
+  const openPanel = (panel: PanelId): void => {
+    setWorkspacePanel(panel);
+    setWorkspaceOpen(true);
   };
 
   onSettled(() => {
@@ -117,14 +145,36 @@ export const GameShell = (): JSX.Element => {
     }
 
     setHasSave(hasAnySave());
+    store.setSpeed(prefs.speed);
 
-    if (!prefs.tutorialDone) {
-      setTutorialOpen(false);
-    }
+    const onKey = (event: KeyboardEvent): void => {
+      if (screen() !== "game") return;
+      const target = event.target;
 
-    return () => {
-      if (toastTimer !== undefined) clearTimeout(toastTimer);
+      if (target instanceof HTMLElement) {
+        const tag = target.tagName;
+
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable) {
+          return;
+        }
+      }
+
+      if (event.code === "Space") {
+        event.preventDefault();
+        store.togglePause();
+
+        return;
+      }
+
+      if (event.key === "1") store.setSpeed(1);
+
+      if (event.key === "2") store.setSpeed(2);
+
+      if (event.key === "3") store.setSpeed(3);
     };
+
+    window.addEventListener("keydown", onKey);
+    onCleanup(() => window.removeEventListener("keydown", onKey));
   });
 
   createTrackedEffect(() => {
@@ -132,6 +182,7 @@ export const GameShell = (): JSX.Element => {
 
     if (error !== null) showToast({ kind: "error", text: errorMessage(error) });
   });
+
   createTrackedEffect(() => {
     const notice = store.notice();
 
@@ -141,17 +192,21 @@ export const GameShell = (): JSX.Element => {
     }
   });
 
-  const openTutorial = (): void => {
-    setTutorialReady(true);
-    setTutorialOpen(true);
-  };
+  createTrackedEffect(() => {
+    writeSession({ ...readSession(), speed: store.speed(), paused: !store.running() });
+  });
+
+  onCleanup(() => {
+    if (toastTimer !== undefined) clearTimeout(toastTimer);
+  });
 
   const startGame = (): void => {
     actions.newGame();
     setScreen("game");
     setHasSave(true);
-    openTutorial();
-    showToast({ kind: "notice", text: "Nhiệm kỳ mới bắt đầu." });
+    store.setSpeed(1);
+    setTutorialOpen(true);
+    showToast({ kind: "notice", text: "Nhiệm kỳ mới bắt đầu. Mô phỏng đang tạm dừng." });
   };
 
   const continueGame = (): void => {
@@ -159,8 +214,13 @@ export const GameShell = (): JSX.Element => {
 
     if (latest !== null) {
       store.setState(latest.state);
+      store.setSpeed(readSession().speed);
       setScreen("game");
-      showToast({ kind: "notice", text: "Đã tải ván chơi." });
+      showToast({ kind: "notice", text: "Đã tải nhiệm kỳ đang lưu." });
+
+      if (!readSession().tutorialDone) setTutorialOpen(true);
+      else
+        store.setRunning(latest.state.events.activeId === null && latest.state.approval === null);
 
       return;
     }
@@ -171,11 +231,13 @@ export const GameShell = (): JSX.Element => {
   const onLoaded = (): void => {
     setScreen("game");
     setHasSave(true);
+    store.setSpeed(readSession().speed);
   };
 
-  const sceneSelect = (selection: SceneSelection): void => {
-    setSelected(selection);
-    showToast({ kind: "notice", text: `Đã chọn ${selectionLabel(selection)}` });
+  const finishTutorial = (): void => {
+    markTutorial();
+    setTutorialOpen(false);
+    store.setRunning(store.state().events.activeId === null && store.state().approval === null);
   };
 
   return (
@@ -187,16 +249,21 @@ export const GameShell = (): JSX.Element => {
         <Loading
           fallback={
             <div class="scene-loading" role="status" aria-live="polite">
-              Đang mở bàn điều hành…
+              Đang khởi động trung tâm điều độ…
             </div>
           }
         >
           <GameView
-            selected={selected()}
-            onSelect={sceneSelect}
-            onClearSelected={() => setSelected(null)}
+            workspaceOpen={workspaceOpen()}
+            workspacePanel={workspacePanel()}
+            onOpenPanel={openPanel}
+            onCloseWorkspace={() => setWorkspaceOpen(false)}
             onOpenMenu={() => setMenuOpen(true)}
-            onOpenTutorial={openTutorial}
+            onOpenTutorial={() => setTutorialOpen(true)}
+            onSelect={(selection) => {
+              setSelected(selection);
+              showToast({ kind: "notice", text: `Đã chọn ${selectionLabel(selection)}` });
+            }}
           />
         </Loading>
       </Show>
@@ -206,7 +273,7 @@ export const GameShell = (): JSX.Element => {
           onStart={startGame}
           onContinue={continueGame}
           onOpenLoad={() => setMenuOpen(true)}
-          onTutorial={openTutorial}
+          onTutorial={() => setTutorialOpen(true)}
         />
       </Show>
       <Show when={menuOpen()}>
@@ -219,15 +286,12 @@ export const GameShell = (): JSX.Element => {
           />
         </Loading>
       </Show>
-      <Show when={tutorialReady()}>
-        <Loading fallback={null}>
-          <TutorialModal
-            open={tutorialOpen()}
-            onClose={() => setTutorialOpen(false)}
-            onFinish={markTutorial}
-          />
-        </Loading>
-      </Show>
+      <TutorialModal
+        open={tutorialOpen()}
+        onClose={() => setTutorialOpen(false)}
+        onFinish={finishTutorial}
+        onOpenPanel={openPanel}
+      />
       <Show when={toast()}>
         {(current) => (
           <div class="toast" data-kind={current().kind} role="status" aria-live="polite">
@@ -238,6 +302,15 @@ export const GameShell = (): JSX.Element => {
             <span>{current().text}</span>
           </div>
         )}
+      </Show>
+      <Show when={selected() !== null}>
+        <div class="scene-selection" role="status">
+          <Icon icon="lucide:map-pin" size={16} />
+          <span>{selectionLabel(selected() ?? "")}</span>
+          <button type="button" class="text-link" onClick={() => setSelected(null)}>
+            Bỏ chọn
+          </button>
+        </div>
       </Show>
     </main>
   );
