@@ -124,18 +124,18 @@ Local production build through the same gzip proxy:
 | Slowest API | none | none | n/a |
 | Slowest DB query | none | none | n/a |
 
-Live production at merge revision `a8a3d14` (`https://monopoly-nhom5.vercel.app`):
+Live production at merge revision `963eddd` (`https://monopoly-nhom5.vercel.app`):
 
 | Strategy | Performance | Accessibility | Best Practices | SEO | LCP | TBT | CLS | Transfer |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Mobile | 98 | 100 | 100 | 100 | 2.2 s | 10 ms | 0 | 428 KiB |
-| Desktop | 100 | 100 | 100 | 100 | 0.7 s | 0 ms | 0.003 | 443 KiB |
+| Mobile | 95-98 | 100 | 100 | 100 | 2.4-2.8 s | 0 ms | 0 | 341 KiB |
+| Desktop | 98-100 | 100 | 100 | 100 | 1.0 s | 0 ms | 0.001 | 355 KiB |
 
-The baseline live run was `54` performance, `4.1 s` LCP, `7,100 ms` TBT and `628 KiB` transfer. Both final strategies are green in all four Lighthouse categories, and the mobile LCP now meets the 2.5 s target.
+The baseline live run was `54` performance, `4.1 s` LCP, `7,100 ms` TBT and `628 KiB` transfer. Both final strategies are green in all four Lighthouse categories. Mobile LCP sits at the 2.5 s boundary across two runs, and desktop LCP is 1.0 s.
 
 ## 6. Remaining Bottlenecks
 
-- Mobile LCP is 2.2 s on the live Vercel deployment, inside the 2.5 s target. The local gzip harness still measures 3.0 s, about 0.5 s above the target; the remaining lab cost is the 25 kB gzip stylesheet and font startup, so a critical-CSS split is the optional next step.
+- Mobile LCP is 2.4-2.8 s across two live Vercel runs, at the 2.5 s boundary. The local gzip harness measures 3.0 s, about 0.5 s above the target; the remaining lab cost is the 25 kB gzip stylesheet and font startup, so a critical-CSS split is the optional next step.
 - Starting a game still downloads Three.js and GSAP (about 170 kB gzip). This is after user intent and does not affect the title benchmark.
 - Chrome UX Report has no field data for this project yet, so the scores are lab measurements.
 
@@ -160,7 +160,7 @@ The baseline live run was `54` performance, `4.1 s` LCP, `7,100 ms` TBT and `628
 ## Evidence Commands
 
 ```bash
-# Final revision: a8a3d14. Baseline revision: 8530282.
+# Final revision: 963eddd. Baseline revision: 8530282.
 pnpm quality
 pnpm check:bundle
 PLAYWRIGHT_SERVER=start PLAYWRIGHT_PORT=3123 \
@@ -174,4 +174,4 @@ CHROME_PATH=/nix/store/.../bin/chromium npx lighthouse@12.8.2 \
   --only-categories=performance,accessibility,best-practices,seo
 ```
 
-`pnpm quality` final output: 22 test files / 173 tests passed, lint, format, line budget, emoji, domain boundary, coverage, production build and bundle budget all green. The production Playwright run printed `31 passed`, `3 skipped` across the desktop and mobile projects. `pnpm check:bundle` printed 11 chunks, every chunk at or below 500 kB, and `Initial shell: 10 JavaScript preloads, no Three.js or GSAP`.
+`pnpm quality` final output: 22 test files / 173 tests passed, lint, format, line budget, emoji, domain boundary, coverage, production build and bundle budget all green. The production Playwright run printed `33 passed`, `3 skipped` across the desktop and mobile projects (`65 passed`, `7 skipped` across all four projects). `pnpm check:bundle` printed 17 chunks, every chunk at or below 500 kB, and `Initial shell: 5 JavaScript preloads, 372.6 kB min / 127.2 kB gzip, no Three.js or GSAP`.
