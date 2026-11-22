@@ -60,6 +60,7 @@ const errorMessages = new Map<string, string>([
   ["save.invalid-state", "Dữ liệu nhiệm kỳ không hợp lệ."],
   ["save.storage-unavailable", "Trình duyệt không cho phép lưu trữ."],
   ["save.write-failed", "Không ghi được vào bộ nhớ trình duyệt."],
+  ["policy.pending", "Cải cách này đang được thực hiện."],
 ]);
 
 const noticeMessages = new Map<string, string>([
@@ -81,7 +82,22 @@ const noticeMessage = (code: string): string => {
 
   if (code.startsWith("notice.project:")) return "Một công trình đã hoàn tất.";
 
-  if (code.startsWith("notice.reform:")) return "Một cải cách cơ cấu đã có hiệu lực.";
+  if (code.startsWith("notice.reform:")) {
+    const key = code.slice("notice.reform:".length);
+
+    const label =
+      key === "n2"
+        ? "N-2"
+        : key === "nsmo"
+          ? "NSMO"
+          : key === "dppa"
+            ? "DPPA"
+            : key === "vrem"
+              ? "VREM"
+              : "Biểu giá hai thành phần";
+
+    return `${label} đã có hiệu lực.`;
+  }
 
   return noticeMessages.get(code) ?? code;
 };

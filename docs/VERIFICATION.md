@@ -51,7 +51,7 @@ pnpm check:bundle
 ```
 
 All 15 client chunks are below 500 kB minified. The initial shell preloads
-624.2 kB minified / 210.1 kB gzip and contains no Three.js or GSAP. The deferred
+624.4 kB minified / 210.2 kB gzip and contains no Three.js or GSAP. The deferred
 `create-power-scene-*.js` chunk is loaded only after the game starts.
 
 ## Browser matrix

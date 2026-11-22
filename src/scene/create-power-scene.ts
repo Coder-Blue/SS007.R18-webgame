@@ -102,6 +102,14 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
   tourRing.visible = false;
   scene.add(tourRing);
 
+  const reformBeacon = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.1, 0.28, 1, 10),
+    new THREE.MeshBasicMaterial({ color: 0xffc857, transparent: true, opacity: 0.85 }),
+  );
+
+  reformBeacon.visible = false;
+  scene.add(reformBeacon);
+
   const progressBeacons = Array.from({ length: 3 }, () => {
     const beacon = new THREE.Mesh(
       new THREE.CylinderGeometry(0.09, 0.09, 1, 6),
@@ -251,6 +259,23 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
       beacon.position.set(x, 2.1 + progress / 2, z);
       beacon.scale.set(0.8, Math.max(0.15, progress), 0.8);
       beacon.material.color.setHex(project.kind === "decision" ? 0xffb347 : 0x39d7ff);
+    }
+
+    const reforms = state.policy.reformProgress;
+
+    if (reforms.length > 0) {
+      const progress =
+        reforms.reduce(
+          (sum, project) => sum + (project.totalMonths - project.monthsLeft) / project.totalMonths,
+          0,
+        ) / reforms.length;
+
+      reformBeacon.position.set(4.2, 1.5 + progress * 0.9, 5.4);
+      reformBeacon.scale.set(1, Math.max(0.2, progress * 1.8), 1);
+      reformBeacon.material.opacity = currentRunning ? 0.65 + Math.sin(elapsed * 3) * 0.2 : 0.85;
+      reformBeacon.visible = true;
+    } else {
+      reformBeacon.visible = false;
     }
 
     if (state.act !== lastAct) {

@@ -1,9 +1,9 @@
 import type { JSX } from "@solidjs/web";
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { useGame } from "../game-context";
 import { Bar, Badge, Panel } from "../components/base";
 import { Icon, type IconName } from "../components/icons";
-import { missionStatus, type MissionId } from "~/domain";
+import { missionStatus, type MissionId, type PolicyKey } from "~/domain";
 import type { PanelId } from "../mobile/mobile-nav";
 
 const icons: Readonly<Record<MissionId, IconName>> = {
@@ -24,6 +24,14 @@ const descriptions: Readonly<Record<MissionId, string>> = {
   security: "Giữ biên dự phòng trên 15% đủ 12 tháng.",
 };
 
+const reformNames: Readonly<Record<PolicyKey, string>> = {
+  n2: "N-2 · Thu hồi chi phí",
+  nsmo: "NSMO · Tách điều độ",
+  dppa: "DPPA · Mua bán trực tiếp",
+  vrem: "VREM · Bán lẻ cạnh tranh",
+  twoPart: "Biểu giá hai thành phần",
+};
+
 export const MissionRail = (props: {
   readonly onOpenPanel: (panel: PanelId) => void;
 }): JSX.Element => {
@@ -33,6 +41,37 @@ export const MissionRail = (props: {
 
   return (
     <aside class="dock dock-left desktop-only" aria-label="Nhiệm vụ dài hạn">
+      <Show when={state().policy.reformProgress.length > 0}>
+        <Panel
+          title="Cải cách đang thực thi"
+          kicker="Tiến trình 0–100%"
+          icon="tabler:gavel"
+          class="dock-panel"
+        >
+          <For each={state().policy.reformProgress}>
+            {(project) => {
+              const progress =
+                ((project.totalMonths - project.monthsLeft) / project.totalMonths) * 100;
+
+              return (
+                <div class="reform-mini" data-reform={project.key}>
+                  <div class="dispatch-head">
+                    <span>{reformNames[project.key]}</span>
+                    <strong>{`${Math.round(progress)}%`}</strong>
+                  </div>
+                  <Bar
+                    value={progress}
+                    tone="electric"
+                    label={`Tiến trình ${reformNames[project.key]}`}
+                  />
+                  <span class="project-meta">{`Còn ${project.monthsLeft} tháng`}</span>
+                </div>
+              );
+            }}
+          </For>
+        </Panel>
+      </Show>
+
       <Panel
         title="Nhiệm vụ dài hạn"
         kicker="Ba trụ cột nhiệm kỳ"
