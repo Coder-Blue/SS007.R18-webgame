@@ -1,4 +1,11 @@
 import type { JSX } from "@solidjs/web";
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/solid/slider";
 import { Icon, type IconName } from "./icons";
 
 export const cx = (...values: readonly (string | false | null | undefined)[]): string =>
@@ -58,9 +65,10 @@ export const Stat = (props: {
 export const Bar = (props: {
   readonly value: number;
   readonly max?: number;
-  readonly tone?: "good" | "warn" | "bad" | "gold" | "green";
+  readonly tone?: "good" | "warn" | "bad" | "gold" | "green" | "electric";
   readonly label?: string;
   readonly class?: string;
+  readonly pulse?: boolean;
 }): JSX.Element => {
   const max = props.max ?? 100;
   const ratio = () => (max <= 0 ? 0 : Math.max(0, Math.min(1, props.value / max)));
@@ -69,7 +77,8 @@ export const Bar = (props: {
   return (
     <div
       class={cx("bar", props.class)}
-      data-tone={props.tone ?? "green"}
+      data-tone={props.tone ?? "electric"}
+      data-pulse={props.pulse ? "true" : undefined}
       role="meter"
       aria-label={props.label ?? "Chỉ số"}
       aria-valuemin={0}
@@ -84,10 +93,18 @@ export const Bar = (props: {
 
 export const Badge = (props: {
   readonly children: JSX.Element;
-  readonly tone?: "neutral" | "good" | "warn" | "bad" | "gold" | "dark";
+  readonly tone?: "neutral" | "good" | "warn" | "bad" | "gold" | "dark" | "electric";
   readonly class?: string;
+  readonly pulse?: boolean;
+  readonly label?: string;
 }): JSX.Element => (
-  <span class={cx("badge", props.class)} data-tone={props.tone ?? "neutral"}>
+  <span
+    class={cx("badge", props.class)}
+    data-tone={props.tone ?? "neutral"}
+    data-pulse={props.pulse ? "true" : undefined}
+    aria-label={props.label}
+    role={props.label === undefined ? undefined : "status"}
+  >
     {props.children}
   </span>
 );
@@ -98,11 +115,13 @@ export const IconButton = (props: {
   readonly onClick?: () => void;
   readonly class?: string;
   readonly disabled?: boolean;
+  readonly pressed?: boolean;
 }): JSX.Element => (
   <button
     type="button"
     class={cx("icon-btn", props.class)}
     aria-label={props.label}
+    aria-pressed={props.pressed === undefined ? undefined : props.pressed ? "true" : "false"}
     title={props.label}
     onClick={props.onClick}
     disabled={props.disabled}
@@ -121,6 +140,7 @@ export const ActionButton = (props: {
   readonly class?: string;
   readonly ariaLabel?: string;
   readonly type?: "button" | "submit";
+  readonly pressed?: boolean;
 }): JSX.Element => (
   <button
     type={props.type ?? "button"}
@@ -130,6 +150,7 @@ export const ActionButton = (props: {
     onClick={props.onClick}
     disabled={props.disabled}
     aria-label={props.ariaLabel}
+    aria-pressed={props.pressed === undefined ? undefined : props.pressed ? "true" : "false"}
   >
     {props.icon === undefined ? null : (
       <Icon icon={props.icon} size={props.size === "sm" ? 15 : 18} />
@@ -172,7 +193,7 @@ export const ProgressRing = (props: {
   readonly size?: number;
   readonly stroke?: number;
   readonly label?: string;
-  readonly tone?: "good" | "warn" | "bad" | "gold";
+  readonly tone?: "good" | "warn" | "bad" | "gold" | "electric";
 }): JSX.Element => {
   const size = props.size ?? 56;
   const stroke = props.stroke ?? 5;
@@ -185,7 +206,7 @@ export const ProgressRing = (props: {
   return (
     <span
       class="ring"
-      data-tone={props.tone ?? "good"}
+      data-tone={props.tone ?? "electric"}
       role="meter"
       aria-label={props.label ?? "Chỉ số"}
       aria-valuemin={0}
@@ -218,3 +239,29 @@ export const ProgressRing = (props: {
     </span>
   );
 };
+
+export const RangeSlider = (props: {
+  readonly value: number;
+  readonly min: number;
+  readonly max: number;
+  readonly step?: number;
+  readonly label: string;
+  readonly onInput: (value: number) => void;
+  readonly class?: string;
+}): JSX.Element => (
+  <Slider
+    class={cx("slider", props.class)}
+    value={props.value}
+    min={props.min}
+    max={props.max}
+    step={props.step ?? 1}
+    onValueChange={(value) => props.onInput(value)}
+  >
+    <SliderControl class="slider-control">
+      <SliderTrack class="slider-track">
+        <SliderIndicator class="slider-indicator" />
+        <SliderThumb class="slider-thumb" aria-label={props.label} />
+      </SliderTrack>
+    </SliderControl>
+  </Slider>
+);

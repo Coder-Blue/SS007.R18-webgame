@@ -1,131 +1,86 @@
-import type { ActionResult, GameState, Result } from "../types";
-import { err } from "../types";
-import {
-  BAILOUT_SATISFACTION_COST,
-  BAILOUT_TRUST_COST,
-  N2_RATE_MAX,
-  N2_RATE_MIN,
-} from "../constants";
-import { clamp } from "../clock";
-import { finishAction, requirePlaying } from "./helpers";
+import type { DecisionId, GameState, PolicyKey } from "../types";
+import { err, ok, type Result } from "../types";
+import { DECISIONS, RECOVERY_RATE_MAX, RECOVERY_RATE_MIN } from "../constants";
+import { addProject, charge } from "./helpers";
 
-const already = (code: string): Result<never, { code: string }> => err({ code });
+export const enableN2Action = (state: GameState): Result<GameState> => {
+  if (state.policy.n2Enabled) return err("policy.already-enabled");
 
-export const enactRecoveryAction = (state: GameState): ActionResult => {
-  const blocked = requirePlaying(state);
+  if (state.clock.year < 2024) return err("policy.too-early");
 
-  if (blocked !== null) return blocked;
-
-  if (state.clock.year < 2024) return already("policy.too-early");
-
-  if (state.policy.n2Enabled) return already("policy.already-enabled");
-
-  return finishAction({
-    ...state,
-    policy: { ...state.policy, n2Enabled: true },
-    metrics: {
-      ...state.metrics,
-      trust: clamp(state.metrics.trust + 3, 0, 100),
-      inflation: state.metrics.inflation + 0.3,
-    },
-  });
-};
-
-export const setRecoveryRateAction = (state: GameState, rate: number): ActionResult => {
-  const blocked = requirePlaying(state);
-
-  if (blocked !== null) return blocked;
-
-  if (!state.policy.n2Enabled) return already("policy.not-enabled");
-
-  if (rate < N2_RATE_MIN || rate > N2_RATE_MAX) return already("policy.rate-out-of-range");
-
-  return finishAction({
-    ...state,
-    policy: { ...state.policy, n2Rate: rate },
-  });
-};
-
-const enablePolicy = (
-  state: GameState,
-  field: "nsmo" | "dppa" | "vrem",
-  cost: number,
-): ActionResult => {
-  const blocked = requirePlaying(state);
-
-  if (blocked !== null) return blocked;
-
-  if (state.policy[field]) return already("policy.already-enabled");
-
-  if (state.finance.cash + (state.finance.debtLimit - state.finance.debt) < cost) {
-    return already("finance.insufficient");
+  if (!state.policy.petitionDone && !state.events.flags.includes("event:revised-law:enact-law")) {
+    return err("policy.requires-petition");
   }
 
-  const cash = state.finance.cash - cost;
-  const borrowed = cash < 0 ? -cash : 0;
-
-  return finishAction({
-    ...state,
-    finance: {
-      ...state.finance,
-      cash: Math.max(0, cash),
-      debt: state.finance.debt + borrowed,
-    },
-    policy: { ...state.policy, [field]: true },
-    metrics: {
-      ...state.metrics,
-      trust: clamp(state.metrics.trust + 2, 0, 100),
-    },
-  });
+  return ok({ ...state, policy: { ...state.policy, n2Enabled: true } });
 };
 
-export const enableNsmoAction = (state: GameState): ActionResult =>
-  enablePolicy(state, "nsmo", 250);
+export const enablePolicyAction = (state: GameState, key: PolicyKey): Result<GameState> => {
+  if (state.policy.branch === "private" || !state.policy.priceCap) {
+    return err("policy.no-authority");
+  }
 
-export const enableDppaAction = (state: GameState): ActionResult =>
-  enablePolicy(state, "dppa", 400);
+  const current = state.policy;
 
-export const enableVremAction = (state: GameState): ActionResult =>
-  enablePolicy(state, "vrem", 350);
+  if (
+    (key === "n2" && current.n2Enabled) ||
+    (key === "nsmo" && current.nsmo) ||
+    (key === "dppa" && current.dppa) ||
+    (key === "vrem" && current.vrem) ||
+    (key === "twoPart" && current.twoPartTariff)
+  ) {
+    return err("policy.already-enabled");
+  }
 
-export const enableTwoPartAction = (state: GameState): ActionResult => {
-  const blocked = requirePlaying(state);
+  if (key === "twoPart" && !current.vrem) return err("policy.requires-vrem");
 
-  if (blocked !== null) return blocked;
+  if (
+    key !== "n2" &&
+    key !== "twoPart" &&
+    !state.events.flags.includes("event:revised-law:enact-law")
+  ) {
+    return err("policy.requires-law");
+  }
 
-  if (!state.policy.vrem) return already("policy.requires-vrem");
+  const next = {
+    ...current,
+    n2Enabled: current.n2Enabled || key === "n2",
+    nsmo: current.nsmo || key === "nsmo",
+    dppa: current.dppa || key === "dppa",
+    vrem: current.vrem || key === "vrem",
+    twoPartTariff: current.twoPartTariff || key === "twoPart",
+  };
 
-  if (state.policy.twoPartTariff) return already("policy.already-enabled");
-
-  return finishAction({
-    ...state,
-    policy: { ...state.policy, twoPartTariff: true },
-    metrics: {
-      ...state.metrics,
-      trust: clamp(state.metrics.trust + 2, 0, 100),
-      satisfaction: clamp(state.metrics.satisfaction + 1, 0, 100),
-    },
-  });
+  return ok({ ...state, policy: next });
 };
 
-export const requestBailoutAction = (state: GameState): ActionResult => {
-  const blocked = requirePlaying(state);
+export const setRecoveryRate = (state: GameState, rate: number): Result<GameState> => {
+  if (!Number.isFinite(rate) || rate < RECOVERY_RATE_MIN || rate > RECOVERY_RATE_MAX) {
+    return err("policy.rate-out-of-range");
+  }
 
-  if (blocked !== null) return blocked;
+  return ok({ ...state, policy: { ...state.policy, n2Rate: rate } });
+};
 
-  if (state.policy.bailoutUsed) return already("policy.bailout-used");
+export const startDecisionAction = (state: GameState, id: DecisionId): Result<GameState> => {
+  if (!state.events.decisions.includes(id)) return err("decision.unavailable");
 
-  return finishAction({
-    ...state,
-    finance: {
-      ...state.finance,
-      debt: Math.max(0, state.finance.debt - 8_000),
-    },
-    metrics: {
-      ...state.metrics,
-      trust: clamp(state.metrics.trust - BAILOUT_TRUST_COST, 0, 100),
-      satisfaction: clamp(state.metrics.satisfaction - BAILOUT_SATISFACTION_COST, 0, 100),
-    },
-    policy: { ...state.policy, bailoutUsed: true },
-  });
+  if (state.events.completedDecisions.includes(id)) return err("decision.completed");
+
+  if (
+    state.operations.projects.some(
+      (project) => project.kind === "decision" && project.targetId === id,
+    )
+  ) {
+    return err("decision.pending");
+  }
+
+  const definition = DECISIONS.find((candidate) => candidate.id === id);
+
+  if (definition === undefined) return err("decision.unknown");
+  const paid = charge(state, definition.cost);
+
+  if (!paid.ok) return paid;
+
+  return addProject(paid.value, "decision", id, definition.months);
 };

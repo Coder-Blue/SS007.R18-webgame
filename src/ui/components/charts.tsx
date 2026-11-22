@@ -1,122 +1,346 @@
+import { For, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
+import type { MonthlyLedger } from "~/domain";
 
-export interface Series {
+const width = 640;
+const height = 220;
+const pad = { left: 44, right: 16, top: 16, bottom: 28 };
+
+type Series = {
+  readonly key: string;
   readonly label: string;
   readonly color: string;
-  readonly values: readonly number[];
-}
-
-const range = (series: readonly Series[]): readonly [number, number] => {
-  const values = series.flatMap((item) => item.values);
-
-  if (values.length === 0) return [0, 1];
-  const min = Math.min(0, ...values);
-  const max = Math.max(1, ...values);
-  const pad = (max - min) * 0.08 || 1;
-
-  return [min - pad, max + pad];
 };
 
-const points = (
-  values: readonly number[],
-  width: number,
-  height: number,
-  min: number,
-  max: number,
-): string => {
-  if (values.length === 0) return "";
-  const step = values.length === 1 ? width : width / (values.length - 1);
+const revenueSeries: readonly Series[] = [
+  { key: "revenueElectricity", label: "Doanh thu điện", color: "var(--electric)" },
+  { key: "revenueOther", label: "Doanh thu khác", color: "var(--cyan-soft)" },
+];
 
-  return values
-    .map((value, index) => {
-      const x = index * step;
-      const y = height - ((value - min) / (max - min)) * height;
+const costSeries: readonly Series[] = [
+  { key: "costSupply", label: "Chi phí cung ứng", color: "var(--amber)" },
+  { key: "costManagement", label: "Chi phí quản lý", color: "var(--rose)" },
+];
 
-      return `${index === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
+const valueOf = (ledger: MonthlyLedger, key: string): number => {
+  if (key === "revenueElectricity") return ledger.revenueElectricity;
+
+  if (key === "revenueOther") return ledger.revenueOther;
+
+  if (key === "costSupply") return ledger.costSupply;
+
+  if (key === "costManagement") return ledger.costManagement;
+
+  if (key === "citizenTrust") return ledger.citizenTrust;
+
+  if (key === "institutionalTrust") return ledger.institutionalTrust;
+
+  return 0;
 };
 
-export const LineChart = (props: {
-  readonly series: readonly Series[];
-  readonly height?: number;
-  readonly ariaLabel: string;
-  readonly grid?: number;
+const monthLabel = (ledger: MonthlyLedger): string =>
+  `T${ledger.month}/${String(ledger.year).slice(2)}`;
+
+const maxOf = (rows: readonly MonthlyLedger[]): number => {
+  let max = 1;
+
+  for (const row of rows) {
+    max = Math.max(
+      max,
+      row.revenueElectricity + row.revenueOther,
+      row.costManagement + row.costSupply,
+    );
+  }
+
+  return max;
+};
+
+const yOf = (value: number, max: number): number =>
+  pad.top + (1 - value / max) * (height - pad.top - pad.bottom);
+
+const pathOf = (rows: readonly MonthlyLedger[], key: string, max: number): string => {
+  let path = "";
+
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+
+    if (row === undefined) continue;
+    const x = pad.left + (index / Math.max(1, rows.length - 1)) * (width - pad.left - pad.right);
+    const y = yOf(valueOf(row, key), max);
+
+    path += `${index === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)} `;
+  }
+
+  return path;
+};
+
+export const RevenueCostChart = (props: {
+  readonly rows: readonly MonthlyLedger[];
 }): JSX.Element => {
-  const width = 360;
-  const height = props.height ?? 140;
-  const bounds = () => range(props.series);
-  const grid = props.grid ?? 4;
+  const rows = () => props.rows.slice(-6);
+  const max = () => maxOf(rows()) * 1.12;
+
+  const groupWidth = () => (width - pad.left - pad.right) / Math.max(1, rows().length);
 
   return (
-    <svg
-      class="line-chart"
-      viewBox={`0 0 ${width} ${height + 18}`}
-      preserveAspectRatio="none"
-      role="img"
-      aria-label={props.ariaLabel}
-    >
-      {Array.from({ length: grid + 1 }, (_value, index) => {
-        const y = (height / grid) * index;
+    <figure class="chart-figure">
+      <div class="chart-legend" aria-hidden="true">
+        <For each={[...revenueSeries, ...costSeries]}>
+          {(series) => (
+            <span class="chart-legend-item">
+              <span class="chart-swatch" style={{ background: series.color }} />
+              {series.label}
+            </span>
+          )}
+        </For>
+      </div>
+      <div class="chart-scroll">
+        <svg
+          class="chart"
+          viewBox={`0 0 ${width} ${height}`}
+          role="img"
+          aria-label="So sánh cơ cấu doanh thu và chi phí sáu tháng gần nhất"
+        >
+          <title>Doanh thu và chi phí theo tháng, đơn vị tỷ đồng</title>
+          <For each={[0, 0.25, 0.5, 0.75, 1]}>
+            {(ratio) => (
+              <g>
+                <line
+                  x1={pad.left}
+                  x2={width - pad.right}
+                  y1={pad.top + ratio * (height - pad.top - pad.bottom)}
+                  y2={pad.top + ratio * (height - pad.top - pad.bottom)}
+                  class="chart-grid"
+                />
+                <text
+                  x={pad.left - 8}
+                  y={pad.top + ratio * (height - pad.top - pad.bottom) + 4}
+                  text-anchor="end"
+                  class="chart-axis"
+                >
+                  {Math.round(max() * (1 - ratio))}
+                </text>
+              </g>
+            )}
+          </For>
+          <For each={rows()}>
+            {(row, index) => {
+              const group = () => pad.left + index() * groupWidth() + groupWidth() * 0.18;
+              const barWidth = () => groupWidth() * 0.26;
+              const totalRevenue = () => row.revenueElectricity + row.revenueOther;
+              const totalCost = () => row.costSupply + row.costManagement;
+              const revenueTop = () => yOf(totalRevenue(), max());
+              const costTop = () => yOf(totalCost(), max());
 
-        return <line x1="0" y1={y} x2={width} y2={y} class="chart-grid" />;
-      })}
-      {props.series.map((item) => (
-        <path
-          d={points(item.values, width, height, bounds()[0], bounds()[1])}
-          fill="none"
-          stroke={item.color}
-          stroke-width="2.2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          vector-effect="non-scaling-stroke"
-        />
-      ))}
-      <line x1="0" y1={height} x2={width} y2={height} class="chart-axis" />
-      {props.series.map((item, index) => (
-        <g transform={`translate(${index * 78}, ${height + 14})`}>
-          <rect width="7" height="7" x="0" y="-7" fill={item.color} rx="1.5" />
-          <text x="12" y="0" class="chart-label">
-            {item.label}
-          </text>
-        </g>
-      ))}
-    </svg>
+              const electricHeight = () =>
+                yOf(row.revenueOther, max()) - yOf(totalRevenue(), max());
+
+              const otherHeight = () => height - pad.bottom - yOf(row.revenueOther, max());
+
+              const supplyHeight = () => yOf(row.costManagement, max()) - yOf(totalCost(), max());
+
+              const managementHeight = () => height - pad.bottom - yOf(row.costManagement, max());
+
+              return (
+                <g>
+                  <rect
+                    x={group()}
+                    y={revenueTop()}
+                    width={barWidth()}
+                    height={height - pad.bottom - revenueTop()}
+                    fill="var(--electric)"
+                    class="chart-bar"
+                    opacity={index() === rows().length - 1 ? 1 : 0.58}
+                  >
+                    <title>{`${monthLabel(row)} · Doanh thu ${Math.round(totalRevenue())} tỷ (100%)`}</title>
+                  </rect>
+                  <rect
+                    x={group()}
+                    y={yOf(row.revenueOther, max())}
+                    width={barWidth()}
+                    height={otherHeight()}
+                    fill="var(--cyan-soft)"
+                    class="chart-bar"
+                    opacity={index() === rows().length - 1 ? 1 : 0.58}
+                  >
+                    <title>{`${monthLabel(row)} · Doanh thu khác ${Math.round(row.revenueOther)} tỷ (${Math.round((row.revenueOther / Math.max(1, totalRevenue())) * 100)}% doanh thu)`}</title>
+                  </rect>
+                  <rect
+                    x={group() + barWidth() + 4}
+                    y={costTop()}
+                    width={barWidth()}
+                    height={height - pad.bottom - costTop()}
+                    fill="var(--amber)"
+                    class="chart-bar"
+                    opacity={index() === rows().length - 1 ? 1 : 0.58}
+                  >
+                    <title>{`${monthLabel(row)} · Chi phí ${Math.round(totalCost())} tỷ (100%)`}</title>
+                  </rect>
+                  <rect
+                    x={group() + barWidth() + 4}
+                    y={yOf(row.costManagement, max())}
+                    width={barWidth()}
+                    height={managementHeight()}
+                    fill="var(--rose)"
+                    class="chart-bar"
+                    opacity={index() === rows().length - 1 ? 1 : 0.58}
+                  >
+                    <title>{`${monthLabel(row)} · Chi phí quản lý ${Math.round(row.costManagement)} tỷ (${Math.round((row.costManagement / Math.max(1, totalCost())) * 100)}% chi phí)`}</title>
+                  </rect>
+                  <rect
+                    x={group()}
+                    y={revenueTop()}
+                    width={barWidth()}
+                    height={electricHeight()}
+                    fill="transparent"
+                  >
+                    <title>{`${monthLabel(row)} · Doanh thu điện ${Math.round(row.revenueElectricity)} tỷ`}</title>
+                  </rect>
+                  <rect
+                    x={group() + barWidth() + 4}
+                    y={costTop()}
+                    width={barWidth()}
+                    height={supplyHeight()}
+                    fill="transparent"
+                  >
+                    <title>{`${monthLabel(row)} · Chi phí cung ứng ${Math.round(row.costSupply)} tỷ`}</title>
+                  </rect>
+                  <text
+                    x={group() + barWidth()}
+                    y={height - 8}
+                    text-anchor="middle"
+                    class="chart-axis"
+                  >
+                    {monthLabel(row)}
+                  </text>
+                </g>
+              );
+            }}
+          </For>
+        </svg>
+      </div>
+      <figcaption class="chart-caption">
+        Cột trái: doanh thu. Cột phải: chi phí. Đơn vị tỷ đồng.
+      </figcaption>
+    </figure>
   );
 };
 
-export const MiniBars = (props: {
-  readonly values: readonly number[];
-  readonly ariaLabel: string;
-  readonly height?: number;
+export const TrustTrendChart = (props: {
+  readonly rows: readonly MonthlyLedger[];
 }): JSX.Element => {
-  const max = () => Math.max(1, ...props.values.map((value) => Math.abs(value)));
-  const width = 120;
-  const height = props.height ?? 34;
-  const barWidth = () => (props.values.length === 0 ? width : width / props.values.length);
+  const rows = () => props.rows.slice(-24);
+  const pathCitizen = () => pathOf(rows(), "citizenTrust", 100);
+  const pathInstitutional = () => pathOf(rows(), "institutionalTrust", 100);
 
   return (
-    <svg
-      class="mini-bars"
-      viewBox={`0 0 ${width} ${height}`}
-      role="img"
-      aria-label={props.ariaLabel}
-    >
-      {props.values.map((value, index) => {
-        const ratio = Math.abs(value) / max();
-        const barHeight = Math.max(2, ratio * (height - 4));
+    <figure class="chart-figure">
+      <div class="chart-legend" aria-hidden="true">
+        <span class="chart-legend-item">
+          <span class="chart-swatch" style={{ background: "var(--electric)" }} />
+          Niềm tin người dân
+        </span>
+        <span class="chart-legend-item">
+          <span class="chart-swatch" style={{ background: "var(--gold)" }} />
+          Tín nhiệm thể chế
+        </span>
+      </div>
+      <div class="chart-scroll">
+        <svg
+          class="chart"
+          viewBox={`0 0 ${width} ${height}`}
+          role="img"
+          aria-label="Xu hướng hai chỉ số niềm tin trong hai mươi bốn tháng"
+        >
+          <title>Hai chỉ số niềm tin theo tháng, phần trăm</title>
+          <For each={[0, 0.25, 0.5, 0.75, 1]}>
+            {(ratio) => (
+              <g>
+                <line
+                  x1={pad.left}
+                  x2={width - pad.right}
+                  y1={pad.top + ratio * (height - pad.top - pad.bottom)}
+                  y2={pad.top + ratio * (height - pad.top - pad.bottom)}
+                  class="chart-grid"
+                />
+                <text
+                  x={pad.left - 8}
+                  y={pad.top + ratio * (height - pad.top - pad.bottom) + 4}
+                  text-anchor="end"
+                  class="chart-axis"
+                >
+                  {Math.round(100 * (1 - ratio))}
+                </text>
+              </g>
+            )}
+          </For>
+          <path d={pathCitizen()} class="chart-line" stroke="var(--electric)" />
+          <path d={pathInstitutional()} class="chart-line" stroke="var(--gold)" />
+        </svg>
+      </div>
+      <figcaption class="chart-caption">
+        Ngưỡng thất bại: 0%. Mục tiêu ổn định: trên 55%.
+      </figcaption>
+    </figure>
+  );
+};
 
-        return (
-          <rect
-            x={index * barWidth() + 1}
-            y={value >= 0 ? height - barHeight : 2}
-            width={Math.max(1, barWidth() - 2)}
-            height={barHeight}
-            rx="1"
-            class={value >= 0 ? "mini-bar-good" : "mini-bar-bad"}
-          />
-        );
-      })}
-    </svg>
+export const GenerationMix = (props: { readonly rows: readonly MonthlyLedger[] }): JSX.Element => {
+  const last = () => props.rows[props.rows.length - 1];
+
+  const total = () => {
+    const row = last();
+
+    if (row === undefined) return 1;
+
+    return Math.max(
+      1,
+      row.hydroMillionKwh + row.thermalMillionKwh + row.renewableMillionKwh + row.importMillionKwh,
+    );
+  };
+
+  const segments = () => {
+    const row = last();
+
+    if (row === undefined) return [];
+
+    return [
+      { label: "Thủy điện", value: row.hydroMillionKwh, color: "var(--cyan-soft)" },
+      { label: "Nhiệt điện", value: row.thermalMillionKwh, color: "var(--amber)" },
+      { label: "Tái tạo", value: row.renewableMillionKwh, color: "var(--lime)" },
+      { label: "Nhập khẩu", value: row.importMillionKwh, color: "var(--electric)" },
+    ];
+  };
+
+  return (
+    <div class="mix">
+      <div class="mix-bar" role="img" aria-label="Cơ cấu nguồn điện tháng gần nhất">
+        <Show when={last() !== undefined}>
+          <For each={segments()}>
+            {(segment) => (
+              <span
+                class="mix-segment"
+                style={{
+                  width: `${(segment.value / total()) * 100}%`,
+                  background: segment.color,
+                }}
+                title={`${segment.label}: ${Math.round(segment.value)} triệu kWh`}
+              />
+            )}
+          </For>
+        </Show>
+      </div>
+      <div class="mix-legend">
+        <For each={segments()}>
+          {(segment) => (
+            <span class="mix-item">
+              <span class="chart-swatch" style={{ background: segment.color }} />
+              {segment.label}
+              <strong>{Math.round((segment.value / total()) * 100)}%</strong>
+            </span>
+          )}
+        </For>
+      </div>
+    </div>
   );
 };

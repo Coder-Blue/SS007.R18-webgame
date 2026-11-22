@@ -8,27 +8,28 @@ describe("rng", () => {
   });
 
   it("threads the seed through bounded draws", () => {
-    const step = randomBetween(7, 2, 4);
-    expect(step.value).toBeGreaterThanOrEqual(2);
-    expect(step.value).toBeLessThan(4);
-    const int = randomInt(7, 2, 4);
-    expect(Number.isInteger(int.value)).toBe(true);
-    expect(int.value).toBeGreaterThanOrEqual(2);
-    expect(int.value).toBeLessThanOrEqual(4);
+    const between = randomBetween(3, 5, 9);
+
+    expect(between.value).toBeGreaterThanOrEqual(5);
+    expect(between.value).toBeLessThan(9);
+    expect(between.seed).not.toBe(3);
+
+    const integer = randomInt(3, 1, 4);
+
+    expect(Number.isInteger(integer.value)).toBe(true);
+    expect(integer.value).toBeGreaterThanOrEqual(1);
+    expect(integer.value).toBeLessThanOrEqual(4);
   });
 
-  it("picks an item from a collection", () => {
-    const picked = pick(3, ["a", "b", "c"]);
+  it("picks an item and rejects an empty collection", () => {
+    const picked = pick(1, ["a", "b", "c"]);
+
     expect(["a", "b", "c"]).toContain(picked.value);
-    expect(picked.seed).toBeTypeOf("number");
-  });
-
-  it("throws when picking from an empty collection", () => {
     expect(() => pick(1, [])).toThrow("pick: empty collection");
   });
 
-  it("reports a chance draw", () => {
-    expect(chance(1, 1).value).toBe(true);
+  it("returns deterministic booleans", () => {
     expect(chance(1, 0).value).toBe(false);
+    expect(chance(1, 1).value).toBe(true);
   });
 });

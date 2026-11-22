@@ -1,95 +1,123 @@
 import { describe, expect, it } from "vitest";
-import { createInitialState } from "../../src/domain/constants";
-import {
-  buildRoad,
-  coverageGap,
-  fleetUpgrade,
-  logisticsEfficiency,
-  roadQualityIndex,
-} from "../../src/domain/infrastructure";
+import { advanceProjects, completeProject } from "../../src/domain/infrastructure";
+import { applyEffects, completeDecision } from "../../src/domain/events/effects";
+import { baseState, effects } from "./test-helpers";
 
-const initial = createInitialState();
+const project = (
+  kind: "line" | "hydro" | "thermal" | "renewable" | "substation" | "decision",
+  targetId: string,
+  monthsLeft = 1,
+) => ({
+  id: `${kind}-${targetId}`,
+  kind,
+  targetId,
+  monthsLeft,
+  totalMonths: monthsLeft,
+});
 
 describe("infrastructure", () => {
-  it.each(["dirt", "cobble", "asphalt"] as const)(
-    "builds a %s road with the expected cost and coverage",
-    (grade) => {
-      const result = buildRoad(initial.infrastructure, grade);
-      expect(result.cost).toBeGreaterThan(0);
-      expect(result.km).toBeGreaterThan(0);
-      expect(result.infrastructure.coverage).toBeGreaterThan(initial.infrastructure.coverage);
-      expect(result.infrastructure.remoteCoverage).toBeGreaterThan(
-        initial.infrastructure.remoteCoverage,
-      );
-    },
-  );
+  it("completes a line into a zone", () => {
+    const state = baseState();
+    const next = completeProject(state, project("line", "rural"));
 
-  it("never exceeds 100 percent coverage", () => {
-    const result = buildRoad(
-      { ...initial.infrastructure, coverage: 99, remoteCoverage: 99 },
-      "asphalt",
+    expect(next.zones.rural.coverage).toBeGreaterThan(state.zones.rural.coverage);
+    expect(next.infrastructure.lineKm500).toBeGreaterThan(state.infrastructure.lineKm500);
+  });
+
+  it("completes each plant kind", () => {
+    const state = baseState();
+
+    expect(
+      completeProject(state, project("hydro", "hydro")).generation.hydroCapacityMw,
+    ).toBeGreaterThan(state.generation.hydroCapacityMw);
+    expect(
+      completeProject(state, project("thermal", "thermal")).generation.thermalCapacityMw,
+    ).toBeGreaterThan(state.generation.thermalCapacityMw);
+    expect(
+      completeProject(state, project("renewable", "renewable")).generation.renewableCapacityMw,
+    ).toBeGreaterThan(state.generation.renewableCapacityMw);
+  });
+
+  it("completes a substation and ignores unknown lines and decisions", () => {
+    const state = baseState();
+    const next = completeProject(state, project("substation", "substation"));
+
+    expect(next.infrastructure.substations).toBe(state.infrastructure.substations + 1);
+    expect(next.infrastructure.gridStrength).toBeGreaterThan(state.infrastructure.gridStrength);
+    expect(completeProject(state, project("line", "unknown"))).toBe(state);
+    expect(completeProject(state, project("decision", "unknown"))).toBe(state);
+  });
+
+  it("advances a queue and completes finished work", () => {
+    const state = baseState();
+
+    const queued = {
+      ...state,
+      operations: {
+        ...state.operations,
+        projects: [project("line", "urban", 2), project("hydro", "hydro", 1)],
+      },
+    };
+
+    const step = advanceProjects(queued);
+
+    expect(step.completed).toHaveLength(1);
+    expect(step.state.operations.projects).toHaveLength(1);
+    expect(step.state.operations.projects[0]?.monthsLeft).toBe(1);
+  });
+});
+
+describe("event effects", () => {
+  it("applies every economic effect and clamps bounds", () => {
+    const state = baseState();
+
+    const next = applyEffects(
+      state,
+      effects({
+        cashDelta: 100,
+        debtDelta: 200,
+        citizenTrustDelta: 100,
+        institutionalTrustDelta: -100,
+        inflationDelta: 50,
+        fuelPriceDelta: 1,
+        reservoirDelta: -100,
+        hydroCapacityDelta: 100,
+        thermalCapacityDelta: 100,
+        renewableCapacityDelta: 100,
+        coverageDelta: 100,
+        demandDelta: 1,
+        mediaMonths: 3,
+        unlockDecisions: ["keep-fuel"],
+        enablePolicy: ["n2", "nsmo", "dppa", "vrem", "twoPart"],
+        setBranch: "private",
+        disablePriceCap: true,
+      }),
     );
 
-    expect(result.infrastructure.coverage).toBe(100);
-    expect(result.infrastructure.remoteCoverage).toBe(100);
+    expect(next.finance.cash).toBe(state.finance.cash + 100);
+    expect(next.finance.debt).toBe(state.finance.debt + 200);
+    expect(next.metrics.citizenTrust).toBe(100);
+    expect(next.metrics.institutionalTrust).toBe(0);
+    expect(next.metrics.inflation).toBe(30);
+    expect(next.market.fuelPriceIndex).toBe(2);
+    expect(next.generation.reservoir).toBe(0);
+    expect(next.zones.rural.coverage).toBe(100);
+    expect(next.media.activeMonths).toBe(3);
+    expect(next.events.decisions).toContain("keep-fuel");
+    expect(next.policy.n2Enabled).toBe(true);
+    expect(next.policy.branch).toBe("private");
+    expect(next.policy.priceCap).toBe(false);
   });
 
-  it("adds fleet capacity", () => {
-    expect(fleetUpgrade(initial.infrastructure, 20).fleet).toBe(initial.infrastructure.fleet + 20);
-  });
+  it("completes a known decision and marks the petition", () => {
+    const state = {
+      ...baseState(),
+      events: { ...baseState().events, decisions: ["policy-petition" as const] },
+    };
 
-  it("measures coverage gaps", () => {
-    expect(coverageGap(initial.infrastructure)).toBe(38 + 82);
-    expect(coverageGap({ ...initial.infrastructure, coverage: 100, remoteCoverage: 100 })).toBe(0);
-  });
+    const next = completeDecision(state, "policy-petition");
 
-  it("clamps logistics efficiency", () => {
-    expect(logisticsEfficiency(120)).toBe(1);
-    expect(logisticsEfficiency(0)).toBe(1.05);
-    expect(logisticsEfficiency(1_000)).toBe(0.82);
-  });
-
-  it("computes a weighted road quality index and defaults empty networks", () => {
-    expect(roadQualityIndex(initial.infrastructure)).toBeGreaterThan(0);
-    expect(
-      roadQualityIndex({
-        dirtKm: 100,
-        cobbleKm: 0,
-        asphaltKm: 0,
-        coverage: 0,
-        remoteCoverage: 0,
-        fleet: 0,
-      }),
-    ).toBeCloseTo(0.4);
-    expect(
-      roadQualityIndex({
-        dirtKm: 0,
-        cobbleKm: 100,
-        asphaltKm: 0,
-        coverage: 0,
-        remoteCoverage: 0,
-        fleet: 0,
-      }),
-    ).toBeCloseTo(0.7);
-    expect(
-      roadQualityIndex({
-        dirtKm: 0,
-        cobbleKm: 0,
-        asphaltKm: 100,
-        coverage: 0,
-        remoteCoverage: 0,
-        fleet: 0,
-      }),
-    ).toBeCloseTo(1);
-    expect(
-      roadQualityIndex({
-        dirtKm: 0,
-        cobbleKm: 0,
-        asphaltKm: 0,
-        coverage: 0,
-        remoteCoverage: 0,
-        fleet: 0,
-      }),
-    ).toBeCloseTo(0.4);
+    expect(next.events.completedDecisions).toContain("policy-petition");
+    expect(next.policy.petitionDone).toBe(true);
   });
 });

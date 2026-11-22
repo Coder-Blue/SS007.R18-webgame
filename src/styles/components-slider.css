@@ -1,0 +1,102 @@
+.empty-state strong {
+  color: var(--ink);
+  font-size: 13px;
+}
+.ring {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  position: relative;
+}
+
+.ring svg {
+  display: block;
+}
+
+.ring-track {
+  stroke: rgba(120, 170, 185, 0.18);
+}
+
+.ring-value {
+  stroke: var(--electric);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 280ms ease;
+}
+
+.ring[data-tone="good"] .ring-value {
+  stroke: var(--green);
+}
+
+.ring[data-tone="warn"] .ring-value {
+  stroke: var(--amber);
+}
+
+.ring[data-tone="bad"] .ring-value {
+  stroke: var(--rose);
+}
+
+.ring-label {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  position: absolute;
+}
+
+/* Range slider built on ui-sdk parts */
+
+.slider {
+  display: block;
+  width: 100%;
+}
+
+.slider-control {
+  padding: 10px 0;
+}
+
+.slider-track {
+  background: rgba(120, 170, 185, 0.2);
+  border-radius: 999px;
+  height: 6px;
+  position: relative;
+  width: 100%;
+}
+
+.slider-indicator {
+  background: linear-gradient(90deg, var(--cyan-soft), var(--electric));
+  border-radius: inherit;
+  height: 100%;
+  position: absolute;
+}
+
+.slider-thumb {
+  background: transparent;
+  border: 0;
+  height: 44px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+}
+
+.slider-thumb::after {
+  background: var(--ink);
+  border: 2px solid var(--electric);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(57, 215, 255, 0.12);
+  content: "";
+  inset: 11px;
+  position: absolute;
+}
+
+.slider-thumb:has(:focus-visible) {
+  outline: 2px solid var(--electric);
+  outline-offset: 3px;
+}
+/* Charts */
+
+.chart-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}

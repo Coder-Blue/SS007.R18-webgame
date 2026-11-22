@@ -1,14 +1,14 @@
-import type { ActionResult, ActionError, GameState, Result } from "../types";
+import type { GameState, ProjectKind, Result } from "../types";
 import { err, ok } from "../types";
-import { spend, spendable } from "../finance";
-import { withEndingCheck } from "../endings";
+import { spend } from "../finance";
 
-export const pay = (state: GameState, cost: number): Result<GameState, ActionError> => {
-  if (cost < 0 || cost > spendable(state.finance)) {
-    return err({ code: "finance.insufficient", detail: String(cost) });
-  }
+export const MAX_PROJECTS = 3;
 
-  const step = spend(state.finance, cost);
+export const charge = (state: GameState, amount: number): Result<GameState> => {
+  const available = state.finance.cash + (state.finance.debtLimit - state.finance.debt);
+
+  if (amount > available) return err("finance.insufficient");
+  const step = spend(state.finance, amount);
 
   return ok({
     ...state,
@@ -16,16 +16,31 @@ export const pay = (state: GameState, cost: number): Result<GameState, ActionErr
   });
 };
 
-export const requirePlaying = (state: GameState): ActionResult | null => {
-  if (state.phase !== "playing") {
-    return err({ code: "game.not-playing" });
-  }
+export const addProject = (
+  state: GameState,
+  kind: ProjectKind,
+  targetId: string,
+  months: number,
+): Result<GameState> => {
+  if (state.operations.projects.length >= MAX_PROJECTS) return err("project.queue-full");
 
-  if (state.ending !== null) {
-    return err({ code: "game.ended" });
-  }
-
-  return null;
+  return ok({
+    ...state,
+    operations: {
+      ...state.operations,
+      projects: [
+        ...state.operations.projects,
+        {
+          id: `${kind}-${targetId}-${state.clock.tick}-${state.operations.projects.length}`,
+          kind,
+          targetId,
+          monthsLeft: months,
+          totalMonths: months,
+        },
+      ],
+    },
+  });
 };
 
-export const finishAction = (state: GameState): ActionResult => ok(withEndingCheck(state));
+export const uniqueFlag = (flags: readonly string[], flag: string): readonly string[] =>
+  flags.includes(flag) ? flags : [...flags, flag];

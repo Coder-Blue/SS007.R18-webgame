@@ -1,9 +1,8 @@
-export interface RngStep {
+export type RngStep = {
   readonly value: number;
   readonly seed: number;
-}
+};
 
-// mulberry32: one integer state, deterministic across platforms and runs.
 export const nextRandom = (seed: number): RngStep => {
   const nextSeed = (seed + 0x6d2b79f5) | 0;
   let t = nextSeed;
@@ -14,10 +13,10 @@ export const nextRandom = (seed: number): RngStep => {
   return { value, seed: nextSeed };
 };
 
-export interface RngValue<T> {
+export type RngValue<T> = {
   readonly value: T;
   readonly seed: number;
-}
+};
 
 export const randomBetween = (seed: number, min: number, max: number): RngValue<number> => {
   const step = nextRandom(seed);
@@ -35,9 +34,7 @@ export const pick = <T>(seed: number, items: readonly T[]): RngValue<T> => {
   const step = randomInt(seed, 0, items.length - 1);
   const value = items[step.value];
 
-  if (value === undefined) {
-    throw new Error("pick: empty collection");
-  }
+  if (value === undefined) throw new Error("pick: empty collection");
 
   return { value, seed: step.seed };
 };

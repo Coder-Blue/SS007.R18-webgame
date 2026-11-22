@@ -1,9 +1,8 @@
 import * as v from "valibot";
 import type { GameState } from "./types";
 import { SAVE_VERSION } from "./constants";
-import { ok, err, type Result } from "./types";
+import { err, ok, type Result } from "./types";
 
-const number = v.number();
 const finiteNumber = v.pipe(v.number(), v.finite());
 const percent = v.pipe(finiteNumber, v.minValue(0), v.maxValue(100));
 const nonNegative = v.pipe(finiteNumber, v.minValue(0));
@@ -14,44 +13,63 @@ const ClockSchema = v.object({
   tick: finiteNumber,
 });
 
-const VillageSchema = v.object({
-  householdsThousand: nonNegative,
-  remoteHouseholdsThousand: nonNegative,
-  workshopsThousand: nonNegative,
+const ZoneSchema = v.object({
+  coverage: percent,
+  baseDemandMw: nonNegative,
+  growth: finiteNumber,
+});
+
+const SupplierSchema = v.object({
+  id: v.string(),
+  kind: v.picklist(["ipp", "bot", "coal", "gas"] as const),
+  priceVndPerKwh: nonNegative,
+  capacityMw: nonNegative,
 });
 
 const MarketSchema = v.object({
-  ricePrice: nonNegative,
-  fertilizerPrice: nonNegative,
-  fuelPrice: nonNegative,
+  fuelPriceIndex: nonNegative,
+  coalPrice: nonNegative,
+  gasPrice: nonNegative,
   exchangeRate: nonNegative,
   drought: percent,
-  privateShare: percent,
+  heat: nonNegative,
+  renewableFactor: percent,
   demandIndex: nonNegative,
-  externalSupplyFactor: nonNegative,
+  suppliers: v.array(SupplierSchema),
 });
 
 const TariffSchema = v.object({
-  tiers: v.tuple([number, number, number, number]),
-  workshop: number,
-  ceiling: number,
+  tiers: v.tuple([
+    finiteNumber,
+    finiteNumber,
+    finiteNumber,
+    finiteNumber,
+    finiteNumber,
+    finiteNumber,
+  ]),
+  industrial: finiteNumber,
+  ceiling: finiteNumber,
 });
 
 const InfrastructureSchema = v.object({
-  dirtKm: nonNegative,
-  cobbleKm: nonNegative,
-  asphaltKm: nonNegative,
-  coverage: percent,
-  remoteCoverage: percent,
-  fleet: nonNegative,
+  lineKm500: nonNegative,
+  lineKm220: nonNegative,
+  substations: nonNegative,
+  gridStrength: percent,
 });
 
-const ProductionSchema = v.object({
-  hydroPaddies: nonNegative,
-  mechanizedPaddies: nonNegative,
-  irrigationLevel: nonNegative,
-  rndLevel: nonNegative,
-  riceInventory: nonNegative,
+const GenerationSchema = v.object({
+  hydroCapacityMw: nonNegative,
+  thermalCapacityMw: nonNegative,
+  renewableCapacityMw: nonNegative,
+  reservoir: percent,
+  maintenance: percent,
+});
+
+const DispatchSchema = v.object({
+  hydroMw: nonNegative,
+  thermalMw: nonNegative,
+  importMw: nonNegative,
 });
 
 const PolicySchema = v.object({
@@ -61,62 +79,66 @@ const PolicySchema = v.object({
   dppa: v.boolean(),
   vrem: v.boolean(),
   twoPartTariff: v.boolean(),
-  antiSmuggling: v.boolean(),
-  campaignCooldown: nonNegative,
-  bailoutUsed: v.boolean(),
+  petitionDone: v.boolean(),
+  branch: v.picklist(["state", "private"] as const),
+  priceCap: v.boolean(),
 });
 
 const MetricsSchema = v.object({
-  satisfaction: percent,
-  trust: percent,
+  citizenTrust: percent,
+  institutionalTrust: percent,
   inflation: nonNegative,
   industrialOutput: nonNegative,
   reliability: percent,
-  debateScore: percent,
+  reserveMargin: finiteNumber,
 });
 
-const MonthlyLedgerSchema = v.object({
+const MediaSchema = v.object({
+  activeMonths: nonNegative,
+  cooldown: nonNegative,
+  pulses: nonNegative,
+});
+
+const LedgerSchema = v.object({
   year: finiteNumber,
   month: finiteNumber,
   tick: finiteNumber,
-  householdDemand: nonNegative,
-  workshopDemand: nonNegative,
-  totalDemand: nonNegative,
-  ownProduction: number,
-  externalPurchase: nonNegative,
-  supplied: nonNegative,
-  shortage: nonNegative,
+  demandMw: nonNegative,
+  connectedDemandMw: nonNegative,
+  supplyMw: nonNegative,
+  shortageMw: nonNegative,
+  energySoldMillionKwh: nonNegative,
+  hydroMillionKwh: nonNegative,
+  thermalMillionKwh: nonNegative,
+  renewableMillionKwh: nonNegative,
+  importMillionKwh: nonNegative,
+  revenueElectricity: finiteNumber,
+  revenueOther: finiteNumber,
+  revenueTotal: finiteNumber,
+  costManagement: finiteNumber,
+  costSupply: finiteNumber,
+  costTotal: finiteNumber,
+  netResult: finiteNumber,
+  cash: finiteNumber,
+  debt: nonNegative,
+  accumulatedLoss: nonNegative,
+  averageRetailTariff: nonNegative,
+  industrialTariff: nonNegative,
   reliability: percent,
-  inventoryEnd: nonNegative,
-  revenueHousehold: number,
-  revenueWorkshop: number,
-  revenueRecovery: number,
-  revenueWheeling: number,
-  revenueTotal: number,
-  costProduction: number,
-  costProcurement: number,
-  costRoads: number,
-  costFleet: number,
-  costStaff: number,
-  costInterest: number,
-  costTotal: number,
-  netResult: number,
-  cash: number,
-  debt: number,
-  tariffAverage: number,
-  ricePrice: number,
-  satisfaction: percent,
-  trust: percent,
+  reserveMargin: finiteNumber,
+  citizenTrust: percent,
+  institutionalTrust: percent,
   inflation: nonNegative,
   coverage: percent,
+  mediaActive: v.boolean(),
 });
 
-const AnnualReportSchema = v.object({
+const AnnualSchema = v.object({
   year: finiteNumber,
-  revenue: number,
-  costs: number,
-  netResult: number,
-  debtEnd: number,
+  revenue: finiteNumber,
+  costs: finiteNumber,
+  netResult: finiteNumber,
+  debtEnd: nonNegative,
   coverage: percent,
   trustAverage: percent,
   satisfactionAverage: percent,
@@ -125,32 +147,119 @@ const AnnualReportSchema = v.object({
 });
 
 const FinanceSchema = v.object({
-  cash: number,
-  debt: number,
+  cash: finiteNumber,
+  debt: nonNegative,
   debtLimit: nonNegative,
   accumulatedLoss: nonNegative,
   interestRate: nonNegative,
   recoveredTotal: nonNegative,
-  monthlyHistory: v.array(MonthlyLedgerSchema),
-  annualHistory: v.array(AnnualReportSchema),
+  recoveredYears: v.optional(v.array(v.object({ year: finiteNumber, amount: nonNegative })), []),
+  monthlyHistory: v.array(LedgerSchema),
+  annualHistory: v.array(AnnualSchema),
+});
+
+const ProjectSchema = v.object({
+  id: v.string(),
+  kind: v.picklist(["line", "hydro", "thermal", "renewable", "substation", "decision"] as const),
+  targetId: v.string(),
+  monthsLeft: nonNegative,
+  totalMonths: nonNegative,
+});
+
+const OperationsSchema = v.object({
+  dispatch: DispatchSchema,
+  supplierId: v.string(),
+  projects: v.array(ProjectSchema),
 });
 
 const EventStateSchema = v.object({
-  activeId: v.nullable(v.string()),
-  queue: v.array(v.string()),
-  resolved: v.array(v.string()),
+  activeId: v.nullable(
+    v.picklist([
+      "fuel-crisis",
+      "summer-drought",
+      "public-skepticism",
+      "revised-law",
+      "media-losses",
+    ] as const),
+  ),
+  queue: v.array(
+    v.picklist([
+      "fuel-crisis",
+      "summer-drought",
+      "public-skepticism",
+      "revised-law",
+      "media-losses",
+    ] as const),
+  ),
+  resolved: v.array(
+    v.picklist([
+      "fuel-crisis",
+      "summer-drought",
+      "public-skepticism",
+      "revised-law",
+      "media-losses",
+    ] as const),
+  ),
   flags: v.array(v.string()),
+  decisions: v.array(
+    v.picklist([
+      "keep-fuel",
+      "cut-staff",
+      "max-hydro",
+      "policy-petition",
+      "negotiate-fuel",
+      "save-power",
+      "shift-industry",
+      "load-shed",
+      "fossil-ramp",
+      "grid-maintenance",
+    ] as const),
+  ),
+  completedDecisions: v.array(
+    v.picklist([
+      "keep-fuel",
+      "cut-staff",
+      "max-hydro",
+      "policy-petition",
+      "negotiate-fuel",
+      "save-power",
+      "shift-industry",
+      "load-shed",
+      "fossil-ramp",
+      "grid-maintenance",
+    ] as const),
+  ),
+});
+
+const MissionsSchema = v.object({
+  completed: v.array(v.picklist(["electrification", "market", "security"] as const)),
+  reserveStreak: nonNegative,
+  privateMonths: nonNegative,
+});
+
+const ApprovalSchema = v.object({
+  proposedTiers: v.tuple([
+    finiteNumber,
+    finiteNumber,
+    finiteNumber,
+    finiteNumber,
+    finiteNumber,
+    finiteNumber,
+  ]),
+  proposedIndustrial: finiteNumber,
+  average: finiteNumber,
+  changePct: finiteNumber,
+  likelihood: percent,
 });
 
 const EndingSchema = v.object({
-  id: v.picklist(["architect", "predator", "collapse"] as const),
+  id: v.picklist(["reformer", "caretaker", "captured", "collapse"] as const),
   reason: v.picklist([
+    "citizen-trust",
+    "institutional-trust",
     "debt",
-    "unrest",
-    "deposed",
     "privatization",
-    "california",
-    "texas",
+    "blackout",
     "final",
   ] as const),
   year: finiteNumber,
@@ -162,33 +271,41 @@ export const GameStateSchema = v.object({
   phase: v.picklist(["title", "playing", "ended"] as const),
   seed: finiteNumber,
   clock: ClockSchema,
-  act: v.picklist([1, 2, 3] as const),
-  village: VillageSchema,
+  act: v.picklist([1, 2, 3, 4] as const),
+  zones: v.object({
+    urban: ZoneSchema,
+    industrial: ZoneSchema,
+    rural: ZoneSchema,
+  }),
   market: MarketSchema,
-  tariffs: TariffSchema,
+  generation: GenerationSchema,
   infrastructure: InfrastructureSchema,
-  production: ProductionSchema,
+  operations: OperationsSchema,
+  tariffs: TariffSchema,
   policy: PolicySchema,
   metrics: MetricsSchema,
+  media: MediaSchema,
   finance: FinanceSchema,
   events: EventStateSchema,
+  missions: MissionsSchema,
+  approval: v.nullable(ApprovalSchema),
   ending: v.nullable(EndingSchema),
   tutorialStep: nonNegative,
 });
 
 export const SaveFileSchema = v.object({
-  format: v.literal("dqkt-save"),
+  format: v.literal("grid-save"),
   version: v.literal(SAVE_VERSION),
   savedAt: v.string(),
   state: GameStateSchema,
 });
 
-export interface SaveFile {
-  readonly format: "dqkt-save";
-  readonly version: 1;
+export type SaveFile = {
+  readonly format: "grid-save";
+  readonly version: 2;
   readonly savedAt: string;
   readonly state: GameState;
-}
+};
 
 export type JsonValue =
   | string
@@ -201,12 +318,10 @@ export type JsonValue =
 export const parseGameState = (value: JsonValue): Result<GameState> => {
   const parsed = v.safeParse(GameStateSchema, value);
 
-  if (!parsed.success) {
-    return err("save.invalid-state");
-  }
+  if (!parsed.success) return err("save.invalid-state");
 
-  // SAFETY: GameStateSchema checks every field before this cast; readonly
-  // modifiers only differ from the schema's inferred output type.
+  // SAFETY: GameStateSchema validates every field; readonly modifiers only differ
+  // from the schema output type.
   return ok(parsed.output as GameState);
 };
 

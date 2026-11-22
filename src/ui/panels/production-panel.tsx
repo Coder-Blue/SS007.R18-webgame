@@ -1,215 +1,356 @@
-import { For } from "solid-js";
+import { For, Show, createSignal, createTrackedEffect } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
-import { ActionButton, Badge, Bar, Panel, SectionHeading, Stat } from "../components/base";
-import { Icon, type IconName } from "../components/icons";
-import { formatBillion, formatPercent, formatPrice, formatTonne } from "~/state/format";
-import { investmentCost, productionCostPerTonne, type InvestmentKind } from "~/domain";
+import { ActionButton, Badge, Bar, Panel, RangeSlider, Stat } from "../components/base";
+import { Icon } from "../components/icons";
+import { formatBillion, formatPower, formatPrice, formatSignedBillion } from "~/state/format";
+import {
+  PLANT_PROJECTS,
+  availableHydroMw,
+  buildPlantAction,
+  dispatchPreview,
+  supplierPreview,
+  type PlantKind,
+  type SupplierKind,
+} from "~/domain";
 
-interface InvestmentCard {
-  readonly kind: InvestmentKind;
-  readonly label: string;
-  readonly desc: string;
-  readonly icon: IconName;
-}
+const supplierLabel: Readonly<Record<SupplierKind, string>> = {
+  ipp: "IPP tư nhân",
+  bot: "BOT khí",
+  coal: "Than nhập khẩu",
+  gas: "Khí nội địa",
+};
 
-const investments: readonly InvestmentCard[] = [
+const plants: readonly {
+  readonly kind: PlantKind;
+  readonly name: string;
+  readonly detail: string;
+  readonly icon: "tabler:droplet" | "tabler:flame" | "tabler:solar-panel" | "lucide:utility-pole";
+}[] = [
   {
     kind: "hydro",
-    label: "Mở ruộng nước",
-    desc: "Tăng công suất thủy lợi, chịu ảnh hưởng hạn hán.",
-    icon: "lucide:droplets",
+    name: "Mở rộng thủy điện",
+    detail: "Công suất rẻ, phụ thuộc hồ chứa",
+    icon: "tabler:droplet",
   },
   {
-    kind: "mechanized",
-    label: "Mở ruộng cơ giới",
-    desc: "Công suất ổn định hơn, cần phân bón và R&D.",
-    icon: "lucide:factory",
+    kind: "thermal",
+    name: "Thêm nhiệt điện",
+    detail: "Ổn định, chi phí nhiên liệu cao",
+    icon: "tabler:flame",
   },
   {
-    kind: "irrigation",
-    label: "Nâng thủy lợi",
-    desc: "Giảm tác động hạn hán lên ruộng nước.",
-    icon: "lucide:cloud-rain",
+    kind: "renewable",
+    name: "Trang trại tái tạo",
+    detail: "Nguồn biến thiên, hợp đồng PPA",
+    icon: "tabler:solar-panel",
   },
   {
-    kind: "rnd",
-    label: "Đầu tư R&D",
-    desc: "Tăng năng suất và giảm chi phí sản xuất.",
-    icon: "lucide:sparkles",
-  },
-  {
-    kind: "fleet",
-    label: "Mua thêm xe",
-    desc: "Tăng 20 xe, giảm chi phí vận chuyển.",
-    icon: "lucide:truck",
+    kind: "substation",
+    name: "Trạm biến áp",
+    detail: "Giảm tổn thất, tăng độ mạnh lưới",
+    icon: "lucide:utility-pole",
   },
 ];
 
 export const ProductionPanel = (): JSX.Element => {
-  const { store, actions } = useGame();
+  const { store } = useGame();
   const state = store.state;
-  const last = () => state().finance.monthlyHistory[state().finance.monthlyHistory.length - 1];
-  const production = () => state().production;
-  const market = () => state().market;
-  const own = () => last()?.ownProduction ?? 0;
-  const external = () => last()?.externalPurchase ?? 0;
+  const [draft, setDraft] = createSignal(state().operations.dispatch);
+  const [supplierDraft, setSupplierDraft] = createSignal(state().operations.supplierId);
 
-  const selfSufficiency = () => {
-    const total = own() + external();
+  createTrackedEffect(() => {
+    setDraft(state().operations.dispatch);
+    setSupplierDraft(state().operations.supplierId);
+  });
 
-    return total <= 0 ? 0 : (own() / total) * 100;
+  const preview = () => dispatchPreview(state(), draft());
+  const supplierView = () => supplierPreview(state(), supplierDraft());
+
+  const draftSupplier = () => state().market.suppliers.find((row) => row.id === supplierDraft());
+
+  const hydroCap = () => availableHydroMw(state().generation);
+
+  const setPart = (key: "hydroMw" | "thermalMw" | "importMw", value: number): void => {
+    setDraft({ ...draft(), [key]: value });
   };
 
   return (
     <div class="stack-lg">
-      <Panel title="Sản xuất" kicker="Phát điện · Ruộng và nông trại" icon="tabler:wheat">
-        <div class="stat-grid">
-          <Stat
-            label="Sản lượng tự sản xuất"
-            value={formatTonne(own())}
-            hint="Mua từ nông dân tư nhân"
-            icon="tabler:wheat"
-          />
-          <Stat
-            label="Tỷ lệ tự chủ"
-            value={formatPercent(selfSufficiency())}
-            tone={selfSufficiency() >= 40 ? "good" : "warn"}
-            icon="lucide:gauge"
-          />
-          <Stat
-            label="Tồn kho"
-            value={formatTonne(production().riceInventory)}
-            tone={production().riceInventory > 60 ? "good" : "warn"}
-            icon="lucide:warehouse"
-          />
-          <Stat
-            label="Nhu cầu tháng"
-            value={formatTonne(last()?.totalDemand ?? 0)}
-            icon="lucide:users"
-          />
+      <Panel title="Mua điện cạnh tranh" kicker="Bước 1 · Thượng nguồn" icon="lucide:handshake">
+        <p class="panel-lead">
+          Ba nhà cung cấp chào giá gần như tương đương. Chênh lệch nhỏ về giá và công suất là toàn
+          bộ cạnh tranh trước khi điện vào lưới độc quyền.
+        </p>
+        <div class="supplier-grid">
+          <For each={state().market.suppliers}>
+            {(supplier) => (
+              <button
+                type="button"
+                class="supplier-card"
+                data-active={supplier.id === state().operations.supplierId ? "true" : "false"}
+                onClick={() => store.setSupplier(supplier.id)}
+                aria-pressed={supplier.id === state().operations.supplierId ? "true" : "false"}
+              >
+                <div class="supplier-head">
+                  <span class="supplier-kind">{supplierLabel[supplier.kind]}</span>
+                  <Badge
+                    tone={supplier.id === state().operations.supplierId ? "electric" : "neutral"}
+                  >
+                    {supplier.id === state().operations.supplierId ? "Đang chọn" : "Chào giá"}
+                  </Badge>
+                </div>
+                <strong>{formatPrice(supplier.priceVndPerKwh)}</strong>
+                <span class="supplier-meta">
+                  <Icon icon="tabler:bolt" size={14} />
+                  Công suất chào {formatPower(supplier.capacityMw)}
+                </span>
+                <Bar
+                  value={supplier.capacityMw}
+                  max={600}
+                  tone={supplier.id === supplierDraft() ? "electric" : "gold"}
+                  label={`Công suất ${supplier.id}`}
+                />
+              </button>
+            )}
+          </For>
         </div>
-        <div class="supply-mix">
-          <span class="muted">Cơ cấu nguồn cung</span>
-          <div class="supply-mix-bar">
-            <span class="mix-self" style={{ width: `${selfSufficiency()}%` }} />
-            <span class="mix-private" style={{ width: `${100 - selfSufficiency()}%` }} />
+        <Show when={draftSupplier() !== undefined}>
+          <div
+            class="preview-card"
+            data-tone={
+              supplierView().after.netResult >= supplierView().before.netResult ? "good" : "warn"
+            }
+          >
+            <div class="preview-head">
+              <span>Dự đoán đổi nhà cung cấp</span>
+              <Badge tone="electric">Trước → Sau</Badge>
+            </div>
+            <div class="preview-grid">
+              <div>
+                <span>Lãi/lỗ tháng</span>
+                <strong>
+                  {formatSignedBillion(supplierView().before.netResult)} →{" "}
+                  {formatSignedBillion(supplierView().after.netResult)}
+                </strong>
+              </div>
+              <div>
+                <span>Dự phòng</span>
+                <strong>
+                  {Math.round(supplierView().before.reserveMargin)}% →{" "}
+                  {Math.round(supplierView().after.reserveMargin)}%
+                </strong>
+              </div>
+              <div>
+                <span>Độ tin cậy</span>
+                <strong>
+                  {Math.round(supplierView().before.reliability)}% →{" "}
+                  {Math.round(supplierView().after.reliability)}%
+                </strong>
+              </div>
+              <div>
+                <span>Niềm tin dân</span>
+                <strong>
+                  {Math.round(supplierView().before.trustBefore)}% →{" "}
+                  {Math.round(supplierView().after.trustAfter)}%
+                </strong>
+              </div>
+              <div>
+                <span>Chấp thuận giá</span>
+                <strong>{Math.round(supplierView().after.approvalLikelihood)}%</strong>
+              </div>
+            </div>
+            <div class="action-row">
+              <ActionButton
+                size="sm"
+                variant="primary"
+                icon="lucide:check"
+                disabled={supplierDraft() === state().operations.supplierId}
+                onClick={() => store.setSupplier(supplierDraft())}
+              >
+                Áp dụng nhà cung cấp
+              </ActionButton>
+              <span class="tier-meta">
+                Giá nhập {formatPrice(draftSupplier()?.priceVndPerKwh ?? 0)} · Tối đa{" "}
+                {formatPower(draftSupplier()?.capacityMw ?? 0)}
+              </span>
+            </div>
           </div>
-          <div class="supply-mix-legend">
-            <span>
-              <i class="dot dot-self" /> Nhà nước {Math.round(selfSufficiency())}%
-            </span>
-            <span>
-              <i class="dot dot-private" /> Tư nhân {Math.round(100 - selfSufficiency())}%
-            </span>
-          </div>
-        </div>
-      </Panel>
-
-      <Panel title="Sản xuất" kicker="Đầu tư" icon="lucide:factory">
-        <SectionHeading title="Ruộng nước" hint="Hạn hán làm giảm mạnh sản lượng ruộng nước." />
-        <div class="line-stats">
-          <span>{`${production().hydroPaddies} đơn vị`}</span>
-          <Badge tone={market().drought > 0.6 ? "bad" : "good"}>
-            Chỉ số hạn hán: {formatPercent(market().drought * 100)}
-          </Badge>
-        </div>
-        <div class="line-stats">
-          <span>{`${production().mechanizedPaddies} đơn vị`}</span>
-          <Badge tone="gold">Mức thủy lợi: {production().irrigationLevel}</Badge>
-        </div>
-        <div class="market-grid">
-          <Stat
-            label="Giá phân bón"
-            value={formatPrice(market().fertilizerPrice)}
-            icon="lucide:leaf"
-          />
-          <Stat
-            label="Giá nhiên liệu"
-            value={formatPrice(market().fuelPrice)}
-            icon="lucide:truck"
-          />
-          <Stat label="Tỷ giá" value={market().exchangeRate.toFixed(2)} icon="lucide:scale" />
-          <Stat
-            label="Chi phí sản xuất/tấn"
-            value={formatPrice(productionCostPerTonne(market(), production().rndLevel))}
-            icon="lucide:coins"
-          />
-        </div>
+        </Show>
       </Panel>
 
       <Panel
-        title="Đầu tư"
-        kicker="Ruộng nước, ruộng cơ giới và nguồn cung tư nhân."
-        icon="lucide:sparkles"
+        title="Điều độ và cân bằng phụ tải"
+        kicker="Bước 2 · Truyền tải"
+        icon="tabler:plug-connected"
       >
-        <div class="action-list">
-          <For each={investments}>
-            {(item) => (
-              <div class="action-card">
-                <div class="action-card-main">
-                  <span class="action-icon">
-                    <Icon icon={item.icon} size={18} />
-                  </span>
-                  <div>
-                    <strong>{item.label}</strong>
-                    <p>{item.desc}</p>
-                  </div>
-                </div>
-                <div class="action-cost">
-                  <span>{formatBillion(investmentCost(state(), item.kind))}</span>
-                  <ActionButton size="sm" variant="gold" onClick={() => actions.invest(item.kind)}>
-                    Đầu tư
-                  </ActionButton>
-                </div>
-              </div>
-            )}
-          </For>
-          <div class="action-card">
-            <div class="action-card-main">
-              <span class="action-icon">
-                <Icon icon="lucide:warehouse" size={18} />
+        <div class="dispatch-grid">
+          <div class="dispatch-control">
+            <div class="dispatch-head">
+              <span>
+                <Icon icon="tabler:droplet" size={16} /> Thủy điện
               </span>
-              <div>
-                <strong>Nhập gạo dự trữ</strong>
-                <p>Mua 100 nghìn tấn theo giá thị trường hiện tại.</p>
-              </div>
+              <strong>{formatPower(draft().hydroMw)}</strong>
             </div>
-            <div class="action-cost">
-              <span>{formatBillion(100 * market().ricePrice * 1.03)}</span>
-              <ActionButton size="sm" variant="primary" onClick={() => actions.importRice()}>
-                Nhập
-              </ActionButton>
+            <RangeSlider
+              value={draft().hydroMw}
+              min={0}
+              max={Math.round(state().generation.hydroCapacityMw)}
+              step={10}
+              label="Công suất huy động thủy điện"
+              onInput={(value) => setPart("hydroMw", value)}
+            />
+            <span class="dispatch-meta">Khả dụng theo hồ chứa: {formatPower(hydroCap())}</span>
+          </div>
+          <div class="dispatch-control">
+            <div class="dispatch-head">
+              <span>
+                <Icon icon="tabler:flame" size={16} /> Nhiệt điện
+              </span>
+              <strong>{formatPower(draft().thermalMw)}</strong>
+            </div>
+            <RangeSlider
+              value={draft().thermalMw}
+              min={0}
+              max={Math.round(state().generation.thermalCapacityMw)}
+              step={10}
+              label="Công suất huy động nhiệt điện"
+              onInput={(value) => setPart("thermalMw", value)}
+            />
+            <span class="dispatch-meta">
+              Giá nhiên liệu đang ở mức {state().market.fuelPriceIndex.toFixed(2)}x
+            </span>
+          </div>
+          <div class="dispatch-control">
+            <div class="dispatch-head">
+              <span>
+                <Icon icon="tabler:antenna" size={16} /> Nhập khẩu
+              </span>
+              <strong>{formatPower(draft().importMw)}</strong>
+            </div>
+            <RangeSlider
+              value={draft().importMw}
+              min={0}
+              max={Math.round(draftSupplier()?.capacityMw ?? 0)}
+              step={10}
+              label="Công suất nhập khẩu"
+              onInput={(value) => setPart("importMw", value)}
+            />
+            <span class="dispatch-meta">Hợp đồng với nhà cung cấp đang chọn</span>
+          </div>
+        </div>
+        <div
+          class="preview-card"
+          data-tone={preview().after.netResult >= preview().before.netResult ? "good" : "bad"}
+        >
+          <div class="preview-head">
+            <span>Dự đoán kết quả tức thì</span>
+            <Badge tone="electric">Trước → Sau</Badge>
+          </div>
+          <div class="preview-grid">
+            <div>
+              <span>Lãi/lỗ tháng</span>
+              <strong>
+                {formatSignedBillion(preview().before.netResult)} →{" "}
+                {formatSignedBillion(preview().after.netResult)}
+              </strong>
+            </div>
+            <div>
+              <span>Dự phòng</span>
+              <strong>
+                {Math.round(preview().before.reserveMargin)}% →{" "}
+                {Math.round(preview().after.reserveMargin)}%
+              </strong>
+            </div>
+            <div>
+              <span>Độ tin cậy</span>
+              <strong>
+                {Math.round(preview().before.reliability)}% →{" "}
+                {Math.round(preview().after.reliability)}%
+              </strong>
+            </div>
+            <div>
+              <span>Niềm tin dân</span>
+              <strong>
+                {Math.round(preview().before.trustBefore)}% →{" "}
+                {Math.round(preview().after.trustAfter)}%
+              </strong>
+            </div>
+            <div>
+              <span>Chấp thuận giá</span>
+              <strong>{Math.round(preview().after.approvalLikelihood)}%</strong>
             </div>
           </div>
+        </div>
+        <div class="action-row">
+          <ActionButton
+            variant="primary"
+            icon="lucide:check"
+            onClick={() => store.setDispatch(draft())}
+          >
+            Áp dụng điều độ
+          </ActionButton>
+          <ActionButton
+            variant="ghost"
+            icon="lucide:rotate-ccw"
+            onClick={() => setDraft(state().operations.dispatch)}
+          >
+            Hoàn tác
+          </ActionButton>
         </div>
       </Panel>
 
-      <Panel title="Nhu cầu tháng" kicker="Tình hình tháng này" icon="lucide:users">
-        <div class="meter-block">
-          <div class="meter-row">
-            <span>Độ ổn định cấp gạo</span>
-            <strong>{formatPercent(state().metrics.reliability)}</strong>
-          </div>
-          <Bar
-            value={state().metrics.reliability}
-            tone={state().metrics.reliability >= 95 ? "good" : "warn"}
-            label="Độ ổn định cấp gạo"
-          />
+      <Panel title="Đầu tư nguồn điện" kicker="Công suất dài hạn" icon="tabler:building-factory-2">
+        <div class="build-grid">
+          <For each={plants}>
+            {(plant) => {
+              const plan = PLANT_PROJECTS[plant.kind];
+
+              return (
+                <div class="build-card">
+                  <div class="build-head">
+                    <Icon icon={plant.icon} size={18} />
+                    <strong>{plant.name}</strong>
+                  </div>
+                  <p>{plant.detail}</p>
+                  <div class="build-meta">
+                    <span>{formatBillion(plan.cost)}</span>
+                    <span>{plan.months} tháng</span>
+                    <span>
+                      {plan.capacityMw > 0
+                        ? `+${plan.capacityMw} MW`
+                        : `+${plan.gridStrength} điểm lưới`}
+                    </span>
+                  </div>
+                  <ActionButton
+                    size="sm"
+                    variant="gold"
+                    icon="lucide:plus"
+                    disabled={state().operations.projects.length >= 3}
+                    onClick={() => store.dispatch(buildPlantAction(state(), plant.kind))}
+                  >
+                    Khởi công
+                  </ActionButton>
+                </div>
+              );
+            }}
+          </For>
         </div>
-        <div class="meter-block">
-          <div class="meter-row">
-            <span>Thiếu hụt</span>
-            <strong>
-              {last()?.shortage && last()!.shortage > 0.5
-                ? formatTonne(last()!.shortage)
-                : "Không thiếu hụt"}
-            </strong>
-          </div>
-          <Bar
-            value={Math.min(100, (last()?.shortage ?? 0) * 2)}
-            tone="bad"
-            label="Thiếu hụt gạo"
+        <div class="mini-grid">
+          <Stat
+            label="Thủy điện"
+            value={formatPower(state().generation.hydroCapacityMw)}
+            tone="good"
+          />
+          <Stat
+            label="Nhiệt điện"
+            value={formatPower(state().generation.thermalCapacityMw)}
+            tone="warn"
+          />
+          <Stat
+            label="Tái tạo"
+            value={formatPower(state().generation.renewableCapacityMw)}
+            tone="good"
           />
         </div>
       </Panel>

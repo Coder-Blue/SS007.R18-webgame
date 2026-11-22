@@ -1,267 +1,407 @@
 import { describe, expect, it } from "vitest";
-import { createInitialState } from "../../src/domain/constants";
-import type { GameState } from "../../src/domain/types";
-import { buildRoadAction } from "../../src/domain/actions/roads";
-import { investAction, investmentCost } from "../../src/domain/actions/investments";
-import { importRiceAction } from "../../src/domain/actions/stock";
-import { setTariffsAction } from "../../src/domain/actions/tariffs";
 import {
-  enableDppaAction,
-  enableNsmoAction,
-  enableTwoPartAction,
-  enableVremAction,
-  enactRecoveryAction,
-  requestBailoutAction,
+  buildLineAction,
+  buildableZones,
+  canBuildLine,
+  lineProjectOf,
+} from "../../src/domain/actions/lines";
+import {
+  buildPlantAction,
+  buildablePlants,
+  isPlantKind,
+  plantAction,
+  plantPlan,
+} from "../../src/domain/actions/plants";
+import { setDispatchAction, setSupplierAction } from "../../src/domain/actions/dispatch";
+import {
+  cancelApprovalAction,
+  requestTariffAction,
+  resolveApprovalAction,
   setRecoveryRateAction,
+} from "../../src/domain/actions/tariffs";
+import {
+  enableN2Action,
+  enablePolicyAction,
+  setRecoveryRate,
+  startDecisionAction,
 } from "../../src/domain/actions/policy";
-import { finishAction, pay, requirePlaying } from "../../src/domain/actions/helpers";
+import { baseState } from "./test-helpers";
+import { ceilingFor } from "../../src/domain/constants";
 
-const initial = createInitialState();
+const rich = () => ({
+  ...baseState(),
+  finance: { ...baseState().finance, cash: 50_000 },
+});
 
-const rich: GameState = {
-  ...initial,
-  finance: { ...initial.finance, cash: 50_000, debt: 0 },
-};
+describe("line actions", () => {
+  it("builds a line and charges the treasury", () => {
+    const state = rich();
+    const result = buildLineAction(state, "rural");
 
-const ended: GameState = {
-  ...rich,
-  phase: "ended",
-  ending: { id: "collapse", reason: "debt", year: 2022, month: 1 },
-};
+    expect(result.ok).toBe(true);
 
-describe("actions", () => {
-  it("guards actions outside a playing game", () => {
-    expect(requirePlaying(ended)?.ok).toBe(false);
-    expect(requirePlaying({ ...rich, ending: ended.ending })?.ok).toBe(false);
-    expect(requirePlaying(rich)).toBeNull();
-    expect(buildRoadAction(ended, "dirt").ok).toBe(false);
+    if (result.ok) {
+      expect(result.value.operations.projects).toHaveLength(1);
+      expect(result.value.finance.cash).toBeLessThan(state.finance.cash);
+    }
   });
 
-  it("guards every action factory against an ended game", () => {
-    expect(investAction(ended, "rnd").ok).toBe(false);
+  it("rejects a completed zone, a pending zone and a full queue", () => {
+    const state = rich();
+
+    const done = {
+      ...state,
+      zones: { ...state.zones, urban: { ...state.zones.urban, coverage: 100 } },
+    };
+
+    const pending = buildLineAction(state, "rural");
+
+    expect(buildLineAction(done, "urban").ok).toBe(false);
+
+    if (pending.ok) {
+      expect(buildLineAction(pending.value, "rural").ok).toBe(false);
+
+      const full = {
+        ...pending.value,
+        operations: {
+          ...pending.value.operations,
+          projects: [
+            ...pending.value.operations.projects,
+            { id: "a", kind: "hydro" as const, targetId: "hydro", monthsLeft: 2, totalMonths: 2 },
+            {
+              id: "b",
+              kind: "thermal" as const,
+              targetId: "thermal",
+              monthsLeft: 2,
+              totalMonths: 2,
+            },
+          ],
+        },
+      };
+
+      expect(buildLineAction(full, "industrial").ok).toBe(false);
+    }
+  });
+
+  it("fails when the treasury cannot cover the line", () => {
+    const state = {
+      ...baseState(),
+      finance: { ...baseState().finance, cash: 0, debt: baseState().finance.debtLimit },
+    };
+
+    expect(buildLineAction(state, "rural").ok).toBe(false);
+  });
+
+  it("reports buildable zones and plans", () => {
+    expect(buildableZones(baseState())).toContain("rural");
+    expect(canBuildLine(baseState(), "rural")).toBe(true);
+    expect(lineProjectOf("rural").coverage).toBeGreaterThan(0);
+  });
+});
+
+describe("plant actions", () => {
+  it("builds every plant kind when funded", () => {
+    for (const kind of buildablePlants()) {
+      const result = buildPlantAction(rich(), kind);
+
+      expect(result.ok).toBe(true);
+    }
+  });
+
+  it("rejects an unfunded plant", () => {
+    const state = {
+      ...baseState(),
+      finance: { ...baseState().finance, cash: 0, debt: baseState().finance.debtLimit },
+    };
+
+    expect(buildPlantAction(state, "hydro").ok).toBe(false);
+  });
+
+  it("validates plant kinds and exposes plans", () => {
+    expect(isPlantKind("hydro")).toBe(true);
+    expect(isPlantKind("coal")).toBe(false);
+    expect(plantPlan("thermal").capacityMw).toBe(300);
+    expect(plantAction(rich(), "thermal").ok).toBe(true);
+    expect(plantAction(rich(), "coal").ok).toBe(true);
+  });
+});
+
+describe("dispatch actions", () => {
+  it("clamps sliders to installed capacity", () => {
+    const result = setDispatchAction(baseState(), {
+      hydroMw: 99_999,
+      thermalMw: 10,
+      importMw: 99_999,
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.operations.dispatch.hydroMw).toBe(baseState().generation.hydroCapacityMw);
+    }
+  });
+
+  it("ignores non-finite values", () => {
+    const state = baseState();
+
+    const result = setDispatchAction(state, {
+      hydroMw: Number.NaN,
+      thermalMw: 1,
+      importMw: 1,
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) expect(result.value).toBe(state);
+  });
+
+  it("selects a supplier and rejects an unknown one", () => {
+    expect(setSupplierAction(baseState(), "ipp-lac-hong").ok).toBe(true);
+    expect(setSupplierAction(baseState(), "missing").ok).toBe(false);
+  });
+});
+
+describe("tariff actions", () => {
+  it("applies a small adjustment immediately", () => {
+    const state = baseState();
+    const result = requestTariffAction(state, [1_800, 1_850, 2_150, 2_700, 3_020, 3_100], 1_760);
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.approval).toBeNull();
+      expect(result.value.tariffs.tiers[0]).toBe(1_800);
+    }
+  });
+
+  it("lowers the industrial tariff directly", () => {
+    const result = requestTariffAction(baseState(), baseState().tariffs.tiers, 1_550);
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.approval).toBeNull();
+      expect(result.value.tariffs.industrial).toBe(1_550);
+    }
+  });
+
+  it("opens an audit for an industrial increase", () => {
+    const base = baseState();
+    const result = requestTariffAction(base, base.tariffs.tiers, 1_950);
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) expect(result.value.approval).not.toBeNull();
+  });
+
+  it("creates a state audit for a large adjustment", () => {
+    const base = baseState();
+
+    const state = {
+      ...base,
+      clock: { year: 2026, month: 1, tick: 48 },
+      tariffs: { ...base.tariffs, ceiling: ceilingFor(2026) },
+    };
+
+    const result = requestTariffAction(state, [2_000, 2_050, 2_400, 2_900, 3_200, 3_300], 1_900);
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.approval?.likelihood).toBeGreaterThan(0);
+      expect(result.value.tariffs).toEqual(state.tariffs);
+    }
+  });
+
+  it("handles a zero industrial baseline", () => {
+    const state = baseState();
+
     expect(
-      investAction({ ...rich, policy: { ...rich.policy, campaignCooldown: 2 } }, "rnd").ok,
+      requestTariffAction(
+        { ...state, tariffs: { ...state.tariffs, industrial: 0 } },
+        [1_806, 1_866, 2_167, 2_729, 3_050, 3_117],
+        0,
+      ).ok,
+    ).toBe(false);
+  });
+
+  it("rejects invalid plans and the private branch", () => {
+    expect(
+      requestTariffAction(baseState(), [1_000, 1_866, 2_167, 2_729, 3_050, 3_117], 1_750).ok,
+    ).toBe(false);
+    expect(
+      requestTariffAction(
+        { ...baseState(), policy: { ...baseState().policy, priceCap: false } },
+        [1_806, 1_866, 2_167, 2_729, 3_050, 3_117],
+        1_750,
+      ).ok,
+    ).toBe(false);
+  });
+
+  it("resolves an approval as accepted when the audit is favourable", () => {
+    const base = baseState();
+
+    const state = {
+      ...base,
+      clock: { year: 2026, month: 1, tick: 48 },
+      tariffs: { ...base.tariffs, ceiling: ceilingFor(2026) },
+    };
+
+    const requested = requestTariffAction(state, [2_000, 2_050, 2_400, 2_900, 3_200, 3_300], 1_900);
+
+    expect(requested.ok).toBe(true);
+
+    if (!requested.ok) return;
+
+    const result = resolveApprovalAction({
+      ...requested.value,
+      approval:
+        requested.value.approval === null ? null : { ...requested.value.approval, likelihood: 80 },
+      market: { ...requested.value.market, fuelPriceIndex: 2 },
+      finance: { ...requested.value.finance, accumulatedLoss: 40_000, debt: 90_000 },
+      policy: { ...requested.value.policy, petitionDone: true },
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.events.flags).toContain("approval-approved");
+      expect(result.value.approval).toBeNull();
+    }
+  });
+
+  it("resolves an approval as refused when the audit is hostile", () => {
+    const base = baseState();
+
+    const state = {
+      ...base,
+      clock: { year: 2026, month: 1, tick: 48 },
+      tariffs: { ...base.tariffs, ceiling: ceilingFor(2026) },
+    };
+
+    const requested = requestTariffAction(state, [2_000, 2_050, 2_400, 2_900, 3_200, 3_300], 1_900);
+
+    expect(requested.ok).toBe(true);
+
+    if (!requested.ok) return;
+
+    const result = resolveApprovalAction({
+      ...requested.value,
+      metrics: { ...requested.value.metrics, inflation: 20, citizenTrust: 10 },
+      policy: { ...requested.value.policy, branch: "private" },
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.events.flags).toContain("approval-refused");
+      expect(result.value.metrics.institutionalTrust).toBeLessThan(
+        requested.value.metrics.institutionalTrust,
+      );
+    }
+  });
+
+  it("rejects a missing approval and bad recovery rates", () => {
+    expect(resolveApprovalAction(baseState()).ok).toBe(false);
+    expect(setRecoveryRateAction(baseState(), 0.1).ok).toBe(false);
+    expect(setRecoveryRateAction(baseState(), 0.5).ok).toBe(true);
+    expect(cancelApprovalAction({ ...baseState(), approval: null }).ok).toBe(true);
+  });
+});
+
+describe("policy actions", () => {
+  it("unlocks N-2 only after the petition and 2024", () => {
+    expect(enableN2Action(baseState()).ok).toBe(false);
+    expect(enableN2Action({ ...baseState(), clock: { year: 2024, month: 1, tick: 24 } }).ok).toBe(
+      false,
+    );
+    expect(
+      enableN2Action({
+        ...baseState(),
+        clock: { year: 2024, month: 1, tick: 24 },
+        policy: { ...baseState().policy, petitionDone: true },
+      }).ok,
     ).toBe(true);
-    expect(enableNsmoAction(ended).ok).toBe(false);
-    expect(enableDppaAction(ended).ok).toBe(false);
-    expect(enableVremAction(ended).ok).toBe(false);
-    expect(enableTwoPartAction(ended).ok).toBe(false);
-    expect(enactRecoveryAction(ended).ok).toBe(false);
-    expect(setRecoveryRateAction(ended, 0.5).ok).toBe(false);
-    expect(importRiceAction(ended).ok).toBe(false);
+    expect(
+      enableN2Action({
+        ...baseState(),
+        clock: { year: 2025, month: 1, tick: 36 },
+        policy: { ...baseState().policy, n2Enabled: true },
+      }).ok,
+    ).toBe(false);
+    expect(
+      enableN2Action({
+        ...baseState(),
+        clock: { year: 2025, month: 1, tick: 36 },
+        events: { ...baseState().events, flags: ["event:revised-law:enact-law"] },
+      }).ok,
+    ).toBe(true);
   });
 
-  it("rejects an unaffordable investment", () => {
-    const poor = { ...initial, finance: { ...initial.finance, cash: 0, debt: 59_999 } };
-    expect(investAction(poor, "hydro").ok).toBe(false);
-  });
+  it("enables policy reforms with prerequisites", () => {
+    const base = baseState();
 
-  it("borrows to pay for a policy when cash is short", () => {
-    const tight = { ...initial, finance: { ...initial.finance, cash: 100, debt: 0 } };
-    const result = enableDppaAction(tight);
-    expect(result.ok).toBe(true);
-
-    if (result.ok) {
-      expect(result.value.finance.cash).toBe(0);
-      expect(result.value.finance.debt).toBe(300);
-    }
-  });
-
-  it("pays from cash or rejects unaffordable actions", () => {
-    expect(pay(rich, 1_000).ok).toBe(true);
-    expect(pay(rich, 200_000)).toEqual({
-      ok: false,
-      error: { code: "finance.insufficient", detail: "200000" },
-    });
-    expect(pay(rich, -1).ok).toBe(false);
-    expect(finishAction(rich).ok).toBe(true);
-  });
-
-  it.each(["dirt", "cobble", "asphalt"] as const)("builds a %s road", (grade) => {
-    const result = buildRoadAction(rich, grade);
-    expect(result.ok).toBe(true);
-
-    if (result.ok) {
-      expect(result.value.infrastructure.coverage).toBeGreaterThan(rich.infrastructure.coverage);
-      expect(result.value.finance.cash).toBeLessThan(rich.finance.cash);
-    }
-  });
-
-  it("rejects an unaffordable road", () => {
-    const poor = { ...initial, finance: { ...initial.finance, cash: 0, debt: 59_999 } };
-    expect(buildRoadAction(poor, "asphalt").ok).toBe(false);
-  });
-
-  it("invests in every production asset and the fleet", () => {
-    const hydro = investAction(rich, "hydro");
-    expect(hydro.ok && hydro.value.production.hydroPaddies).toBe(6);
-    const mechanized = investAction(rich, "mechanized");
-    expect(mechanized.ok && mechanized.value.production.mechanizedPaddies).toBe(4);
-    const irrigation = investAction(rich, "irrigation");
-    expect(irrigation.ok && irrigation.value.production.irrigationLevel).toBe(2);
-    const rnd = investAction(rich, "rnd");
-    expect(rnd.ok && rnd.value.production.rndLevel).toBe(1);
-    const fleet = investAction(rich, "fleet");
-    expect(fleet.ok && fleet.value.infrastructure.fleet).toBe(140);
-  });
-
-  it("runs a campaign and anti-smuggling crackdown", () => {
-    const campaign = investAction(rich, "campaign");
-    expect(campaign.ok).toBe(true);
-
-    if (campaign.ok) {
-      expect(campaign.value.policy.campaignCooldown).toBe(6);
-      expect(campaign.value.metrics.trust).toBeGreaterThan(rich.metrics.trust);
-    }
-
-    const crackdown = investAction(rich, "crackdown");
-    expect(crackdown.ok).toBe(true);
-
-    if (crackdown.ok) {
-      expect(crackdown.value.policy.antiSmuggling).toBe(true);
-      expect(crackdown.value.events.flags).toContain("smuggling_cracked");
-    }
-  });
-
-  it("rejects capped assets and repeated actions", () => {
-    const capped = {
-      ...rich,
-      production: {
-        ...rich.production,
-        hydroPaddies: 12,
-        mechanizedPaddies: 10,
-        irrigationLevel: 6,
-        rndLevel: 5,
-      },
-      infrastructure: { ...rich.infrastructure, fleet: 320 },
-      policy: { ...rich.policy, campaignCooldown: 2, antiSmuggling: true },
+    const reviewed = {
+      ...base,
+      clock: { year: 2025, month: 1, tick: 36 },
+      events: { ...base.events, flags: ["event:revised-law:enact-law"] },
     };
 
-    for (const kind of [
-      "hydro",
-      "mechanized",
-      "irrigation",
-      "rnd",
-      "fleet",
-      "campaign",
-      "crackdown",
-    ] as const) {
-      expect(investAction(capped, kind)).toEqual({
-        ok: false,
-        error: { code: "action.at-cap" },
-      });
-    }
-  });
+    const state = { ...reviewed, events: { ...reviewed.events, flags: [] } };
 
-  it("exposes investment costs that scale with the asset", () => {
-    expect(investmentCost(initial, "hydro")).toBe(1_400);
+    expect(enablePolicyAction(state, "nsmo").ok).toBe(false);
+    expect(enablePolicyAction(reviewed, "nsmo").ok).toBe(true);
+    expect(enablePolicyAction(reviewed, "twoPart").ok).toBe(false);
     expect(
-      investmentCost(
-        { ...initial, production: { ...initial.production, hydroPaddies: 8 } },
-        "hydro",
-      ),
-    ).toBe(1_940);
-  });
-
-  it("imports rice and rejects a full or unaffordable store", () => {
-    const imported = importRiceAction(rich);
-    expect(imported.ok).toBe(true);
-
-    if (imported.ok) {
-      expect(imported.value.production.riceInventory).toBe(rich.production.riceInventory + 100);
-    }
-
+      enablePolicyAction({ ...reviewed, policy: { ...reviewed.policy, vrem: true } }, "twoPart").ok,
+    ).toBe(true);
+    expect(enablePolicyAction(reviewed, "dppa").ok).toBe(true);
+    expect(enablePolicyAction(reviewed, "vrem").ok).toBe(true);
     expect(
-      importRiceAction({ ...rich, production: { ...rich.production, riceInventory: 600 } }),
-    ).toEqual({ ok: false, error: { code: "action.stock-full" } });
+      enablePolicyAction({ ...reviewed, policy: { ...reviewed.policy, nsmo: true } }, "nsmo").ok,
+    ).toBe(false);
     expect(
-      importRiceAction({
-        ...initial,
-        finance: { ...initial.finance, cash: 0, debt: 59_999 },
-      }).ok,
+      enablePolicyAction({ ...state, policy: { ...state.policy, branch: "private" } }, "dppa").ok,
     ).toBe(false);
   });
 
-  it("validates and applies tariffs", () => {
-    const applied = setTariffsAction(rich, [8.2, 10.4, 13.6, 17], 7.4);
-    expect(applied.ok).toBe(true);
-    const invalid = setTariffsAction(rich, [10.2, 13.2, 18.0, 26.0], 9.2);
-    expect(invalid).toEqual({ ok: false, error: { code: "tariff.above-ceiling" } });
-    expect(setTariffsAction(ended, [8.2, 10.4, 13.6, 17], 7.4).ok).toBe(false);
+  it("validates the recovery rate", () => {
+    expect(setRecoveryRate(baseState(), 0.2).ok).toBe(false);
+    expect(setRecoveryRate(baseState(), 0.5).ok).toBe(true);
   });
 
-  it("unlocks N-2 recovery from 2024 and controls the rate", () => {
-    const early = enactRecoveryAction(rich);
-    expect(early).toEqual({ ok: false, error: { code: "policy.too-early" } });
-    const ready = { ...rich, clock: { year: 2024, month: 1, tick: 24 } };
-    const enacted = enactRecoveryAction(ready);
-    expect(enacted.ok).toBe(true);
-
-    if (enacted.ok) expect(enacted.value.policy.n2Enabled).toBe(true);
-    expect(enactRecoveryAction({ ...ready, policy: { ...ready.policy, n2Enabled: true } })).toEqual(
-      {
-        ok: false,
-        error: { code: "policy.already-enabled" },
-      },
-    );
-    expect(setRecoveryRateAction(ready, 0.5)).toEqual({
-      ok: false,
-      error: { code: "policy.not-enabled" },
-    });
-    const enabled = { ...ready, policy: { ...ready.policy, n2Enabled: true } };
-    expect(setRecoveryRateAction(enabled, 0.5).ok).toBe(true);
-    expect(setRecoveryRateAction(enabled, 0.1).ok).toBe(false);
-    expect(setRecoveryRateAction(enabled, 0.9).ok).toBe(false);
-  });
-
-  it("enables NSMO, DPPA, VREM and two-part tariffs", () => {
-    expect(enableNsmoAction(rich).ok).toBe(true);
-    expect(enableDppaAction(rich).ok).toBe(true);
-    const vrem = enableVremAction(rich);
-    expect(vrem.ok).toBe(true);
-
-    const twoPart = enableTwoPartAction(
-      vrem.ok ? vrem.value : { ...rich, policy: { ...rich.policy, vrem: true } },
-    );
-
-    expect(twoPart.ok).toBe(true);
-    expect(enableTwoPartAction(rich)).toEqual({
-      ok: false,
-      error: { code: "policy.requires-vrem" },
-    });
-
-    const enabled = {
-      ...rich,
-      policy: { ...rich.policy, nsmo: true, dppa: true, vrem: true, twoPartTariff: true },
+  it("starts an available decision and rejects invalid ones", () => {
+    const state = {
+      ...rich(),
+      events: { ...baseState().events, decisions: ["keep-fuel" as const] },
     };
 
-    expect(enableNsmoAction(enabled).ok).toBe(false);
-    expect(enableDppaAction(enabled).ok).toBe(false);
-    expect(enableVremAction(enabled).ok).toBe(false);
-    expect(enableTwoPartAction(enabled).ok).toBe(false);
+    expect(startDecisionAction(state, "keep-fuel").ok).toBe(true);
+    expect(startDecisionAction(baseState(), "keep-fuel").ok).toBe(false);
     expect(
-      enableNsmoAction({
-        ...initial,
-        finance: { ...initial.finance, cash: 0, debt: 60_000 },
-      }).ok,
+      startDecisionAction(
+        {
+          ...state,
+          events: { ...state.events, completedDecisions: ["keep-fuel"] },
+        },
+        "keep-fuel",
+      ).ok,
     ).toBe(false);
+
+    const building = startDecisionAction(state, "keep-fuel");
+
+    if (building.ok) {
+      expect(startDecisionAction(building.value, "keep-fuel").ok).toBe(false);
+    }
   });
 
-  it("requests the one-time bailout", () => {
-    const bailout = requestBailoutAction(rich);
-    expect(bailout.ok).toBe(true);
+  it("rejects an unfunded decision", () => {
+    const state = {
+      ...baseState(),
+      finance: { ...baseState().finance, cash: 0, debt: baseState().finance.debtLimit },
+      events: { ...baseState().events, decisions: ["policy-petition" as const] },
+    };
 
-    if (bailout.ok) {
-      expect(bailout.value.policy.bailoutUsed).toBe(true);
-      expect(bailout.value.finance.debt).toBe(0);
-    }
-
-    expect(requestBailoutAction(rich).ok).toBe(true);
-    const used = { ...rich, policy: { ...rich.policy, bailoutUsed: true } };
-    expect(requestBailoutAction(used)).toEqual({
-      ok: false,
-      error: { code: "policy.bailout-used" },
-    });
-    expect(requestBailoutAction(ended).ok).toBe(false);
+    expect(startDecisionAction(state, "policy-petition").ok).toBe(false);
   });
 });

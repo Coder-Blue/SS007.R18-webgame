@@ -41,7 +41,7 @@ The local TBT is dominated by the 3D scene running under software rendering; the
 
 ### Frontend
 
-- Rendered a 24 kB desktop / 9.2 kB mobile WebP village poster on the title screen and mounted the Three.js scene only during play.
+- Rendered a lightweight CSS/SVG title poster and mounted the Three.js grid scene only during play.
 - Split the game surface (HUD, docks, panels, event/ending screens) into a lazy `game-view` chunk behind a Solid `Loading` boundary; the route chunk fell from 238.2 kB to 8.9 kB minified.
 - Lazy-loaded the save menu and tutorial on first open, removing the dialog/UI SDK foundation from the initial route.
 - Dynamically imported the scene factory after the first paint during idle time, with single-flight loading, disposal on failure and a visible retry action.
@@ -67,20 +67,20 @@ The local TBT is dominated by the 3D scene running under software rendering; the
 ### Infrastructure
 
 - Vercel already supplies the CDN, Brotli/gzip, HTTP/2, TLS and managed load balancing. No new CDN, reverse proxy, Redis or load balancer was added.
-- Hashed `/assets/*` remain one-year immutable through Vercel. Fonts and village posters use a thirty-day shared cache without `immutable`. Favicons use thirty days and `robots.txt` one day.
+- Hashed `/assets/*` remain one-year immutable through Vercel. Fonts use a thirty-day shared cache without `immutable`. Favicons use thirty days and `robots.txt` one day.
 
 ### Dependencies / Build
 
 - Added Vite 8 `rolldownOptions.output.codeSplitting` groups for Three.js, Three core and GSAP.
 - Added `pnpm check:bundle` to `pnpm quality` and CI. It fails any client chunk over 500 kB and fails if the initial shell preloads Three.js or GSAP.
-- Added a production-server Playwright smoke run (`PLAYWRIGHT_SERVER=start`) that asserts the scene chunk is absent on the title and loads from `/assets/create-village-scene-*.js` after starting the game.
+- Added a production-server Playwright smoke run (`PLAYWRIGHT_SERVER=start`) that asserts the scene chunk is absent on the title and loads from `/assets/create-power-scene-*.js` after starting the game.
 - Audited runtime dependencies; every declared package is referenced. No package was removed.
 
 ## 4. Checklist
 
 - Cache API responses: Not applicable. There are no API endpoints; static assets have an explicit cache policy.
 - Database indexes: Not applicable. There is no database.
-- Image compression: Implemented. WebP posters are 24 kB and 9.2 kB with explicit dimensions.
+- Image compression: Implemented. The title poster is CSS/SVG with reserved dimensions and no image request.
 - Loading skeletons: Implemented for the only async state. The scene has loading, status and retry states; panels render synchronously and need no skeleton.
 - Expensive query caching: Not applicable. There is no database or remote query.
 - N+1 prevention: Not applicable. There is no database.
@@ -92,10 +92,10 @@ The local TBT is dominated by the 3D scene running under software rendering; the
 - API payload compression: Already handled. Vercel Brotli/gzip; there is no JSON API.
 - Reduced unnecessary re-renders: Implemented. Solid fine-grained updates and an rAF counter tween; no broad context additions.
 - JS/CSS minification: Implemented. Vite production build.
-- Lazy loading: Implemented. The 3D scene is dynamic; the title poster is eager because it is above the fold.
+- Lazy loading: Implemented. The 3D scene is dynamic; the title poster is inline CSS/SVG.
 - LCP asset priority: Implemented. The poster is eager with explicit dimensions; the 3D scene is deferred.
 - Deferred non-critical scripts: Implemented. There are no third-party scripts; the scene is dynamically imported.
-- Static asset caching: Already handled. Vercel serves hashed `/assets/*` as one-year immutable; fonts and posters use thirty days.
+- Static asset caching: Already handled. Vercel serves hashed `/assets/*` as one-year immutable; fonts use thirty days.
 - Removed unused npm packages: Audited. Every runtime dependency is referenced; no package was removed.
 - Sensitive data in shared caches: Implemented. The app is localStorage-only and serves no user-specific HTML or JSON.
 - Unnecessary architecture: Avoided. No database, Redis, CDN provider or app-level load balancer was added.
@@ -141,11 +141,11 @@ The baseline live run was `54` performance, `4.1 s` LCP, `7,100 ms` TBT and `628
 
 ## 7. Files Changed
 
-- `src/ui/scene/title-poster.tsx`, `src/ui/scene/village-canvas.tsx`, `src/ui/app/game-shell.tsx`, `src/ui/app/game-view.tsx`
+- `src/ui/scene/title-poster.tsx`, `src/ui/scene/power-canvas.tsx`, `src/ui/app/game-shell.tsx`, `src/ui/app/game-view.tsx`
 - `src/ui/components/animated-number.tsx`, `src/ui/components/base.tsx`
 - `src/routes/__root.tsx`, `src/routes/index.tsx`, `src/site.ts`, `routes/sitemap.xml.ts`, `routes/robots.txt.ts`
 - `src/styles/*.css`, `src/state/persistence.ts`
-- `public/fonts/*.woff2`, `public/images/village-poster-*.webp`
+- `public/fonts/*.woff2`
 - `vite.config.ts`, `nitro.config.ts`, `vercel.json`, `scripts/check-bundle.mjs`
 - `playwright.config.ts`, `tests/e2e/game.spec.ts`, `tests/e2e/font-loading.spec.ts`, `tests/fonts.test.ts`, `tests/seo.test.ts`
 - `AGENTS.md`, `AGENT_DIRECTORY.md`, `SKILL.md`, `CODEBASE.md`, `CHANGELOG.md`, `CI_CD_PIPELINE.md`, `.github/workflows/test.yml`
@@ -175,3 +175,15 @@ CHROME_PATH=/nix/store/.../bin/chromium npx lighthouse@12.8.2 \
 ```
 
 `pnpm quality` final output: 22 test files / 173 tests passed, lint, format, line budget, emoji, domain boundary, coverage, production build and bundle budget all green. The production Playwright run printed `33 passed`, `3 skipped` across the desktop and mobile projects (`65 passed`, `7 skipped` across all four projects). `pnpm check:bundle` printed 17 chunks, every chunk at or below 500 kB, and `Initial shell: 5 JavaScript preloads, 372.6 kB min / 127.2 kB gzip, no Three.js or GSAP`.
+
+## Grid migration re-check (2026-11-23)
+
+- Production build: 15 client chunks, all below 500 kB minified.
+- Initial shell: 621.3 kB minified / 209.3 kB gzip across 7 preloads, with no
+  Three.js or GSAP.
+- Deferred scene: `create-power-scene-*.js` at 17.5 kB minified / 6.8 kB gzip,
+  loaded only after the game screen starts.
+- Title poster: inline CSS/SVG, no image request and no layout shift.
+- Persistent chrome: no backdrop filters; opaque top bar, docks and sheets.
+- The scene caps pixel ratio at 2 on desktop and 1.5 on coarse pointers, and
+  freezes all animation while the RTS clock is paused.

@@ -1,74 +1,68 @@
 import { describe, expect, it } from "vitest";
-import { createInitialState } from "../../src/domain/constants";
 import {
-  computeProduction,
-  fleetCost,
-  productionCostPerTonne,
-  roadMaintenanceCost,
-  staffCost,
+  availableCapacityMw,
+  availableHydroMw,
+  computeSupply,
+  dispatchWithinCaps,
+  reserveMargin,
+  supplierCapacity,
 } from "../../src/domain/production";
-
-const initial = createInitialState();
+import { baseState } from "./test-helpers";
 
 describe("production", () => {
-  it("produces from hydro and mechanized paddies", () => {
-    const result = computeProduction(initial.production, initial.market, initial.metrics);
-    expect(result.hydro).toBeGreaterThan(0);
-    expect(result.mechanized).toBeGreaterThan(0);
-    expect(result.ownProduction).toBeCloseTo(result.hydro + result.mechanized);
-    expect(result.productionCost).toBeCloseTo(result.ownProduction * result.costPerTonne);
+  it("derives available hydro from reservoir and maintenance", () => {
+    expect(availableHydroMw({ ...baseState().generation, reservoir: 100, maintenance: 100 })).toBe(
+      963,
+    );
+    expect(availableHydroMw(baseState().generation)).toBeLessThan(900);
   });
 
-  it("drought reduces hydro output", () => {
-    const dry = computeProduction(
-      initial.production,
-      { ...initial.market, drought: 1 },
-      initial.metrics,
+  it("caps import at the supplier fleet", () => {
+    const market = baseState().market;
+
+    expect(supplierCapacity(market, 100)).toBe(100);
+    expect(supplierCapacity(market, 10_000)).toBe(1_350);
+  });
+
+  it("computes dispatch, energy and variable cost", () => {
+    const state = baseState();
+
+    const supply = computeSupply(
+      state.generation,
+      { hydroMw: 500, thermalMw: 400, importMw: 150 },
+      state.market,
+      2_450,
+      500,
     );
 
-    expect(dry.hydro).toBeLessThan(initial.production.hydroPaddies * 24);
+    expect(supply.output.hydroMw).toBeLessThanOrEqual(500);
+    expect(supply.output.thermalMw).toBe(400);
+    expect(supply.output.importMw).toBe(150);
+    expect(supply.supplyMw).toBeGreaterThan(0);
+    expect(supply.costSupplyVariable).toBeGreaterThan(0);
+    expect(supply.output.hydroMillionKwh).toBeGreaterThan(0);
   });
 
-  it("fertilizer and fuel increase production cost", () => {
-    const cheap = productionCostPerTonne(initial.market, 0);
+  it("clamps dispatch to installed capacity", () => {
+    const state = baseState();
 
-    const expensive = productionCostPerTonne(
-      { ...initial.market, fertilizerPrice: 14, fuelPrice: 32 },
-      0,
+    const capped = dispatchWithinCaps(
+      { hydroMw: 99_999, thermalMw: -1, importMw: 99_999 },
+      state.generation,
+      state.market,
+      "coal-quang-ninh",
     );
 
-    expect(expensive).toBeGreaterThan(cheap);
-    expect(productionCostPerTonne(initial.market, 3)).toBeLessThan(cheap);
+    expect(capped.hydroMw).toBe(state.generation.hydroCapacityMw);
+    expect(capped.thermalMw).toBe(0);
+    expect(capped.importMw).toBe(500);
   });
 
-  it("clamps the fertilizer harvest factor at its floor", () => {
-    const result = computeProduction(
-      initial.production,
-      { ...initial.market, fertilizerPrice: 20 },
-      initial.metrics,
-    );
+  it("reports reserve margin against peak demand", () => {
+    const state = baseState();
 
-    expect(result.mechanized).toBeGreaterThan(0);
-  });
-
-  it("clamps industrial demand influence on mechanized paddies", () => {
-    const low = computeProduction(initial.production, initial.market, {
-      ...initial.metrics,
-      industrialOutput: 0,
-    });
-
-    const high = computeProduction(initial.production, initial.market, {
-      ...initial.metrics,
-      industrialOutput: 400,
-    });
-
-    expect(high.mechanized).toBeGreaterThan(low.mechanized);
-  });
-
-  it("calculates road, fleet and staff costs", () => {
-    expect(roadMaintenanceCost(100, 100, 100)).toBeCloseTo(12 + 28 + 50);
-    expect(roadMaintenanceCost(0, 0, 0)).toBe(0);
-    expect(fleetCost(100, initial.market)).toBeCloseTo(38);
-    expect(staffCost(10)).toBe(310);
+    expect(reserveMargin(state.generation, state.market, 0, 100)).toBe(100);
+    expect(reserveMargin(state.generation, state.market, 10_000, 100)).toBeLessThan(0);
+    expect(availableCapacityMw(state.generation, state.market, 100)).toBeGreaterThan(0);
   });
 });

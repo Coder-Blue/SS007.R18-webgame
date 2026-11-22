@@ -1,90 +1,226 @@
-import type { GameState, RoadGrade, TariffTiers } from "./types";
+import type { DecisionDefinition, GameState, TariffTiers, ZoneId } from "./types";
 
-export const GAME_VERSION = "1.0.0" as const;
-export const SAVE_VERSION = 1 as const;
+export const GAME_VERSION = "2.0.0" as const;
+export const SAVE_VERSION = 2 as const;
 export const START_YEAR = 2022;
 export const START_MONTH = 1;
 export const END_YEAR = 2026;
 export const END_MONTH = 12;
 export const TOTAL_MONTHS = 60;
 export const MONTHS_PER_YEAR = 12;
+export const HOURS_PER_MONTH = 720;
 
-export const STARTING_CASH = 6_000;
-export const STARTING_DEBT = 14_000;
-export const DEBT_LIMIT = 60_000;
-export const CASH_FLOOR = 1_000;
-export const CASH_REPAY_RESERVE = 4_000;
+export const STARTING_CASH = 4_000;
+export const STARTING_DEBT = 26_000;
+export const DEBT_LIMIT = 100_000;
+export const CASH_FLOOR = 2_000;
+export const CASH_REPAY_RESERVE = 6_000;
 export const INTEREST_RATE = 0.065;
-export const BAILOUT_AMOUNT = 8_000;
-export const BAILOUT_TRUST_COST = 9;
-export const BAILOUT_SATISFACTION_COST = 4;
+export const RECOVERY_RATE_MIN = 0.3;
+export const RECOVERY_RATE_MAX = 0.8;
+export const RECOVERY_RATE_DEFAULT = 0.55;
 
-export const TARIFF_WEIGHTS = [0.45, 0.28, 0.18, 0.09] as const;
+export const TARIFF_WEIGHTS = [0.15, 0.17, 0.19, 0.2, 0.17, 0.12] as const;
 
 export const TARIFF_BANDS = [
-  [7.2, 11.0],
-  [9.0, 14.5],
-  [11.5, 21.0],
-  [14.0, 32.0],
+  [1_700, 2_050],
+  [1_780, 2_120],
+  [2_050, 2_450],
+  [2_580, 2_980],
+  [2_900, 3_260],
+  [2_980, 3_340],
 ] as const;
 
-export const WORKSHOP_TARIFF_MIN = 6.8;
-export const WORKSHOP_TARIFF_MAX = 9.2;
-export const N2_RATE_MIN = 0.3;
-export const N2_RATE_MAX = 0.8;
-export const N2_RATE_DEFAULT = 0.55;
+export const INDUSTRIAL_TARIFF_MIN = 1_550;
+export const INDUSTRIAL_TARIFF_MAX = 1_950;
 
-export interface CeilingByYear {
-  readonly [year: number]: number;
-}
+export const ceilingFor = (year: number): number => {
+  if (year <= 2022) return 2_450;
 
-export const CEILINGS: CeilingByYear = {
-  2022: 13.8,
-  2023: 13.8,
-  2024: 14.2,
-  2025: 14.7,
-  2026: 15.1,
+  if (year === 2023) return 2_510;
+
+  if (year === 2024) return 2_580;
+
+  if (year === 2025) return 2_650;
+
+  return 2_720;
 };
-
-export interface RoadProject {
-  readonly grade: RoadGrade;
-  readonly cost: number;
-  readonly km: number;
-  readonly coverage: number;
-  readonly remoteCoverage: number;
-}
-
-export const ROAD_PROJECTS: Readonly<Record<RoadGrade, RoadProject>> = {
-  dirt: { grade: "dirt", cost: 220, km: 8, coverage: 3, remoteCoverage: 8 },
-  cobble: { grade: "cobble", cost: 380, km: 6, coverage: 5, remoteCoverage: 12 },
-  asphalt: { grade: "asphalt", cost: 650, km: 4, coverage: 7, remoteCoverage: 16 },
-};
-
-export const HYDRO_COST = 1_400;
-export const MECHANIZED_COST = 1_100;
-export const IRRIGATION_BASE_COST = 600;
-export const RND_BASE_COST = 500;
-export const FLEET_COST = 320;
-export const FLEET_STEP = 20;
-export const FLEET_MAX = 320;
-export const CAMPAIGN_COST = 450;
-export const CAMPAIGN_COOLDOWN_MONTHS = 6;
-export const CRACKDOWN_COST = 350;
-export const IMPORT_RICE_VOLUME = 100;
-export const IMPORT_RICE_MARKUP = 1.03;
 
 export const INITIAL_TARIFFS: TariffTiers = {
-  tiers: [8.2, 10.4, 13.6, 17.0],
-  workshop: 7.4,
-  ceiling: CEILINGS[START_YEAR]!,
+  tiers: [1_806, 1_866, 2_167, 2_729, 3_050, 3_117],
+  industrial: 1_750,
+  ceiling: ceilingFor(START_YEAR),
 };
 
-export const ARCHITECT_DEBT_MAX = 25_000;
-export const PREDATOR_CASH_MIN = 28_000;
-export const PREDATOR_SATISFACTION_MAX = 50;
-export const FINAL_TRUST_MIN = 55;
-export const FINAL_SATISFACTION_MIN = 55;
-export const FINAL_RELIABILITY_MIN = 95;
+export const DIRECT_TARIFF_CAP_PCT = 5;
+export const APPROVAL_THRESHOLD = 55;
+export const TARIFF_HIKE_MEDIA_PCT = 4;
+
+export const HYDRO_VARIABLE_COST = 350;
+export const THERMAL_FUEL_COST = 2_500;
+export const RENEWABLE_PPA_COST = 1_050;
+export const TRANSMISSION_COST_PER_KWH = 380;
+export const MANAGEMENT_BASE_COST = 540;
+export const MANAGEMENT_PER_GW = 26;
+export const INTEREST_MONTHS = 12;
+
+export const LOSS_FACTOR_BASE = 0.09;
+export const LOSS_FACTOR_STRENGTH = 0.0005;
+export const LOSS_FACTOR_MIN = 0.04;
+
+export const RESERVE_TARGET = 15;
+export const SECURITY_STREAK_MONTHS = 12;
+
+export type LineProject = {
+  readonly zone: ZoneId;
+  readonly cost: number;
+  readonly months: number;
+  readonly coverage: number;
+  readonly lineKm500: number;
+  readonly lineKm220: number;
+};
+
+export const LINE_PROJECTS: Readonly<Record<ZoneId, LineProject>> = {
+  urban: { zone: "urban", cost: 1_200, months: 2, coverage: 8, lineKm500: 40, lineKm220: 120 },
+  industrial: {
+    zone: "industrial",
+    cost: 1_600,
+    months: 3,
+    coverage: 10,
+    lineKm500: 60,
+    lineKm220: 180,
+  },
+  rural: { zone: "rural", cost: 2_100, months: 4, coverage: 12, lineKm500: 90, lineKm220: 240 },
+};
+
+export type PlantKind = "hydro" | "thermal" | "renewable" | "substation";
+
+export type PlantProject = {
+  readonly kind: PlantKind;
+  readonly cost: number;
+  readonly months: number;
+  readonly capacityMw: number;
+  readonly gridStrength: number;
+  readonly substations: number;
+};
+
+export const PLANT_PROJECTS: Readonly<Record<PlantKind, PlantProject>> = {
+  hydro: {
+    kind: "hydro",
+    cost: 3_200,
+    months: 8,
+    capacityMw: 250,
+    gridStrength: 0,
+    substations: 0,
+  },
+  thermal: {
+    kind: "thermal",
+    cost: 2_800,
+    months: 6,
+    capacityMw: 300,
+    gridStrength: 0,
+    substations: 0,
+  },
+  renewable: {
+    kind: "renewable",
+    cost: 2_600,
+    months: 5,
+    capacityMw: 200,
+    gridStrength: 0,
+    substations: 0,
+  },
+  substation: {
+    kind: "substation",
+    cost: 1_400,
+    months: 3,
+    capacityMw: 0,
+    gridStrength: 6,
+    substations: 1,
+  },
+};
+
+const noEffects = {
+  cashDelta: 0,
+  debtDelta: 0,
+  citizenTrustDelta: 0,
+  institutionalTrustDelta: 0,
+  inflationDelta: 0,
+  fuelPriceDelta: 0,
+  reservoirDelta: 0,
+  hydroCapacityDelta: 0,
+  thermalCapacityDelta: 0,
+  renewableCapacityDelta: 0,
+  coverageDelta: 0,
+  gridStrengthDelta: 0,
+  demandDelta: 0,
+  mediaMonths: 0,
+  unlockDecisions: [],
+  enablePolicy: [],
+  disablePriceCap: false,
+} as const;
+
+export const DECISIONS: readonly DecisionDefinition[] = [
+  { id: "keep-fuel", cost: 0, months: 1, effects: { ...noEffects, thermalCapacityDelta: 100 } },
+  {
+    id: "cut-staff",
+    cost: 0,
+    months: 1,
+    effects: { ...noEffects, institutionalTrustDelta: -6, cashDelta: 900 },
+  },
+  {
+    id: "max-hydro",
+    cost: 0,
+    months: 1,
+    effects: { ...noEffects, reservoirDelta: -14, cashDelta: 1_200, citizenTrustDelta: 1 },
+  },
+  {
+    id: "policy-petition",
+    cost: 700,
+    months: 6,
+    effects: { ...noEffects, institutionalTrustDelta: 3 },
+  },
+  {
+    id: "negotiate-fuel",
+    cost: 1_100,
+    months: 12,
+    effects: { ...noEffects, fuelPriceDelta: -0.14, institutionalTrustDelta: 2 },
+  },
+  {
+    id: "save-power",
+    cost: 600,
+    months: 3,
+    effects: { ...noEffects, demandDelta: -0.05, citizenTrustDelta: 2 },
+  },
+  {
+    id: "shift-industry",
+    cost: 350,
+    months: 2,
+    effects: { ...noEffects, demandDelta: -0.04, citizenTrustDelta: -3 },
+  },
+  {
+    id: "load-shed",
+    cost: 0,
+    months: 1,
+    effects: {
+      ...noEffects,
+      citizenTrustDelta: -10,
+      institutionalTrustDelta: -2,
+      demandDelta: -0.03,
+    },
+  },
+  {
+    id: "fossil-ramp",
+    cost: 500,
+    months: 1,
+    effects: { ...noEffects, thermalCapacityDelta: 150, inflationDelta: 0.4 },
+  },
+  {
+    id: "grid-maintenance",
+    cost: 900,
+    months: 4,
+    effects: { ...noEffects, gridStrengthDelta: 8, institutionalTrustDelta: 1 },
+  },
+] as const;
 
 export const createInitialState = (seed: number = 7): GameState => ({
   version: SAVE_VERSION,
@@ -92,56 +228,65 @@ export const createInitialState = (seed: number = 7): GameState => ({
   seed,
   clock: { year: START_YEAR, month: START_MONTH, tick: 0 },
   act: 1,
-  village: {
-    householdsThousand: 420,
-    remoteHouseholdsThousand: 38,
-    workshopsThousand: 12,
+  zones: {
+    urban: { coverage: 92, baseDemandMw: 620, growth: 0.012 },
+    industrial: { coverage: 74, baseDemandMw: 540, growth: 0.02 },
+    rural: { coverage: 46, baseDemandMw: 210, growth: 0.008 },
   },
   market: {
-    ricePrice: 12,
-    fertilizerPrice: 8.4,
-    fuelPrice: 22,
+    fuelPriceIndex: 1,
+    coalPrice: 140,
+    gasPrice: 9.8,
     exchangeRate: 1,
-    drought: 0.25,
-    privateShare: 0.58,
+    drought: 0.28,
+    heat: 1,
+    renewableFactor: 0.55,
     demandIndex: 1,
-    externalSupplyFactor: 1,
+    suppliers: [
+      { id: "ipp-lac-hong", kind: "ipp", priceVndPerKwh: 2_450, capacityMw: 450 },
+      { id: "bot-duyen-hai", kind: "bot", priceVndPerKwh: 2_465, capacityMw: 400 },
+      { id: "coal-quang-ninh", kind: "coal", priceVndPerKwh: 2_440, capacityMw: 500 },
+    ],
+  },
+  generation: {
+    hydroCapacityMw: 900,
+    thermalCapacityMw: 1_000,
+    renewableCapacityMw: 300,
+    reservoir: 68,
+    maintenance: 80,
+  },
+  infrastructure: {
+    lineKm500: 1_850,
+    lineKm220: 4_200,
+    substations: 18,
+    gridStrength: 62,
+  },
+  operations: {
+    dispatch: { hydroMw: 500, thermalMw: 350, importMw: 150 },
+    supplierId: "coal-quang-ninh",
+    projects: [],
   },
   tariffs: INITIAL_TARIFFS,
-  infrastructure: {
-    dirtKm: 210,
-    cobbleKm: 140,
-    asphaltKm: 90,
-    coverage: 62,
-    remoteCoverage: 18,
-    fleet: 120,
-  },
-  production: {
-    hydroPaddies: 5,
-    mechanizedPaddies: 3,
-    irrigationLevel: 1,
-    rndLevel: 0,
-    riceInventory: 140,
-  },
   policy: {
     n2Enabled: false,
-    n2Rate: N2_RATE_DEFAULT,
+    n2Rate: RECOVERY_RATE_DEFAULT,
     nsmo: false,
     dppa: false,
     vrem: false,
     twoPartTariff: false,
-    antiSmuggling: false,
-    campaignCooldown: 0,
-    bailoutUsed: false,
+    petitionDone: false,
+    branch: "state",
+    priceCap: true,
   },
   metrics: {
-    satisfaction: 72,
-    trust: 66,
-    inflation: 3.2,
+    citizenTrust: 68,
+    institutionalTrust: 62,
+    inflation: 3.4,
     industrialOutput: 100,
     reliability: 100,
-    debateScore: 50,
+    reserveMargin: 39,
   },
+  media: { activeMonths: 0, cooldown: 0, pulses: 0 },
   finance: {
     cash: STARTING_CASH,
     debt: STARTING_DEBT,
@@ -149,6 +294,7 @@ export const createInitialState = (seed: number = 7): GameState => ({
     accumulatedLoss: 0,
     interestRate: INTEREST_RATE,
     recoveredTotal: 0,
+    recoveredYears: [],
     monthlyHistory: [],
     annualHistory: [],
   },
@@ -157,7 +303,11 @@ export const createInitialState = (seed: number = 7): GameState => ({
     queue: [],
     resolved: [],
     flags: [],
+    decisions: [],
+    completedDecisions: [],
   },
+  missions: { completed: [], reserveStreak: 0, privateMonths: 0 },
+  approval: null,
   ending: null,
   tutorialStep: 0,
 });

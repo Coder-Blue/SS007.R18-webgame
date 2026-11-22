@@ -1,107 +1,41 @@
 import { describe, expect, it } from "vitest";
-import { createInitialState } from "../../src/domain/constants";
-import {
-  advanceMarket,
-  computeDemand,
-  exchangeIndex,
-  fertilizerIndex,
-  fuelIndex,
-  growVillage,
-} from "../../src/domain/market";
-
-const initial = createInitialState(11);
+import { advanceMarket, cheapestSupplier, peakDemandMw, zoneDemand } from "../../src/domain/market";
+import { baseState } from "./test-helpers";
 
 describe("market", () => {
-  it("prices the three pillars from indices", () => {
-    expect(fertilizerIndex(initial.market)).toBe(1);
-    expect(fuelIndex(initial.market)).toBe(1);
-    expect(exchangeIndex(initial.market)).toBe(1);
+  it("advances prices deterministically inside bounds", () => {
+    const state = baseState();
+    const first = advanceMarket(state.market, 1, state.metrics, 7);
+    const again = advanceMarket(state.market, 1, state.metrics, 7);
+
+    expect(first).toEqual(again);
+    expect(first.market.fuelPriceIndex).toBeGreaterThanOrEqual(0.8);
+    expect(first.market.fuelPriceIndex).toBeLessThanOrEqual(2.4);
+    expect(first.market.drought).toBeGreaterThanOrEqual(0);
+    expect(first.market.suppliers).toHaveLength(3);
   });
 
-  it("computes connected household and workshop demand", () => {
-    const demand = computeDemand(
-      initial.village,
-      initial.infrastructure,
-      initial.market,
-      initial.metrics,
-      initial.clock,
-    );
+  it("keeps competing suppliers within a narrow band", () => {
+    const state = baseState();
+    const { market } = advanceMarket(state.market, 7, state.metrics, 11);
+    const prices = market.suppliers.map((row) => row.priceVndPerKwh);
 
-    expect(demand.household).toBeCloseTo(191.5, 1);
-    expect(demand.workshop).toBeCloseTo(216, 1);
-    expect(demand.total).toBeCloseTo(demand.household + demand.workshop);
-    expect(demand.externalOffer).toBeCloseTo(
-      demand.total * initial.market.privateShare * initial.market.externalSupplyFactor,
-    );
-    expect(demand.household).toBeGreaterThan(0);
+    expect(Math.max(...prices) - Math.min(...prices)).toBeLessThan(40);
+    expect(cheapestSupplier(market)).toBe(Math.min(...prices));
   });
 
-  it("raises connected demand with full coverage", () => {
-    const low = computeDemand(
-      initial.village,
-      { ...initial.infrastructure, coverage: 0 },
-      initial.market,
-      initial.metrics,
-      initial.clock,
-    );
+  it("weights zone demand by coverage, season and industrial output", () => {
+    const state = baseState();
+    const demand = zoneDemand(state.zones, state.market, state.metrics);
 
-    const high = computeDemand(
-      initial.village,
-      { ...initial.infrastructure, coverage: 100 },
-      initial.market,
-      initial.metrics,
-      initial.clock,
-    );
-
-    expect(high.household).toBeGreaterThan(low.household);
+    expect(demand.total).toBeGreaterThan(0);
+    expect(demand.urban).toBeGreaterThan(0);
+    expect(demand.industrial).toBeGreaterThan(0);
+    expect(demand.rural).toBeGreaterThan(0);
+    expect(demand.connected).toBe(demand.total);
   });
 
-  it("walks the market deterministically within bounds", () => {
-    const summer = advanceMarket(initial.market, { year: 2022, month: 6, tick: 5 }, 3.2, 42);
-    expect(summer.market.ricePrice).toBeGreaterThanOrEqual(9.5);
-    expect(summer.market.ricePrice).toBeLessThanOrEqual(28);
-    expect(summer.market.drought).toBeGreaterThan(0.5);
-    expect(summer.market.drought).toBeLessThanOrEqual(1);
-    expect(summer.seed).not.toBe(42);
-  });
-
-  it("handles every scripted drought year", () => {
-    for (const year of [2022, 2023, 2024, 2025, 2026, 2027]) {
-      for (const month of [2, 7]) {
-        const step = advanceMarket(initial.market, { year, month, tick: 0 }, 4, year + month);
-        expect(step.market.drought).toBeGreaterThanOrEqual(0);
-        expect(step.market.drought).toBeLessThanOrEqual(1);
-      }
-    }
-  });
-
-  it("clamps stressed prices and exchange rates", () => {
-    const stressed = advanceMarket(
-      {
-        ...initial.market,
-        ricePrice: 40,
-        fertilizerPrice: 30,
-        fuelPrice: 60,
-        exchangeRate: 1.5,
-      },
-      { year: 2025, month: 7, tick: 42 },
-      20,
-      5,
-    );
-
-    expect(stressed.market.ricePrice).toBeLessThanOrEqual(28);
-    expect(stressed.market.fertilizerPrice).toBeLessThanOrEqual(16);
-    expect(stressed.market.fuelPrice).toBeLessThanOrEqual(38);
-    expect(stressed.market.exchangeRate).toBeLessThanOrEqual(1.24);
-    expect(stressed.market.externalSupplyFactor).toBeGreaterThanOrEqual(0.62);
-  });
-
-  it("grows village demand annually", () => {
-    const grown = growVillage(initial.village);
-    expect(grown.householdsThousand).toBeGreaterThan(initial.village.householdsThousand);
-    expect(grown.workshopsThousand).toBeGreaterThan(initial.village.workshopsThousand);
-    expect(grown.remoteHouseholdsThousand).toBeGreaterThan(
-      initial.village.remoteHouseholdsThousand,
-    );
+  it("sets peak demand above average", () => {
+    expect(peakDemandMw(1_000)).toBeCloseTo(1_150);
   });
 });

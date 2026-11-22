@@ -7,57 +7,22 @@ import {
   DrawerContent,
   DrawerTitle,
 } from "@ui-sdk/solid/drawer";
-import { Icon, type IconName } from "../components/icons";
-import { OverviewPanel } from "../panels/overview-panel";
-import { ProductionPanel } from "../panels/production-panel";
-import { InfrastructurePanel } from "../panels/infrastructure-panel";
-import { TariffPanel } from "../panels/tariff-panel";
-import { PolicyPanel } from "../panels/policy-panel";
-import { FinancePanel } from "../panels/finance-panel";
-import { HistoryPanel } from "../panels/history-panel";
+import { Icon } from "../components/icons";
+import { PanelView } from "../panels/panel-view";
+import { PANEL_TABS } from "../hud/bottom-dock";
 
-export type PanelId =
-  | "overview"
-  | "production"
-  | "infrastructure"
-  | "tariffs"
-  | "finance"
-  | "policy"
-  | "history";
+export type PanelId = "overview" | "production" | "grid" | "tariffs" | "policy" | "finance";
 
 export const PANEL_IDS = [
   "overview",
   "production",
-  "infrastructure",
+  "grid",
   "tariffs",
-  "finance",
   "policy",
-  "history",
+  "finance",
 ] as const satisfies readonly PanelId[];
 
-const tabs: readonly { readonly id: PanelId; readonly label: string; readonly icon: IconName }[] = [
-  { id: "overview", label: "Tổng quan", icon: "lucide:gauge" },
-  { id: "production", label: "Sản xuất", icon: "tabler:wheat" },
-  { id: "infrastructure", label: "Đường", icon: "lucide:road" },
-  { id: "tariffs", label: "Giá", icon: "lucide:scale" },
-  { id: "policy", label: "Chính sách", icon: "lucide:landmark" },
-];
-
-const PanelView = (props: { readonly panel: PanelId }): JSX.Element => {
-  if (props.panel === "production") return <ProductionPanel />;
-
-  if (props.panel === "infrastructure") return <InfrastructurePanel />;
-
-  if (props.panel === "tariffs") return <TariffPanel />;
-
-  if (props.panel === "finance") return <FinancePanel />;
-
-  if (props.panel === "policy") return <PolicyPanel />;
-
-  if (props.panel === "history") return <HistoryPanel />;
-
-  return <OverviewPanel />;
-};
+const mobileTabs = PANEL_TABS.filter((tab) => tab.id !== "policy");
 
 export const MobileNav = (): JSX.Element => {
   const [open, setOpen] = createSignal(false);
@@ -71,10 +36,11 @@ export const MobileNav = (): JSX.Element => {
   return (
     <>
       <nav class="mobile-nav" aria-label="Bảng điều hành">
-        {tabs.map((tab) => (
+        {mobileTabs.map((tab) => (
           <button
             type="button"
             class="mobile-tab"
+            data-tutorial={tab.id}
             aria-haspopup="dialog"
             aria-expanded={open() && panel() === tab.id ? "true" : "false"}
             onClick={() => openPanel(tab.id)}
@@ -94,26 +60,17 @@ export const MobileNav = (): JSX.Element => {
             </DrawerClose>
           </div>
           <div class="sheet-tabs">
-            {tabs.map((tab) => (
+            {PANEL_TABS.map((tab) => (
               <button
                 type="button"
                 class="sheet-tab"
-                data-active={panel() === tab.id}
+                data-active={panel() === tab.id ? "true" : "false"}
                 aria-pressed={panel() === tab.id ? "true" : "false"}
                 onClick={() => setPanel(tab.id)}
               >
                 {tab.label}
               </button>
             ))}
-            <button
-              type="button"
-              class="sheet-tab"
-              data-active={panel() === "history"}
-              aria-pressed={panel() === "history" ? "true" : "false"}
-              onClick={() => setPanel("history")}
-            >
-              Lịch sử
-            </button>
           </div>
           <div class="sheet-body">
             <Show when={open()}>

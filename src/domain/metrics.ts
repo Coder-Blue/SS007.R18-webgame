@@ -1,166 +1,159 @@
-import type { Infrastructure, Market, Metrics, Policy, TariffTiers } from "./types";
+import type { Metrics, Policy } from "./types";
 import { clamp } from "./clock";
-import { averageHouseholdTariff } from "./tariffs";
-import { N2_RATE_DEFAULT } from "./constants";
+import { RECOVERY_RATE_DEFAULT } from "./constants";
 
-export const reliabilityOf = (supplied: number, demand: number): number => {
-  if (demand <= 0) return 100;
-
-  return clamp((supplied / demand) * 100, 0, 100);
-};
-
-export interface MetricContext {
+export type MetricContext = {
   readonly previous: Metrics;
   readonly reliability: number;
-  readonly infrastructure: Infrastructure;
-  readonly tariffs: TariffTiers;
-  readonly market: Market;
+  readonly reserveMargin: number;
+  readonly coverage: number;
+  readonly averageTariff: number;
+  readonly previousAverageTariff: number;
+  readonly industrialTariff: number;
+  readonly fuelPriceIndex: number;
+  readonly previousFuelPriceIndex: number;
+  readonly mediaActive: boolean;
+  readonly branch: Policy["branch"];
+  readonly completedMissions: number;
+  readonly missionProgress: number;
+  readonly netResult: number;
+  readonly debt: number;
   readonly policy: Policy;
-  readonly flags: readonly string[];
-  readonly industrialOutput: number;
-}
+};
+
+export type MetricStep = {
+  readonly metrics: Metrics;
+};
 
 export const nextInflation = (
   previous: number,
   averageTariff: number,
   previousTariff: number,
-  ricePrice: number,
-  previousRicePrice: number,
+  fuelPriceIndex: number,
+  previousFuel: number,
   recoveryRate: number,
 ): number => {
   const tariffChange =
     previousTariff > 0 ? ((averageTariff - previousTariff) / previousTariff) * 100 : 0;
 
-  const riceChange =
-    previousRicePrice > 0 ? ((ricePrice - previousRicePrice) / previousRicePrice) * 100 : 0;
+  const fuelChange = (fuelPriceIndex - previousFuel) * 100;
+  const recoveryPush = Math.max(0, recoveryRate - RECOVERY_RATE_DEFAULT) * 1.8;
+  const target = 3.2 + tariffChange * 0.55 + fuelChange * 0.04 + recoveryPush;
 
-  const recoveryPush = Math.max(0, recoveryRate - N2_RATE_DEFAULT) * 2.4;
-  const target = 3 + tariffChange * 1.1 + riceChange * 0.45 + recoveryPush;
-
-  return clamp(previous + (target - previous) * 0.35, 0, 28);
+  return clamp(previous + (target - previous) * 0.32, 0, 30);
 };
 
 export const nextIndustrialOutput = (
   previous: number,
   reliability: number,
-  workshopTariff: number,
+  industrialTariff: number,
   policy: Policy,
   inflation: number,
 ): number => {
-  const reliabilityPull = (reliability - 95) * 0.0012;
-  const tariffPull = (8 - workshopTariff) * 0.002;
+  const reliabilityPull = (reliability - 96) * 0.0014;
+  const tariffPull = (1_750 - industrialTariff) * 0.00004;
 
   const reformPull =
     (policy.dppa ? 0.0018 : 0) + (policy.vrem ? 0.0015 : 0) + (policy.nsmo ? 0.0008 : 0);
 
   const inflationDrag = inflation > 8 ? -0.0025 : 0;
-
-  return clamp(previous * (1 + reliabilityPull + tariffPull + reformPull + inflationDrag), 65, 175);
-};
-
-export const nextSatisfaction = (context: MetricContext): number => {
-  const averageTariff = averageHouseholdTariff(context.tariffs);
-
-  const target =
-    70 +
-    (context.reliability - 95) * 1.25 +
-    (context.infrastructure.coverage - 60) * 0.2 +
-    (context.infrastructure.remoteCoverage - 30) * 0.16 -
-    Math.max(0, averageTariff - 10.5) * 1.65 -
-    Math.max(0, context.tariffs.workshop - 7.4) * 2.1 +
-    (context.industrialOutput - 100) * 0.12 +
-    (context.policy.antiSmuggling ? 2 : 0) +
-    (context.flags.includes("farmers_helped") ? 3 : 0) +
-    (context.flags.includes("bribe_accepted") ? -4 : 0);
+  const privateDrag = policy.branch === "private" ? -0.004 : 0;
 
   return clamp(
-    context.previous.satisfaction + (target - context.previous.satisfaction) * 0.35,
+    previous * (1 + reliabilityPull + tariffPull + reformPull + inflationDrag + privateDrag),
+    55,
+    165,
+  );
+};
+
+export const citizenTarget = (context: MetricContext, inflation: number): number => {
+  const blackout = Math.max(0, 95 - context.reliability) * 1.45;
+  const pricePressure = Math.max(0, context.averageTariff - 2_400) * 0.028;
+  const missionBonus = context.completedMissions * 2.2 + context.missionProgress * 0.025;
+
+  return clamp(
+    72 +
+      (context.reliability - 96) * 1.1 +
+      (context.coverage - 60) * 0.16 -
+      pricePressure -
+      blackout -
+      Math.max(0, inflation - 8) * 0.8 +
+      missionBonus,
     0,
     100,
   );
 };
 
-export const nextTrust = (context: MetricsDebateContext, inflation: number): number => {
-  const averageTariff = averageHouseholdTariff(context.tariffs);
+export const institutionalTarget = (context: MetricContext, inflation: number): number => {
+  const lossDrag = context.netResult < 0 ? Math.min(9, Math.abs(context.netResult) / 260) : 0;
+  const debtDrag = Math.max(0, context.debt / 1_000 - 30) * 0.18;
+  const missionBonus = context.completedMissions * 3.4 + context.missionProgress * 0.02;
 
-  const reformBonus =
-    (context.policy.n2Enabled ? 4 : 0) +
-    (context.policy.nsmo ? 2 : 0) +
-    (context.policy.dppa ? 2 : 0) +
-    (context.policy.vrem ? 2 : 0);
-
-  const scandal =
-    (context.flags.includes("bribe_accepted") ? 9 : 0) +
-    (context.flags.includes("smuggling_rampant") ? 6 : 0) +
-    (context.flags.includes("privatization_accepted") ? 60 : 0);
-
-  const target =
+  return clamp(
     58 +
-    context.infrastructure.coverage * 0.22 +
-    (context.industrialOutput - 100) * 0.1 -
-    inflation * 1.45 +
-    (context.reliability - 95) * 0.4 +
-    (context.metricsDebate - 50) * 0.12 +
-    reformBonus -
-    Math.max(0, averageTariff - 12) * 1.2 -
-    Math.max(0, context.tariffs.workshop - 8) * 1.8 -
-    scandal;
-
-  return clamp(context.previous.trust + (target - context.previous.trust) * 0.32, 0, 100);
+      context.coverage * 0.14 +
+      (context.reliability - 96) * 0.5 -
+      inflation * 1.35 -
+      lossDrag -
+      debtDrag +
+      missionBonus +
+      (context.policy.n2Enabled ? 2 : 0) +
+      (context.policy.nsmo ? 1.5 : 0) +
+      (context.policy.dppa ? 1.5 : 0) +
+      (context.policy.vrem ? 1.5 : 0),
+    0,
+    100,
+  );
 };
 
-export interface MetricsDebateContext extends MetricContext {
-  readonly metricsDebate: number;
-}
-
-export interface MetricsStep {
-  readonly metrics: Metrics;
-  readonly averageTariff: number;
-}
-
-export const advanceMetrics = (
-  context: MetricContext,
-  previousTariff: number,
-  previousRicePrice: number,
-): MetricsStep => {
-  const averageTariff = averageHouseholdTariff(context.tariffs);
-
+export const advanceMetrics = (context: MetricContext): MetricStep => {
   const inflation = nextInflation(
     context.previous.inflation,
-    averageTariff,
-    previousTariff,
-    context.market.ricePrice,
-    previousRicePrice,
+    context.averageTariff,
+    context.previousAverageTariff,
+    context.fuelPriceIndex,
+    context.previousFuelPriceIndex,
     context.policy.n2Rate,
   );
 
   const industrialOutput = nextIndustrialOutput(
-    context.industrialOutput,
+    context.previous.industrialOutput,
     context.reliability,
-    context.tariffs.workshop,
+    context.industrialTariff,
     context.policy,
     inflation,
   );
 
-  const withIndustry: MetricContext = { ...context, industrialOutput };
-  const satisfaction = nextSatisfaction(withIndustry);
+  const mediaDecay = context.mediaActive ? 1.15 : 0;
+  const privateDecay = context.branch === "private" ? 2.1 : 0;
+  const lossDecay = context.netResult < 0 ? Math.min(1.4, Math.abs(context.netResult) / 900) : 0;
 
-  const debateContext: MetricsDebateContext = {
-    ...withIndustry,
-    metricsDebate: context.previous.debateScore,
-  };
+  const citizen = clamp(
+    context.previous.citizenTrust +
+      (citizenTarget(context, inflation) - context.previous.citizenTrust) * 0.3 -
+      mediaDecay -
+      privateDecay,
+    0,
+    100,
+  );
 
-  const trust = nextTrust(debateContext, inflation);
+  const institutional = clamp(
+    context.previous.institutionalTrust +
+      (institutionalTarget(context, inflation) - context.previous.institutionalTrust) * 0.2 -
+      lossDecay,
+    0,
+    100,
+  );
 
   return {
     metrics: {
       ...context.previous,
-      satisfaction,
-      trust,
+      citizenTrust: citizen,
+      institutionalTrust: institutional,
       inflation,
       industrialOutput,
       reliability: context.reliability,
+      reserveMargin: context.reserveMargin,
     },
-    averageTariff,
   };
 };

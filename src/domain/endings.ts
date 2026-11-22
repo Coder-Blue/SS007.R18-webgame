@@ -1,12 +1,6 @@
 import type { Ending, GameState } from "./types";
-import {
-  ARCHITECT_DEBT_MAX,
-  FINAL_RELIABILITY_MIN,
-  FINAL_SATISFACTION_MIN,
-  FINAL_TRUST_MIN,
-  PREDATOR_CASH_MIN,
-  PREDATOR_SATISFACTION_MAX,
-} from "./constants";
+import { DEBT_LIMIT, END_MONTH, END_YEAR } from "./constants";
+import { missionStatus, reformsEnabled } from "./missions";
 
 const ending = (state: GameState, id: Ending["id"], reason: Ending["reason"]): Ending => ({
   id,
@@ -16,66 +10,48 @@ const ending = (state: GameState, id: Ending["id"], reason: Ending["reason"]): E
 });
 
 export const evaluateEarlyEnding = (state: GameState): Ending | null => {
-  if (state.finance.debt > state.finance.debtLimit) {
-    return ending(state, "collapse", "debt");
+  if (state.metrics.citizenTrust <= 0) return ending(state, "collapse", "citizen-trust");
+
+  if (state.metrics.institutionalTrust <= 0) {
+    return ending(state, "collapse", "institutional-trust");
   }
 
-  if (state.metrics.satisfaction <= 0) {
-    return ending(state, "collapse", "unrest");
-  }
+  if (state.finance.debt > DEBT_LIMIT) return ending(state, "collapse", "debt");
 
-  if (state.metrics.trust <= 0) {
-    return ending(state, "collapse", "deposed");
-  }
-
-  if (state.events.flags.includes("privatization_accepted")) {
+  if (state.policy.branch === "private" && state.missions.privateMonths >= 12) {
     return ending(state, "collapse", "privatization");
   }
+
+  if (state.metrics.reliability < 45) return ending(state, "collapse", "blackout");
 
   return null;
 };
 
-export const finalReliability = (state: GameState): number => {
-  const report = state.finance.annualHistory.find((row) => row.year === state.clock.year);
-
-  return report?.reliability ?? state.metrics.reliability;
-};
-
 export const evaluateFinalEnding = (state: GameState): Ending => {
-  const reportFlags = state.events.flags;
-  const debtHealed = state.finance.debt <= ARCHITECT_DEBT_MAX;
-
-  const coverageComplete =
-    state.infrastructure.coverage >= 100 && state.infrastructure.remoteCoverage >= 100;
-
-  const reforms = state.policy.n2Enabled && state.policy.dppa && state.policy.vrem;
+  const coverageComplete = missionStatus(state).some(
+    (row) => row.id === "electrification" && row.done,
+  );
 
   const legitimate =
-    state.metrics.trust >= FINAL_TRUST_MIN &&
-    state.metrics.satisfaction >= FINAL_SATISFACTION_MIN &&
-    finalReliability(state) >= FINAL_RELIABILITY_MIN;
+    state.metrics.institutionalTrust >= 50 &&
+    state.metrics.citizenTrust >= 45 &&
+    state.metrics.industrialOutput >= 100 &&
+    reformsEnabled(state) >= 3;
 
-  if (debtHealed && coverageComplete && reforms && legitimate) {
-    return ending(state, "architect", "final");
-  }
+  if (state.policy.branch === "private") return ending(state, "collapse", "privatization");
 
-  const predatory =
-    state.finance.cash >= PREDATOR_CASH_MIN &&
-    state.metrics.satisfaction < PREDATOR_SATISFACTION_MAX &&
-    (reportFlags.includes("bribe_accepted") || reportFlags.includes("smuggling_rampant"));
+  if (coverageComplete && legitimate) return ending(state, "reformer", "final");
 
-  if (predatory) return ending(state, "predator", "final");
+  if (state.metrics.citizenTrust < 40) return ending(state, "captured", "final");
 
-  return ending(state, "collapse", "final");
+  return ending(state, "caretaker", "final");
 };
 
 export const withEndingCheck = (state: GameState): GameState => {
   if (state.ending !== null) return state;
   const early = evaluateEarlyEnding(state);
 
-  if (early !== null) {
-    return { ...state, phase: "ended", ending: early };
-  }
+  if (early !== null) return { ...state, phase: "ended", ending: early };
 
   return state;
 };
@@ -83,7 +59,7 @@ export const withEndingCheck = (state: GameState): GameState => {
 export const withFinalCheck = (state: GameState): GameState => {
   if (state.ending !== null) return state;
 
-  if (state.clock.year === 2026 && state.clock.month === 12) {
+  if (state.clock.year === END_YEAR && state.clock.month === END_MONTH) {
     return { ...state, phase: "ended", ending: evaluateFinalEnding(state) };
   }
 

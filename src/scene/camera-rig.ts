@@ -1,61 +1,59 @@
 import * as THREE from "three";
 import { gsap } from "gsap";
+import { clamp } from "./motion";
 
-export interface CameraRig {
+export type CameraRig = {
   readonly camera: THREE.PerspectiveCamera;
   readonly resize: (width: number, height: number) => void;
   readonly reset: (reduced: boolean) => void;
   readonly focus: (point: THREE.Vector3, reduced: boolean) => void;
   readonly dispose: () => void;
-}
+};
 
-export interface CameraRigOptions {
+export type CameraRigOptions = {
   readonly canvas: HTMLCanvasElement;
   readonly onTap: (clientX: number, clientY: number) => void;
-}
+};
 
-interface View {
+type View = {
   targetX: number;
   targetZ: number;
   distance: number;
-}
+};
 
 const preventContextMenu = (event: Event): void => event.preventDefault();
 
-const clamp = (value: number, min: number, max: number): number =>
-  Math.min(max, Math.max(min, value));
-
 export const createCameraRig = (options: CameraRigOptions): CameraRig => {
-  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
-  const view: View = { targetX: 0, targetZ: 0, distance: 31 };
-  let userMovedCamera = false;
-  const target = new THREE.Vector3(0, 0.6, 0);
+  const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 240);
+  const view: View = { targetX: 0, targetZ: 0, distance: 38 };
+  const target = new THREE.Vector3(0, 1, 0);
   const pointers = new Map<number, { x: number; y: number }>();
   let dragging = false;
+  let moved = 0;
   let startX = 0;
   let startY = 0;
-  let moved = 0;
   let pinchStart = 0;
   let pinchDistance = 0;
+  let userMovedCamera = false;
 
   const apply = (): void => {
-    target.set(view.targetX, 0.6, view.targetZ);
-    const horizontal = view.distance * 0.72;
-    camera.position.set(view.targetX + horizontal, view.distance * 0.78, view.targetZ + horizontal);
+    target.set(view.targetX, 1, view.targetZ);
+    const horizontal = view.distance * 0.68;
+    camera.position.set(view.targetX + horizontal, view.distance * 0.8, view.targetZ + horizontal);
     camera.lookAt(target);
   };
 
   const pan = (dx: number, dy: number): void => {
-    const scale = view.distance / 480;
+    const scale = view.distance / 520;
     userMovedCamera = true;
-    view.targetX = clamp(view.targetX - dx * scale - dy * scale * 0.45, -11, 11);
-    view.targetZ = clamp(view.targetZ - dy * scale + dx * scale * 0.45, -10, 10);
+    view.targetX = clamp(view.targetX - dx * scale - dy * scale * 0.4, -14, 14);
+    view.targetZ = clamp(view.targetZ - dy * scale + dx * scale * 0.4, -12, 12);
     apply();
   };
 
   const zoom = (factor: number): void => {
     userMovedCamera = true;
-    view.distance = clamp(view.distance * factor, 15, 52);
+    view.distance = clamp(view.distance * factor, 18, 66);
     apply();
   };
 
@@ -86,7 +84,7 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
       const distance = Math.hypot((a?.x ?? 0) - (b?.x ?? 0), (a?.y ?? 0) - (b?.y ?? 0));
 
       if (pinchStart > 0) {
-        view.distance = clamp(pinchDistance * (pinchStart / Math.max(1, distance)), 15, 52);
+        view.distance = clamp(pinchDistance * (pinchStart / Math.max(1, distance)), 18, 66);
         apply();
       }
 
@@ -96,6 +94,7 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
     if (!dragging) return;
     const dx = event.clientX - previous.x;
     const dy = event.clientY - previous.y;
+
     moved += Math.abs(dx) + Math.abs(dy);
     pan(dx, dy);
   };
@@ -138,7 +137,7 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
       camera.updateProjectionMatrix();
 
       if (!userMovedCamera) {
-        view.distance = camera.aspect < 0.85 ? 42 : 31;
+        view.distance = camera.aspect < 0.85 ? 52 : 38;
         apply();
       }
     },
@@ -146,18 +145,18 @@ export const createCameraRig = (options: CameraRigOptions): CameraRig => {
       gsap.to(view, {
         targetX: 0,
         targetZ: 0,
-        distance: camera.aspect < 0.85 ? 42 : 31,
-        duration: reduced ? 0 : 0.8,
+        distance: camera.aspect < 0.85 ? 52 : 38,
+        duration: reduced ? 0 : 0.9,
         ease: "power2.inOut",
         onUpdate: apply,
       });
     },
     focus: (point: THREE.Vector3, reduced: boolean) => {
       gsap.to(view, {
-        targetX: clamp(point.x, -10, 10),
-        targetZ: clamp(point.z, -9, 9),
-        distance: camera.aspect < 0.85 ? 30 : 21,
-        duration: reduced ? 0 : 0.85,
+        targetX: clamp(point.x, -13, 13),
+        targetZ: clamp(point.z, -11, 11),
+        distance: camera.aspect < 0.85 ? 34 : 24,
+        duration: reduced ? 0 : 0.9,
         ease: "power2.inOut",
         onUpdate: apply,
       });

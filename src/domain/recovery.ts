@@ -1,36 +1,30 @@
-import type { Finance, GameState } from "./types";
-import { N2_RATE_DEFAULT } from "./constants";
+import type { Finance, Policy } from "./types";
+import { clamp } from "./clock";
 
-export interface RecoveryInfo {
-  readonly eligibleLoss: number;
+export type Recovery = {
   readonly eligibleYear: number;
+  readonly eligibleLoss: number;
   readonly monthlyCredit: number;
   readonly remaining: number;
-  readonly rate: number;
-}
-
-export const recoveryFor = (
-  finance: Finance,
-  currentYear: number,
-  rate: number,
-  enabled: boolean,
-): RecoveryInfo => {
-  const eligibleYear = currentYear - 2;
-  const report = finance.annualHistory.find((row) => row.year === eligibleYear);
-  const eligibleLoss = Math.max(0, -(report?.netResult ?? 0));
-  const base = enabled && currentYear >= 2024 ? eligibleLoss : 0;
-  const remaining = Math.max(0, base - finance.recoveredTotal);
-  const monthlyCredit = Math.min(remaining, (base * rate) / 12);
-
-  return { eligibleLoss, eligibleYear, monthlyCredit, remaining, rate };
 };
 
-export const recoveryOf = (state: GameState): RecoveryInfo =>
-  recoveryFor(
-    state.finance,
-    state.clock.year,
-    state.policy.n2Rate || N2_RATE_DEFAULT,
-    state.policy.n2Enabled,
-  );
+export const recoveryOf = (finance: Finance, year: number, policy: Policy): Recovery => {
+  const eligibleYear = year - 2;
+  const report = finance.annualHistory.find((row) => row.year === eligibleYear);
+  const eligibleLoss = Math.abs(Math.min(0, report?.netResult ?? 0));
+  const recovered = finance.recoveredYears.find((row) => row.year === eligibleYear)?.amount ?? 0;
+  const remaining = Math.max(0, eligibleLoss - recovered);
 
-export const recoveryRateCost = (rate: number): number => Math.max(0, rate - N2_RATE_DEFAULT) * 24;
+  if (!policy.n2Enabled || eligibleLoss <= 0 || remaining <= 0) {
+    return { eligibleYear, eligibleLoss, monthlyCredit: 0, remaining };
+  }
+
+  const monthlyCredit = Math.min(remaining, (eligibleLoss * clamp(policy.n2Rate, 0, 1)) / 12);
+
+  return {
+    eligibleYear,
+    eligibleLoss,
+    monthlyCredit,
+    remaining: remaining - monthlyCredit,
+  };
+};

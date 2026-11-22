@@ -9,10 +9,10 @@ the project uses semantic versioning for save-compatible releases.
 
 - Self-hosted Be Vietnam Pro WOFF2 subsets serve the UI and preload manifest;
   full TTF weights remain for the Open Graph image.
-- The title screen uses a lightweight village poster and renders the Three.js
+- The title screen uses a lightweight CSS/SVG poster and renders the Three.js
   scene only during play, so the first visit does not pay for the renderer.
-- The game surface, save menu and tutorial are lazy chunks; the title route now
-  preloads 372.6 kB of JavaScript instead of 644.0 kB.
+- The game surface, save menu and tutorial are lazy chunks; the current initial
+  shell preloads 621.3 kB minified / 209.3 kB gzip with no Three.js or GSAP.
 - The title and HUD reserve their layout, preload the visible font weights, and
   expose named meters, a single main landmark, accessible mobile tabs and the
   reduced-motion switch.
@@ -43,3 +43,30 @@ the project uses semantic versioning for save-compatible releases.
 - Nix flakes for glibc and musl, direnv detection, Vercel configuration.
 - Vitest domain suite and Playwright responsive checks.
 - Agent, architecture and contribution documentation.
+
+## [2.0.0] - 2026-11-23
+
+### Changed
+
+- Replaced the village rice economy with the 60-month national power grid
+  simulation: competitive procurement, MW dispatch, 500kV/220kV coverage,
+  six-tier retail tariffs and autonomous State price review.
+- Rebuilt the Three.js scene as a national grid map with hydro dams, thermal
+  stacks, solar/wind farms, pylons, substations and load centers; added fuel
+  crisis, drought, privatization and blackout world states.
+- Reworked the HUD around tactical pause, 1x/2x/3x speed, dual trust gauges,
+  long-term missions, media pressure, project progress and monthly reports.
+- Rewrote the domain catalog with four scripted Big Events, ten post-event
+  decisions, DPPA/VREM/NSMO reforms, N-2 recovery and calibrated structural
+  deficit near `-45,000 tỷ` with debt below `100,000 tỷ`.
+
+### Added
+
+- Installed the `ui-ux-pro-max` design skill and applied its data-dense
+  dashboard guidance with the unslop nine-pass polish.
+- Guided Chairman briefing with a five-step spotlight tutorial.
+- Live before/after previews for dispatch, supplier and tariff changes.
+- Stacked revenue/cost breakdown chart, trust trend chart and generation mix.
+- State approval dialog with a deterministic audit of fuel, deficit, inflation,
+  debt and public mood.
+- Save schema version 2 with `grid-save` envelopes.

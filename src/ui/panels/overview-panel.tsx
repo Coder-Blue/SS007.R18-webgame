@@ -1,228 +1,205 @@
 import { For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
-import { Panel, Stat, Bar, Badge, cx } from "../components/base";
-import { Icon, type IconName } from "../components/icons";
-import { formatBillion, formatPercent, formatTonne, actLabel } from "~/state/format";
-import { ARCHITECT_DEBT_MAX, recoveryOf } from "~/domain";
-import { projectFinance } from "~/state/selectors";
+import { Badge, Bar, Panel, Stat } from "../components/base";
+import { Icon } from "../components/icons";
+import { GenerationMix, RevenueCostChart, TrustTrendChart } from "../components/charts";
+import {
+  formatBillion,
+  formatEnergy,
+  formatPercent,
+  formatSignedBillion,
+  actLabel,
+} from "~/state/format";
+import { missionStatus, recoveryOf } from "~/domain";
+import { projectFinance, totalCoverage } from "~/state/selectors";
 
-interface Goal {
-  readonly label: string;
-  readonly done: boolean;
-  readonly detail: string;
-}
-
-const pillar = (
-  name: string,
-  tag: string,
-  icon: IconName,
-  value: number,
-  detail: string,
-  tone: "good" | "warn" | "bad" | "green" | "gold",
-) => (
-  <div class="pillar-card" data-tone={tone}>
-    <div class="pillar-top">
-      <span class="pillar-icon">
-        <Icon icon={icon} size={18} />
-      </span>
-      <div>
-        <strong>{name}</strong>
-        <span>{tag}</span>
-      </div>
-      <Badge tone={tone === "good" || tone === "green" ? "good" : tone === "bad" ? "bad" : "warn"}>
-        {Math.round(value)}%
-      </Badge>
-    </div>
-    <Bar value={value} tone={tone} label={name} />
-    <p class="pillar-detail">{detail}</p>
+const row = (label: string, value: number, total: number, tone: string): JSX.Element => (
+  <div class="breakdown-row">
+    <span class="breakdown-label">
+      <span class="chart-swatch" style={{ background: tone }} />
+      {label}
+    </span>
+    <span class="breakdown-value">{formatBillion(value)}</span>
+    <span class="breakdown-share">
+      {total > 0 ? `${Math.round((value / total) * 100)}%` : "0%"}
+    </span>
   </div>
 );
 
-export const OverviewPanel = (): import("@solidjs/web").JSX.Element => {
+export const OverviewPanel = (): JSX.Element => {
   const { store } = useGame();
   const state = store.state;
   const last = () => state().finance.monthlyHistory[state().finance.monthlyHistory.length - 1];
   const projection = () => projectFinance(state());
-  const recovery = () => recoveryOf(state());
-
-  const goals = (): readonly Goal[] => {
-    const current = state();
-
-    return [
-      {
-        label: "Phủ 100% đường đến hộ dân và bản xa",
-        done:
-          current.infrastructure.coverage >= 100 && current.infrastructure.remoteCoverage >= 100,
-        detail: `${formatPercent(current.infrastructure.coverage)} / ${formatPercent(current.infrastructure.remoteCoverage)}`,
-      },
-      {
-        label: "Đưa dư nợ về dưới 25.000 tỷ",
-        done: current.finance.debt <= ARCHITECT_DEBT_MAX,
-        detail: formatBillion(current.finance.debt),
-      },
-      {
-        label: "Ban hành N-2, DPPA và VREM",
-        done: current.policy.n2Enabled && current.policy.dppa && current.policy.vrem,
-        detail: `${current.policy.n2Enabled ? "Đang áp dụng" : "Chưa áp dụng"} · ${current.policy.vrem ? "VREM" : "—"}`,
-      },
-      {
-        label: "Giữ tín nhiệm và hài lòng trên 55%",
-        done: current.metrics.trust >= 55 && current.metrics.satisfaction >= 55,
-        detail: `${formatPercent(current.metrics.trust)} / ${formatPercent(current.metrics.satisfaction)}`,
-      },
-    ];
-  };
+  const recovery = () => recoveryOf(state().finance, state().clock.year, state().policy);
+  const missions = () => missionStatus(state());
+  const revenueTotal = () => (last()?.revenueElectricity ?? 0) + (last()?.revenueOther ?? 0);
+  const costTotal = () => (last()?.costSupply ?? 0) + (last()?.costManagement ?? 0);
 
   return (
     <div class="stack-lg">
-      <Panel title="Tình hình tháng này" kicker={actLabel(state().act)} icon="lucide:chart-column">
+      <Panel title="Bức tranh điều hành" kicker={actLabel(state().act)} icon="lucide:gauge">
         <div class="overview-hero">
           <div class="overview-copy">
             <p class="eyebrow">{`Tháng ${state().clock.month}/${state().clock.year}`}</p>
-            <h3>Chuỗi giá trị của làng</h3>
+            <h3>Một lưới điện, ba khâu, một nhiệm kỳ năm năm</h3>
             <p class="muted">
-              Một làng, một mạng đường, một giỏ gạo. Giữ cho dân no, xưởng chạy và ngân sách không
-              sụp. Mở đường và giữ giá xưởng thấp để xưởng mở rộng.
+              Mua điện cạnh tranh ở thượng nguồn, giữ cân bằng MW trên lưới truyền tải và bán điện
+              theo biểu giá nhà nước. Mọi lựa chọn đều đổi lấy niềm tin hoặc nợ.
             </p>
             <div class="hero-chips">
-              <Badge tone="gold">Sản xuất</Badge>
-              <Badge tone="dark">Truyền tải</Badge>
+              <Badge tone="gold">Sản xuất & mua điện</Badge>
+              <Badge tone="electric">Truyền tải</Badge>
               <Badge tone="good">Phân phối</Badge>
             </div>
           </div>
           <div class="overview-score">
-            <span class="score-label">Điểm tranh luận công khai</span>
-            <strong>{Math.round(state().metrics.debateScore)}</strong>
+            <span class="score-label">Lỗ lũy kế</span>
+            <strong>{formatBillion(state().finance.accumulatedLoss)}</strong>
             <Bar
-              value={state().metrics.debateScore}
-              tone="gold"
-              label="Điểm tranh luận công khai"
+              value={state().finance.accumulatedLoss}
+              max={45_000}
+              tone="bad"
+              label="Lỗ lũy kế"
             />
+            <span class="score-hint">
+              {projection().runwayMonths >= 99
+                ? "Dòng tiền tháng đang dương"
+                : `Còn ${Math.round(projection().runwayMonths)} tháng trước trần nợ`}
+            </span>
           </div>
         </div>
         <div class="stat-grid">
           <Stat
-            label="Nhu cầu"
-            value={formatTonne(last()?.totalDemand ?? 0)}
-            hint="Thiếu hụt"
-            icon="tabler:wheat"
+            label="Doanh thu tháng"
+            value={formatBillion(revenueTotal())}
+            hint={`Điện: ${formatBillion(last()?.revenueElectricity ?? 0)} · Khác: ${formatBillion(last()?.revenueOther ?? 0)}`}
+            tone="gold"
+            icon="tabler:cash-banknote"
           />
           <Stat
-            label="Độ ổn định"
-            value={formatPercent(state().metrics.reliability)}
-            tone={
-              state().metrics.reliability >= 95
-                ? "good"
-                : state().metrics.reliability >= 80
-                  ? "warn"
-                  : "bad"
-            }
-            icon="lucide:shield"
+            label="Chi phí tháng"
+            value={formatBillion(costTotal())}
+            hint={`Cung ứng: ${formatBillion(last()?.costSupply ?? 0)} · Quản lý: ${formatBillion(last()?.costManagement ?? 0)}`}
+            tone="warn"
+            icon="tabler:report-money"
           />
           <Stat
-            label="Kết quả tháng trước"
-            value={last() === undefined ? "—" : formatBillion(last()?.netResult ?? 0)}
+            label="Kết quả tháng"
+            value={formatSignedBillion(last()?.netResult ?? 0)}
+            hint={`Nợ: ${formatBillion(state().finance.debt)}`}
             tone={(last()?.netResult ?? 0) >= 0 ? "good" : "bad"}
-            icon="lucide:wallet"
+            icon="lucide:trending-down"
           />
           <Stat
-            label="Số tháng còn lại trước trần nợ"
-            value={
-              projection().runwayMonths >= 99
-                ? "—"
-                : `${Math.round(projection().runwayMonths)} tháng`
-            }
-            tone={
-              projection().runwayMonths >= 12
-                ? "good"
-                : projection().runwayMonths >= 6
-                  ? "warn"
-                  : "bad"
-            }
-            icon="lucide:clock"
+            label="Điện thương phẩm"
+            value={formatEnergy(last()?.energySoldMillionKwh ?? 0)}
+            hint={`Phủ điện: ${formatPercent(totalCoverage(state()))}`}
+            tone="good"
+            icon="tabler:bolt"
           />
         </div>
       </Panel>
 
-      <Panel title="Sức khỏe ba trụ cột" kicker="Trạng thái làng" icon="lucide:landmark">
-        <div class="pillar-grid">
-          {pillar(
-            "Sản xuất",
-            "Phát điện · Ruộng và nông trại",
-            "tabler:wheat",
-            Math.min(
-              100,
-              (last()?.reliability ?? 100) * 0.55 +
-                Math.min(100, state().production.riceInventory) * 0.1,
-            ),
-            `${formatTonne(last()?.ownProduction ?? 0)} · Tồn kho gạo: ${formatTonne(state().production.riceInventory)}`,
-            "good",
-          )}
-          {pillar(
-            "Truyền tải",
-            "Truyền tải · Đường độc quyền",
-            "lucide:road",
-            state().infrastructure.coverage,
-            `Bao phủ bản xa: ${formatPercent(state().infrastructure.remoteCoverage)} · Đội xe: ${state().infrastructure.fleet}`,
-            state().infrastructure.coverage >= 90
-              ? "good"
-              : state().infrastructure.coverage >= 70
-                ? "warn"
-                : "bad",
-          )}
-          {pillar(
-            "Phân phối",
-            "Bán lẻ · Giá trần và trợ giá",
-            "lucide:scale",
-            Math.max(
-              0,
-              100 -
-                Math.abs(recovery().monthlyCredit > 0 ? 20 : 35) -
-                state().metrics.inflation * 2,
-            ),
-            `Giá bình quân: ${state()
-              .tariffs.tiers.reduce(
-                (sum, value, index) => sum + value * [0.45, 0.28, 0.18, 0.09][index]!,
-                0,
-              )
-              .toFixed(2)} · Trần giá: ${state().tariffs.ceiling}`,
-            "gold",
-          )}
-        </div>
+      <Panel
+        title="Cơ cấu doanh thu và chi phí"
+        kicker="Sáu tháng gần nhất"
+        icon="tabler:chart-bar"
+      >
+        <RevenueCostChart rows={state().finance.monthlyHistory} />
+        <Show when={last() !== undefined}>
+          <div class="breakdown-grid">
+            <div class="breakdown-card">
+              <div class="breakdown-head">
+                <span>Doanh thu</span>
+                <strong>{formatBillion(revenueTotal())}</strong>
+              </div>
+              {row(
+                "Doanh thu điện",
+                last()?.revenueElectricity ?? 0,
+                revenueTotal(),
+                "var(--electric)",
+              )}
+              {row("Doanh thu khác", last()?.revenueOther ?? 0, revenueTotal(), "var(--cyan-soft)")}
+            </div>
+            <div class="breakdown-card">
+              <div class="breakdown-head">
+                <span>Chi phí</span>
+                <strong>{formatBillion(costTotal())}</strong>
+              </div>
+              {row("Chi phí cung ứng điện", last()?.costSupply ?? 0, costTotal(), "var(--amber)")}
+              {row("Chi phí quản lý", last()?.costManagement ?? 0, costTotal(), "var(--rose)")}
+            </div>
+          </div>
+        </Show>
       </Panel>
 
-      <Panel title="Mục tiêu nhiệm kỳ" kicker="Trạng thái làng" icon="lucide:shield">
+      <div class="split-grid">
+        <Panel title="Cơ cấu nguồn điện" kicker="Tháng gần nhất" icon="tabler:plug-connected">
+          <GenerationMix rows={state().finance.monthlyHistory} />
+          <div class="mini-grid">
+            <Stat
+              label="Độ tin cậy"
+              value={formatPercent(last()?.reliability ?? 100)}
+              tone="good"
+            />
+            <Stat
+              label="Dự phòng"
+              value={formatPercent(last()?.reserveMargin ?? 0)}
+              tone={(last()?.reserveMargin ?? 0) >= 15 ? "good" : "bad"}
+            />
+          </div>
+        </Panel>
+        <Panel title="Hai chỉ số niềm tin" kicker="Hai mươi bốn tháng" icon="tabler:users">
+          <TrustTrendChart rows={state().finance.monthlyHistory} />
+          <div class="mini-grid">
+            <Stat
+              label="Người dân"
+              value={formatPercent(state().metrics.citizenTrust)}
+              tone={state().metrics.citizenTrust >= 45 ? "good" : "bad"}
+            />
+            <Stat
+              label="Thể chế"
+              value={formatPercent(state().metrics.institutionalTrust)}
+              tone={state().metrics.institutionalTrust >= 45 ? "good" : "bad"}
+            />
+          </div>
+        </Panel>
+      </div>
+
+      <Panel title="Nhiệm vụ dài hạn" kicker="Tiến độ nhiệm kỳ" icon="tabler:target">
         <div class="goal-list">
-          <For each={goals()}>
-            {(goal) => (
-              <div class="goal" data-done={goal.done}>
-                <span class={cx("goal-check", goal.done && "is-done")}>
-                  <Icon icon={goal.done ? "lucide:check" : "lucide:clock"} size={15} />
+          <For each={missions()}>
+            {(mission) => (
+              <div class="goal" data-done={mission.done ? "true" : "false"}>
+                <span class="goal-check">
+                  <Icon icon={mission.done ? "lucide:check" : "lucide:clock"} size={15} />
                 </span>
                 <div>
-                  <strong>{goal.label}</strong>
-                  <span>{goal.detail}</span>
+                  <strong>
+                    {mission.id === "electrification"
+                      ? "Phủ điện đến mọi khu vực"
+                      : mission.id === "market"
+                        ? "Điều hành thị trường điện hợp lý"
+                        : "Đảm bảo an ninh năng lượng"}
+                  </strong>
+                  <span>{mission.detail}</span>
                 </div>
+                <Bar
+                  value={mission.progress}
+                  tone={mission.done ? "good" : "electric"}
+                  label={mission.id}
+                />
               </div>
             )}
           </For>
         </div>
-      </Panel>
-
-      <Panel title="Gợi ý điều hành" kicker="Hướng dẫn" icon="lucide:book-open">
-        <ul class="guide-list">
-          <li>Mở đường và giữ giá xưởng thấp để xưởng mở rộng.</li>
-          <li>Dùng kho gạo khi hạn hán đẩy giá mua ngoài lên cao.</li>
-          <li>Đừng để nợ vượt 80% trần trước năm 2024.</li>
-          <li>Sau 2024, ban hành N-2 và chọn tỷ lệ thu hồi vừa phải.</li>
-        </ul>
-        <Show when={recovery().eligibleLoss > 0}>
+        <Show when={recovery().monthlyCredit > 0}>
           <div class="callout">
             <Icon icon="lucide:info" size={16} />
             <span>
-              {`Năm kiểm toán ${recovery().eligibleYear}`}: {formatBillion(recovery().eligibleLoss)}{" "}
-              {"· Thu hồi tháng này: "}
-              {formatBillion(recovery().monthlyCredit)}
+              {`Năm kiểm toán ${recovery().eligibleYear}: ${formatBillion(recovery().eligibleLoss)} · Thu hồi tháng này: ${formatBillion(recovery().monthlyCredit)}`}
             </span>
           </div>
         </Show>

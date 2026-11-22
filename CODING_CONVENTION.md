@@ -44,8 +44,8 @@
 
 ## Economics
 
-- Write the unit in the identifier: `cashBillionVnd`, `riceThousandTonnes`,
-  `tariffMillionVndPerTonne`.
+- Write the unit in the identifier: `cashBillionVnd`, `energyMillionKwh`,
+  `capacityMw`, `tariffVndPerKwh`.
 - Clamp at the domain boundary and explain the clamp only when the reason is
   not obvious.
 - Tests cover zero, negative, cap, floor and the cliff between branches.

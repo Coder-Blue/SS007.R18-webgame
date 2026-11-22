@@ -1,0 +1,294 @@
+.data-table th {
+  border-bottom: 1px solid var(--line-strong);
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 8px 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.data-table th:first-child,
+.data-table td:first-child {
+  text-align: left;
+}
+
+.data-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 8px 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(57, 215, 255, 0.04);
+}
+
+.data-table td[data-tone="good"] {
+  color: var(--green);
+}
+
+.data-table td[data-tone="bad"] {
+  color: var(--rose);
+}
+
+/* Domain cards */
+
+.overview-hero {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+}
+
+.overview-copy h3 {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 2px 0 6px;
+}
+
+.overview-copy p {
+  font-size: 13px;
+  max-width: 62ch;
+}
+
+.hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.overview-score {
+  background: rgba(7, 22, 29, 0.65);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+  padding: 12px 14px;
+}
+
+.score-label {
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.overview-score strong {
+  color: var(--rose);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.score-hint {
+  color: var(--ink-faint);
+  font-size: 11px;
+}
+
+.pillar-grid,
+.zone-grid,
+.supplier-grid,
+.build-grid,
+.decision-list,
+.reform-list {
+  display: grid;
+  gap: 10px;
+}
+
+.pillar-grid,
+.zone-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.supplier-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.build-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.decision-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.reform-list {
+  grid-template-columns: 1fr;
+}
+
+.pillar-card,
+.zone-card,
+.supplier-card,
+.build-card,
+.decision-card {
+  background: rgba(7, 22, 29, 0.62);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  text-align: left;
+}
+
+.supplier-card {
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.supplier-card:hover {
+  border-color: var(--line-strong);
+}
+
+.supplier-card[data-active="true"] {
+  background: rgba(57, 215, 255, 0.08);
+  border-color: rgba(57, 215, 255, 0.5);
+}
+
+.supplier-head,
+.zone-head,
+.build-head,
+.decision-head,
+.project-head,
+.mission-head,
+.event-choice,
+.reform-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.supplier-head {
+  align-items: center;
+}
+
+.supplier-kind {
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.supplier-card strong {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.supplier-meta,
+.zone-meta,
+.build-meta,
+.decision-meta,
+.project-meta {
+  align-items: center;
+  color: var(--ink-faint);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 11px;
+  gap: 8px;
+}
+
+.zone-head {
+  align-items: center;
+}
+
+.zone-head > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.zone-head strong {
+  font-size: 13px;
+}
+
+.zone-head span {
+  color: var(--ink-faint);
+  font-size: 11px;
+}
+
+.zone-icon {
+  align-items: center;
+  background: rgba(57, 215, 255, 0.1);
+  border-radius: 8px;
+  color: var(--electric);
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.zone-card[data-complete="true"] {
+  border-color: rgba(91, 214, 162, 0.38);
+}
+
+.zone-card[data-complete="true"] .zone-icon {
+  background: rgba(91, 214, 162, 0.12);
+  color: var(--green);
+}
+
+.build-card p,
+.decision-card p {
+  color: var(--ink-faint);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.build-head {
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--electric);
+}
+
+.build-head strong {
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.build-meta {
+  justify-content: space-between;
+}
+
+.decision-card[data-completed="true"] {
+  opacity: 0.7;
+}
+
+.decision-head strong {
+  font-size: 12px;
+}
+
+.decision-meta {
+  justify-content: flex-start;
+}
+
+.reform-row {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.reform-row:last-child {
+  border-bottom: 0;
+}
+
+.reform-row > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reform-row strong {
+  font-size: 12px;
+}
+
+.reform-row span {
+  color: var(--ink-faint);
+  font-size: 11px;
+}
