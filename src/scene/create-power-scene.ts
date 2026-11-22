@@ -91,6 +91,19 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
   const plants = createPlants();
   const grid = createGrid();
   const weather = createWeather(scene, terrain.water);
+
+  const progressBeacons = Array.from({ length: 3 }, () => {
+    const beacon = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.09, 0.09, 1, 6),
+      new THREE.MeshBasicMaterial({ color: 0x39d7ff, transparent: true, opacity: 0.9 }),
+    );
+
+    beacon.visible = false;
+    scene.add(beacon);
+
+    return beacon;
+  });
+
   scene.add(terrain.group, plants.group, grid.group);
   scene.add(new THREE.AmbientLight(0xffffff, 0.18));
 
@@ -173,10 +186,46 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
     }
   };
 
+  const beaconPoint = (kind: string, targetId: string): readonly [number, number] => {
+    if (kind === "line") {
+      if (targetId === "urban") return [4.2, 5.4];
+
+      if (targetId === "industrial") return [8.2, -1.2];
+
+      return [-7.2, 6.2];
+    }
+
+    if (kind === "hydro") return [-9, -3.5];
+
+    if (kind === "thermal") return [-1.5, -7.2];
+
+    if (kind === "renewable") return [7, 2.6];
+
+    return [0, 0.4];
+  };
+
   const update = (state: GameState, running: boolean): void => {
     currentState = state;
     currentRunning = running;
     weather.update(state, options.reducedMotion());
+
+    for (let index = 0; index < progressBeacons.length; index += 1) {
+      const beacon = progressBeacons[index];
+      const project = state.operations.projects[index];
+
+      if (beacon === undefined) continue;
+      beacon.visible = project !== undefined;
+
+      if (project === undefined) continue;
+      const [x, z] = beaconPoint(project.kind, project.targetId);
+
+      const progress =
+        (project.totalMonths - project.monthsLeft + 1) / Math.max(1, project.totalMonths);
+
+      beacon.position.set(x, 2.1 + progress / 2, z);
+      beacon.scale.set(0.8, Math.max(0.15, progress), 0.8);
+      beacon.material.color.setHex(project.kind === "decision" ? 0xffb347 : 0x39d7ff);
+    }
 
     if (state.act !== lastAct) {
       lastAct = state.act;
