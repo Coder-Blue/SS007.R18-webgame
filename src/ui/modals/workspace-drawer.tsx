@@ -1,11 +1,5 @@
 import type { JSX } from "@solidjs/web";
-import {
-  Drawer,
-  DrawerBackdrop,
-  DrawerClose,
-  DrawerContent,
-  DrawerTitle,
-} from "@ui-sdk/solid/drawer";
+import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from "@ui-sdk/solid/drawer";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs";
 import { Icon } from "../components/icons";
 import { PanelView } from "../panels/panel-view";
@@ -18,8 +12,11 @@ export const WorkspaceDrawer = (props: {
   readonly onPanel: (panel: PanelId) => void;
   readonly onClose: () => void;
 }): JSX.Element => (
-  <Drawer open={props.open} onOpenChange={(open) => (open ? undefined : props.onClose())}>
-    <DrawerBackdrop class="modal-backdrop" />
+  <Drawer
+    open={props.open}
+    modal={false}
+    onOpenChange={(open) => (open ? undefined : props.onClose())}
+  >
     <DrawerContent class="workspace-drawer" data-side="right">
       <div class="workspace-head">
         <div>
