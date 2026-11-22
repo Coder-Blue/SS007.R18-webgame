@@ -366,3 +366,9 @@
     padding: 28px 14px 36px;
   }
 }
+
+@media (min-width: 1340px) {
+  html[data-tour="open"] .workspace-drawer {
+    width: min(840px, 60vw);
+  }
+}

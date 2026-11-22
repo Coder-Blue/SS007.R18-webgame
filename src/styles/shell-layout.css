@@ -450,3 +450,20 @@
 .mobile-status .badge {
   padding: 6px;
 }
+
+.scene-tour-focus {
+  align-items: center;
+  background: rgba(7, 22, 29, 0.9);
+  border: 1px solid rgba(57, 215, 255, 0.45);
+  border-radius: 999px;
+  color: var(--ink);
+  display: inline-flex;
+  font-size: 11px;
+  gap: 6px;
+  padding: 5px 10px;
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 12px));
+  white-space: nowrap;
+  z-index: 4;
+}
