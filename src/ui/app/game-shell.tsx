@@ -97,6 +97,7 @@ export const GameShell = (): JSX.Element => {
   const [hasSave, setHasSave] = createSignal(false);
   const [menuOpen, setMenuOpen] = createSignal(false);
   const [tutorialOpen, setTutorialOpen] = createSignal(false);
+  const [tutorialReady, setTutorialReady] = createSignal(false);
   const [selected, setSelected] = createSignal<SceneSelection | null>(null);
   const [toast, setToast] = createSignal<ToastState | null>(null);
   let toastTimer: ReturnType<typeof setTimeout> | undefined;
@@ -140,11 +141,16 @@ export const GameShell = (): JSX.Element => {
     }
   });
 
+  const openTutorial = (): void => {
+    setTutorialReady(true);
+    setTutorialOpen(true);
+  };
+
   const startGame = (): void => {
     actions.newGame();
     setScreen("game");
     setHasSave(true);
-    setTutorialOpen(true);
+    openTutorial();
     showToast({ kind: "notice", text: "Nhiệm kỳ mới bắt đầu." });
   };
 
@@ -190,7 +196,7 @@ export const GameShell = (): JSX.Element => {
             onSelect={sceneSelect}
             onClearSelected={() => setSelected(null)}
             onOpenMenu={() => setMenuOpen(true)}
-            onOpenTutorial={() => setTutorialOpen(true)}
+            onOpenTutorial={openTutorial}
           />
         </Loading>
       </Show>
@@ -200,7 +206,7 @@ export const GameShell = (): JSX.Element => {
           onStart={startGame}
           onContinue={continueGame}
           onOpenLoad={() => setMenuOpen(true)}
-          onTutorial={() => setTutorialOpen(true)}
+          onTutorial={openTutorial}
         />
       </Show>
       <Show when={menuOpen()}>
@@ -213,9 +219,13 @@ export const GameShell = (): JSX.Element => {
           />
         </Loading>
       </Show>
-      <Show when={tutorialOpen()}>
+      <Show when={tutorialReady()}>
         <Loading fallback={null}>
-          <TutorialModal open onClose={() => setTutorialOpen(false)} onFinish={markTutorial} />
+          <TutorialModal
+            open={tutorialOpen()}
+            onClose={() => setTutorialOpen(false)}
+            onFinish={markTutorial}
+          />
         </Loading>
       </Show>
       <Show when={toast()}>

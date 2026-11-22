@@ -116,6 +116,21 @@ test("loads the scene from a deferred production chunk", async ({ page }) => {
   await expect(page.locator(".village-canvas")).toHaveCount(1);
 });
 
+test("keeps the tutorial step when it is reopened", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Bắt đầu nhiệm kỳ/i }).click();
+
+  const tutorial = page.locator(".tutorial-modal");
+  await expect(tutorial).toBeVisible();
+  await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
+  await expect(tutorial.getByText("Bước 2/5")).toBeVisible();
+  await tutorial.getByRole("button", { name: "Bỏ qua hướng dẫn" }).click();
+  await expect(tutorial).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Hướng dẫn" }).click();
+  await expect(page.locator(".tutorial-modal").getByText("Bước 2/5")).toBeVisible();
+});
+
 test("renders Iconify icons without API calls or untracked reads", async ({ page }) => {
   const diagnostics: string[] = [];
   const iconRequests: string[] = [];

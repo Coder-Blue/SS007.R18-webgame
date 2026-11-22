@@ -110,9 +110,9 @@ Local production build through the same gzip proxy:
 
 | Metric | Before | After | Change |
 |---|---:|---:|---:|
-| Lighthouse Performance, mobile | 47 | 95 | +48 |
+| Lighthouse Performance, mobile | 47 | 94 | +47 |
 | Lighthouse Performance, desktop | 67 | 100 | +33 |
-| LCP, mobile | 6.3 s | 2.9 s | -3.4 s |
+| LCP, mobile | 6.3 s | 3.0 s | -3.3 s |
 | LCP, desktop | 1.1 s | 0.7 s | -0.4 s |
 | TBT, mobile | 142,560 ms | 10 ms | eliminated |
 | TBT, desktop | 19,550 ms | 0 ms | eliminated |
@@ -135,7 +135,7 @@ The baseline live run was `54` performance, `4.1 s` LCP, `7,100 ms` TBT and `628
 
 ## 6. Remaining Bottlenecks
 
-- Mobile LCP is 2.2 s on the live Vercel deployment, inside the 2.5 s target. The local gzip harness still measures 2.9 s, about 0.4 s above the target; the remaining lab cost is the 25 kB gzip stylesheet and font startup, so a critical-CSS split is the optional next step.
+- Mobile LCP is 2.2 s on the live Vercel deployment, inside the 2.5 s target. The local gzip harness still measures 3.0 s, about 0.5 s above the target; the remaining lab cost is the 25 kB gzip stylesheet and font startup, so a critical-CSS split is the optional next step.
 - Starting a game still downloads Three.js and GSAP (about 170 kB gzip). This is after user intent and does not affect the title benchmark.
 - Chrome UX Report has no field data for this project yet, so the scores are lab measurements.
 
