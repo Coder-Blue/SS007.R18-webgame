@@ -118,4 +118,5 @@ lint/format, kiểm tra viewport hoặc ảnh chụp. Đọc `AGENTS.md`,
 - `CODEBASE.md`: bản đồ code và mô hình kinh tế.
 - `CODING_CONVENTION.md`: quy ước functional, tiếng Việt và test.
 - `CI_CD_PIPELINE.md`: sáu cổng chất lượng và quy trình review.
+- `docs/DESIGN.md`: hướng thiết kế, token và quy tắc responsive.
 - `AGENT_DIRECTORY.md`: vai trò, skill và quy trình đa agent.
