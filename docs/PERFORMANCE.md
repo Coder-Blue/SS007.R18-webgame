@@ -42,7 +42,7 @@ The local TBT is dominated by the 3D scene running under software rendering; the
 ### Frontend
 
 - Rendered a 24 kB desktop / 9.2 kB mobile WebP village poster on the title screen and mounted the Three.js scene only during play.
-- Split the game surface (HUD, docks, panels, event/ending screens) into a lazy `game-view` chunk behind a Solid `Loading` boundary; the route chunk fell from 238.2 kB to 8.8 kB minified.
+- Split the game surface (HUD, docks, panels, event/ending screens) into a lazy `game-view` chunk behind a Solid `Loading` boundary; the route chunk fell from 238.2 kB to 8.9 kB minified.
 - Lazy-loaded the save menu and tutorial on first open, removing the dialog/UI SDK foundation from the initial route.
 - Dynamically imported the scene factory after the first paint during idle time, with single-flight loading, disposal on failure and a visible retry action.
 - Removed GSAP from the HUD number tween; `AnimatedNumber` now uses a 550 ms `requestAnimationFrame` quadratic ease.

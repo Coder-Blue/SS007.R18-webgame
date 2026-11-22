@@ -12,7 +12,7 @@ the project uses semantic versioning for save-compatible releases.
 - The title screen uses a lightweight village poster and renders the Three.js
   scene only during play, so the first visit does not pay for the renderer.
 - The game surface, save menu and tutorial are lazy chunks; the title route now
-  preloads 372.6 kB of JavaScript instead of 642.0 kB.
+  preloads 372.6 kB of JavaScript instead of 644.0 kB.
 - The title and HUD reserve their layout, preload the visible font weights, and
   expose named meters, a single main landmark, accessible mobile tabs and the
   reduced-motion switch.
