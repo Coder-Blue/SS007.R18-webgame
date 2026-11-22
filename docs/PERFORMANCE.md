@@ -179,7 +179,7 @@ CHROME_PATH=/nix/store/.../bin/chromium npx lighthouse@12.8.2 \
 ## Grid migration re-check (2026-11-23)
 
 - Production build: 15 client chunks, all below 500 kB minified.
-- Initial shell: 620.5 kB minified / 209.0 kB gzip across 7 preloads, with no
+- Initial shell: 621.3 kB minified / 209.3 kB gzip across 7 preloads, with no
   Three.js or GSAP.
 - Deferred scene: `create-power-scene-*.js` at 17.5 kB minified / 6.8 kB gzip,
   loaded only after the game screen starts.
