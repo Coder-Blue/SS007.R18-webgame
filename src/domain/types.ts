@@ -116,6 +116,12 @@ export type Dispatch = {
   readonly importMw: number;
 };
 
+export type ReformProject = {
+  readonly key: PolicyKey;
+  readonly monthsLeft: number;
+  readonly totalMonths: number;
+};
+
 export type Policy = {
   readonly n2Enabled: boolean;
   readonly n2Rate: number;
@@ -126,6 +132,7 @@ export type Policy = {
   readonly petitionDone: boolean;
   readonly branch: Branch;
   readonly priceCap: boolean;
+  readonly reformProgress: readonly ReformProject[];
 };
 
 export type Metrics = {

@@ -338,6 +338,40 @@ describe("policy actions", () => {
     ).toBe(true);
   });
 
+  it("validates the N-2 path through the policy action", () => {
+    const base = baseState();
+
+    expect(enablePolicyAction(base, "n2").ok).toBe(false);
+    expect(
+      enablePolicyAction({ ...base, clock: { year: 2024, month: 1, tick: 24 } }, "n2").ok,
+    ).toBe(false);
+    expect(
+      enablePolicyAction(
+        {
+          ...base,
+          clock: { year: 2024, month: 1, tick: 24 },
+          policy: { ...base.policy, petitionDone: true },
+        },
+        "n2",
+      ).ok,
+    ).toBe(true);
+  });
+
+  it("rejects a reform that is already in progress", () => {
+    const base = baseState();
+
+    const started = enablePolicyAction(
+      { ...base, events: { ...base.events, flags: ["event:revised-law:enact-law"] } },
+      "nsmo",
+    );
+
+    expect(started.ok).toBe(true);
+
+    if (started.ok) {
+      expect(enablePolicyAction(started.value, "nsmo").ok).toBe(false);
+    }
+  });
+
   it("enables policy reforms with prerequisites", () => {
     const base = baseState();
 

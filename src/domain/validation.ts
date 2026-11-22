@@ -82,6 +82,16 @@ const PolicySchema = v.object({
   petitionDone: v.boolean(),
   branch: v.picklist(["state", "private"] as const),
   priceCap: v.boolean(),
+  reformProgress: v.optional(
+    v.array(
+      v.object({
+        key: v.picklist(["n2", "nsmo", "dppa", "vrem", "twoPart"] as const),
+        monthsLeft: nonNegative,
+        totalMonths: nonNegative,
+      }),
+    ),
+    [],
+  ),
 });
 
 const MetricsSchema = v.object({

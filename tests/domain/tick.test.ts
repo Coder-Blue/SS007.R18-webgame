@@ -73,6 +73,25 @@ describe("advanceMonth", () => {
     }
   });
 
+  it("completes a reform project and emits a notice", () => {
+    const state = baseState();
+
+    const result = advanceMonth({
+      ...state,
+      policy: {
+        ...state.policy,
+        reformProgress: [{ key: "n2", monthsLeft: 1, totalMonths: 4 }],
+      },
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.state.policy.n2Enabled).toBe(true);
+      expect(result.value.notices).toContain("notice.reform:n2");
+    }
+  });
+
   it("completes a mission and pays the trust reward", () => {
     const state = baseState();
 

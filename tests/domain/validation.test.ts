@@ -40,7 +40,10 @@ describe("validation", () => {
 
     expect(result.ok).toBe(true);
 
-    if (result.ok) expect(result.value.finance.recoveredYears).toEqual([]);
+    if (result.ok) {
+      expect(result.value.finance.recoveredYears).toEqual([]);
+      expect(result.value.policy.reformProgress).toEqual([]);
+    }
   });
 
   it("rejects a malformed state", () => {

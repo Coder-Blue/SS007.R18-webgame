@@ -20,6 +20,14 @@ export const RECOVERY_RATE_MIN = 0.3;
 export const RECOVERY_RATE_MAX = 0.8;
 export const RECOVERY_RATE_DEFAULT = 0.55;
 
+export const REFORM_MONTHS = {
+  n2: 4,
+  nsmo: 6,
+  dppa: 5,
+  vrem: 8,
+  twoPart: 4,
+} as const;
+
 export const TARIFF_WEIGHTS = [0.15, 0.17, 0.19, 0.2, 0.17, 0.12] as const;
 
 export const TARIFF_BANDS = [
@@ -277,6 +285,7 @@ export const createInitialState = (seed: number = 7): GameState => ({
     petitionDone: false,
     branch: "state",
     priceCap: true,
+    reformProgress: [],
   },
   metrics: {
     citizenTrust: 68,

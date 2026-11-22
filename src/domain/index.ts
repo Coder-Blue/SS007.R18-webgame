@@ -18,6 +18,8 @@ export * from "./recovery";
 
 export * from "./reforms";
 
+export * from "./reform-progress";
+
 export * from "./infrastructure";
 
 export * from "./metrics";

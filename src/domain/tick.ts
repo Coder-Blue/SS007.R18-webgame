@@ -18,6 +18,7 @@ import { advanceMissions, missionProgressScore } from "./missions";
 import { advanceMetrics } from "./metrics";
 import { recoveryOf } from "./recovery";
 import { reformRevenue } from "./reforms";
+import { advanceReforms } from "./reform-progress";
 import {
   averageHouseholdTariff,
   industrialRevenue,
@@ -49,25 +50,27 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
   if (state.approval !== null) return err("tick.approval-pending");
 
   const projectStep = advanceProjects(state);
-  const mediaActive = projectStep.state.media.activeMonths > 0;
+  const reformStep = advanceReforms(projectStep.state.policy);
+  const stateWithReforms = { ...projectStep.state, policy: reformStep.policy };
+  const mediaActive = stateWithReforms.media.activeMonths > 0;
 
   const mediaState = {
-    ...projectStep.state.media,
-    activeMonths: Math.max(0, projectStep.state.media.activeMonths - 1),
-    cooldown: Math.max(0, projectStep.state.media.cooldown - 1),
+    ...stateWithReforms.media,
+    activeMonths: Math.max(0, stateWithReforms.media.activeMonths - 1),
+    cooldown: Math.max(0, stateWithReforms.media.cooldown - 1),
   };
 
-  const tariffs = privateTariffs(projectStep.state);
+  const tariffs = privateTariffs(stateWithReforms);
 
   const marketStep = advanceMarket(
-    projectStep.state.market,
-    projectStep.state.clock.month,
-    projectStep.state.metrics,
-    projectStep.state.seed,
+    stateWithReforms.market,
+    stateWithReforms.clock.month,
+    stateWithReforms.metrics,
+    stateWithReforms.seed,
   );
 
   const market = marketStep.market;
-  const base = { ...projectStep.state, tariffs, market };
+  const base = { ...stateWithReforms, tariffs, market };
   const demand = zoneDemand(base.zones, market, base.metrics);
 
   const dispatch = dispatchWithinCaps(
@@ -253,7 +256,11 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
     },
   };
 
-  const notices = buildNotices(nextState, ledger, projectStep.completed, missionStep.completed);
+  const notices = [
+    ...buildNotices(nextState, ledger, projectStep.completed, missionStep.completed),
+    ...reformStep.completed.map((key) => `notice.reform:${key}`),
+  ];
+
   const ended = withEndingCheck(nextState);
 
   if (ended.ending !== null) {
