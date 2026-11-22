@@ -90,7 +90,7 @@ test("exposes named meters, the motion switch, and the save flow", async ({ page
   await expect(page.getByRole("switch", { name: "Giảm chuyển động" })).toBeVisible();
   await page.locator(".slot-card").first().getByRole("button", { name: /^Lưu$/ }).click();
   await expect(page.locator(".toast")).toContainText("Đã lưu nhiệm kỳ.");
-  await page.locator(".save-head .icon-btn").click();
+  await page.keyboard.press("Escape");
   await expect(page.locator(".save-modal")).toHaveCount(0);
 
   await page.reload();
@@ -260,7 +260,7 @@ test("desktop workspace exposes every panel without overlapping chrome", async (
   await expect(
     page.locator(".workspace-drawer .panel-title").filter({ hasText: "Bản đồ phủ điện" }),
   ).toBeVisible();
-  await page.locator(".workspace-head .icon-btn").click();
+  await page.keyboard.press("Escape");
   await expect(page.locator(".workspace-drawer")).toHaveCount(0);
 });
 
