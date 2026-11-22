@@ -5,6 +5,8 @@ import { approvalLikelihood, tariffChangePercent } from "./approval";
 import { computeSupply, dispatchWithinCaps, reserveMargin } from "./production";
 import { peakDemandMw, zoneDemand } from "./market";
 import { interestForMonth, managementCost, transmissionCost } from "./finance";
+import { recoveryOf } from "./recovery";
+import { reformRevenue } from "./reforms";
 
 export type MonthPreview = {
   readonly netResult: number;
@@ -14,7 +16,11 @@ export type MonthPreview = {
   readonly reserveMargin: number;
   readonly averageTariff: number;
   readonly trustDelta: number;
+  readonly trustBefore: number;
+  readonly trustAfter: number;
   readonly satisfactionDelta: number;
+  readonly satisfactionBefore: number;
+  readonly satisfactionAfter: number;
   readonly approvalLikelihood: number;
 };
 
@@ -23,12 +29,11 @@ export type PreviewPair = {
   readonly after: MonthPreview;
 };
 
-const supplierPrice = (state: GameState, supplierId: string): number => {
-  const supplier =
-    state.market.suppliers.find((row) => row.id === supplierId) ?? state.market.suppliers[0];
+const supplierQuote = (state: GameState, supplierId: string) =>
+  state.market.suppliers.find((row) => row.id === supplierId) ?? state.market.suppliers[0];
 
-  return supplier?.priceVndPerKwh ?? 2_450;
-};
+const supplierPrice = (state: GameState, supplierId: string): number =>
+  supplierQuote(state, supplierId)?.priceVndPerKwh ?? 2_450;
 
 export const projectMonth = (
   state: GameState,
@@ -37,13 +42,14 @@ export const projectMonth = (
   supplierId: string,
 ): MonthPreview => {
   const demand = zoneDemand(state.zones, state.market, state.metrics);
-  const capped = dispatchWithinCaps(dispatch, state.generation, state.market);
+  const capped = dispatchWithinCaps(dispatch, state.generation, state.market, supplierId);
 
   const supply = computeSupply(
     state.generation,
     capped,
     state.market,
     supplierPrice(state, supplierId),
+    supplierQuote(state, supplierId)?.capacityMw ?? 0,
   );
 
   const served = Math.min(demand.total, supply.supplyMw);
@@ -65,7 +71,9 @@ export const projectMonth = (
 
   const revenue =
     residentialRevenue(delivered * residentialShare, average) +
-    industrialRevenue(delivered * (1 - residentialShare), tariffs.industrial);
+    industrialRevenue(delivered * (1 - residentialShare), tariffs.industrial) +
+    recoveryOf(state.finance, state.clock.year, state.policy).monthlyCredit +
+    reformRevenue(state.policy).total;
 
   const costSupply =
     supply.costSupplyVariable + transmissionCost((supply.output.totalMw * 720) / 1_000);
@@ -79,7 +87,20 @@ export const projectMonth = (
     ) +
     interestForMonth(state.finance.debt, state.finance.interestRate);
 
-  const change = tariffChangePercent(state, average);
+  const householdChange = tariffChangePercent(state, average);
+
+  const industrialChange =
+    state.tariffs.industrial > 0
+      ? Math.abs(((tariffs.industrial - state.tariffs.industrial) / state.tariffs.industrial) * 100)
+      : 0;
+
+  const change = Math.max(householdChange, industrialChange);
+
+  const trustDelta =
+    (reliability - state.metrics.reliability) * 0.1 - Math.max(0, average - 2_400) * 0.02;
+
+  const satisfactionDelta =
+    (reliability - state.metrics.reliability) * 0.12 - Math.max(0, average - 2_400) * 0.025;
 
   return {
     netResult: revenue - cost,
@@ -88,10 +109,12 @@ export const projectMonth = (
     reliability,
     reserveMargin: reserve,
     averageTariff: average,
-    trustDelta:
-      (reliability - state.metrics.reliability) * 0.1 - Math.max(0, average - 2_400) * 0.02,
-    satisfactionDelta:
-      (reliability - state.metrics.reliability) * 0.12 - Math.max(0, average - 2_400) * 0.025,
+    trustDelta,
+    trustBefore: state.metrics.citizenTrust,
+    trustAfter: Math.min(100, Math.max(0, state.metrics.citizenTrust + trustDelta)),
+    satisfactionDelta,
+    satisfactionBefore: state.metrics.citizenTrust,
+    satisfactionAfter: Math.min(100, Math.max(0, state.metrics.citizenTrust + satisfactionDelta)),
     approvalLikelihood: approvalLikelihood(state, average, change),
   };
 };

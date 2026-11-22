@@ -229,6 +229,10 @@ export const createGrid = (): GridBuild => {
       line.line.visible = visible;
       line.pulse.visible = visible;
 
+      if (line.line.material instanceof THREE.LineBasicMaterial) {
+        line.line.material.opacity = visible ? 0.8 : 0;
+      }
+
       if (visible) {
         line.pulse.position.copy(line.curve.getPointAt((time * 0.18 + 0.2) % 1));
       }
@@ -236,6 +240,10 @@ export const createGrid = (): GridBuild => {
 
     dppa.visible = state.policy.dppa && !collapse;
     dppaPulse.visible = state.policy.dppa && !collapse;
+
+    if (dppa.material instanceof THREE.LineBasicMaterial) {
+      dppa.material.opacity = state.policy.dppa && !collapse ? 0.8 : 0;
+    }
 
     if (dppaPulse.visible) {
       dppaPulse.position.copy(dppaCurve.getPointAt((time * 0.22) % 1));

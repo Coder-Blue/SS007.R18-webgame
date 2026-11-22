@@ -12,7 +12,7 @@ export const ErrorScreen = (props: {
       <span class="outcome-icon">
         <Icon icon="tabler:alert-triangle" size={22} />
       </span>
-      <h1>{props.notFound === true ? "Không tìm thấy trang" : "Làng đang gặp trục trặc"}</h1>
+      <h1>{props.notFound === true ? "Không tìm thấy trang" : "Lưới đang gặp trục trặc"}</h1>
       <p>
         {props.notFound === true
           ? "Đường dẫn này không nối vào lưới điện."

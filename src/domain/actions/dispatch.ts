@@ -15,7 +15,12 @@ export const setDispatchAction = (state: GameState, dispatch: Dispatch): Result<
     ...state,
     operations: {
       ...state.operations,
-      dispatch: dispatchWithinCaps(dispatch, state.generation, state.market),
+      dispatch: dispatchWithinCaps(
+        dispatch,
+        state.generation,
+        state.market,
+        state.operations.supplierId,
+      ),
     },
   });
 };
@@ -27,6 +32,13 @@ export const setSupplierAction = (state: GameState, supplierId: string): Result<
 
   return ok({
     ...state,
-    operations: { ...state.operations, supplierId },
+    operations: {
+      ...state.operations,
+      supplierId,
+      dispatch: {
+        ...state.operations.dispatch,
+        importMw: Math.min(state.operations.dispatch.importMw, supplier.capacityMw),
+      },
+    },
   });
 };

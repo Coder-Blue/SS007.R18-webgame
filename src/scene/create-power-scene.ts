@@ -9,7 +9,7 @@ import { createWeather } from "./weather";
 export type { SceneSelection } from "./plants";
 
 export type PowerScene = {
-  readonly update: (state: GameState) => void;
+  readonly update: (state: GameState, running: boolean) => void;
   readonly resize: () => void;
   readonly resetView: () => void;
   readonly dispose: () => void;
@@ -98,6 +98,7 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
   const selectables: THREE.Object3D[] = [...plants.selectables, ...grid.selectables];
 
   let currentState: GameState | null = null;
+  let currentRunning = false;
   let selected: SceneSelection | null = null;
   let selectedObject: THREE.Object3D | null = null;
   let frame = 0;
@@ -172,8 +173,9 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
     }
   };
 
-  const update = (state: GameState): void => {
+  const update = (state: GameState, running: boolean): void => {
     currentState = state;
+    currentRunning = running;
     weather.update(state, options.reducedMotion());
 
     if (state.act !== lastAct) {
@@ -201,7 +203,7 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
     lastTime = time;
     elapsed += delta;
 
-    if (currentState !== null) {
+    if (currentState !== null && currentRunning) {
       plants.update(currentState, elapsed, delta);
       grid.update(currentState, elapsed);
       weather.tick(delta);

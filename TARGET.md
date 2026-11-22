@@ -38,8 +38,9 @@ production, grid and tariff panels, and explains the three-mandate loop.
   auto-pause for Big Events, State approvals and quarterly/annual summaries.
 - **Competitive procurement**: at least three IPP/BOT/coal suppliers with
   nearly identical prices and capacities.
-- **MW balance**: hydro, thermal, renewable and import dispatch against urban,
-  industrial and rural load with a visible reserve margin.
+- **MW balance**: dispatchable hydro, thermal and import against urban,
+  industrial and rural load; renewables are must-run in this build. The reserve
+  margin is visible in the HUD and previews.
 - **Six-tier retail tariffs** with industrial cross-subsidy and a State ceiling.
   Increases up to 5% apply directly; larger increases open a State submission
   dialog whose autonomous audit returns agree or refuse.

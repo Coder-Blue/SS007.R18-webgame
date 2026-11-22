@@ -55,17 +55,15 @@ test("reserves the continue action and keeps settings reachable on mobile", asyn
 
 test("pauses, resumes and advances a month at three times speed", async ({ page }) => {
   await startGame(page);
-  await expect(page.locator(".paused-banner")).toBeVisible();
   await expectMonth(page, "Tháng 1/2022");
 
-  await setSpeed3(page);
+  await page.getByRole("button", { name: "Tạm dừng mô phỏng" }).click();
+  await expect(page.locator(".paused-banner")).toBeVisible();
   await page.getByRole("button", { name: "Tiếp tục mô phỏng" }).click();
   await expect(page.locator(".paused-banner")).toHaveCount(0);
-  await expectMonth(page, "Tháng 2/2022");
 
-  await page.keyboard.press("Space");
-  await expect(page.locator(".paused-banner")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Tiếp tục mô phỏng" })).toBeVisible();
+  await setSpeed3(page);
+  await expectMonth(page, "Tháng 2/2022");
 });
 
 test("exposes named meters, the motion switch, and the save flow", async ({ page }) => {

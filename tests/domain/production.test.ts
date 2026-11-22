@@ -32,6 +32,7 @@ describe("production", () => {
       { hydroMw: 500, thermalMw: 400, importMw: 150 },
       state.market,
       2_450,
+      500,
     );
 
     expect(supply.output.hydroMw).toBeLessThanOrEqual(500);
@@ -49,6 +50,7 @@ describe("production", () => {
       { hydroMw: 99_999, thermalMw: -1, importMw: 99_999 },
       state.generation,
       state.market,
+      "coal-quang-ninh",
     );
 
     expect(capped.hydroMw).toBe(state.generation.hydroCapacityMw);

@@ -96,7 +96,8 @@ Each month composes:
 1. Project progress and decision completion.
 2. Fuel, drought, heat and renewable walk from the seeded RNG.
 3. Zonal demand from coverage, season, heat and industrial output.
-4. Dispatch of hydro, thermal, renewable, import and available reserve.
+4. Dispatch of hydro, thermal and import; renewable output is must-run, and
+   available reserve is computed from the dispatchable fleet.
 5. Served energy, transmission losses, six-tier residential and industrial
    revenue.
 6. Variable supply cost, transmission cost, management cost and interest.

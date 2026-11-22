@@ -42,16 +42,55 @@ const endingTitle = (id: string, reason: EndingReason): string => {
 
   if (id === "captured") return "Tập đoàn bị chi phối";
 
-  if (reason === "final") return "Nhiệm kỳ khép lại";
+  if (reason === "citizen-trust") return "Bị cách chức vì bất ổn";
 
-  return "Cách chức & vỡ nợ";
+  if (reason === "institutional-trust") return "Bị cách chức";
+
+  if (reason === "debt") return "Vỡ nợ";
+
+  if (reason === "privatization") return "Lưới điện phân mảnh";
+
+  if (reason === "blackout") return "Sụp đổ hệ thống điện";
+
+  return "Nhiệm kỳ khép lại";
 };
 
-export const EndingScreen = (): JSX.Element => {
-  const { store, actions } = useGame();
+const finalCopy = {
+  reformer: {
+    title: "Hoàn tất nhiệm kỳ cải cách",
+    body: "Bạn giữ được lưới vận hành, phủ điện toàn quốc và để lại bộ khung N-2, DPPA, VREM cho giai đoạn phục hồi sau năm 5. Khoản lỗ cấu trúc vẫn còn, nhưng đã có đường trả.",
+  },
+  caretaker: {
+    title: "Nhiệm kỳ khép lại trong giới hạn",
+    body: "Bạn giữ được dòng tiền và lưới không sụp, nhưng chưa hoàn tất bộ cải cách. Nhiệm kỳ kết thúc với dư địa phục hồi hẹp hơn.",
+  },
+  captured: {
+    title: "Tập đoàn bị chi phối",
+    body: "Ngân quỹ được bảo vệ nhưng người dân bị bỏ lại phía sau. Giá điện, cắt điện và lợi ích nhóm đã chi phối quyết định cuối nhiệm kỳ.",
+  },
+} as const;
+
+export const EndingScreen = (props: { readonly onNewGame: () => void }): JSX.Element => {
+  const { store } = useGame();
   const state = store.state;
   const ending = () => state().ending;
-  const copy = () => (ending() === null ? reasonCopy.final : reasonCopy[ending()!.reason]);
+
+  const copy = () => {
+    const current = ending();
+
+    if (current === null) return reasonCopy.final;
+
+    if (current.reason !== "final") return reasonCopy[current.reason];
+
+    if (current.id === "reformer") return finalCopy.reformer;
+
+    if (current.id === "caretaker") return finalCopy.caretaker;
+
+    if (current.id === "captured") return finalCopy.captured;
+
+    return reasonCopy.final;
+  };
+
   const isBad = () => ending()?.id === "collapse" || ending()?.id === "captured";
 
   return (
@@ -161,11 +200,7 @@ export const EndingScreen = (): JSX.Element => {
           </p>
 
           <div class="ending-actions">
-            <ActionButton
-              variant="primary"
-              icon="lucide:rotate-ccw"
-              onClick={() => actions.newGame()}
-            >
+            <ActionButton variant="primary" icon="lucide:rotate-ccw" onClick={props.onNewGame}>
               Nhiệm kỳ mới
             </ActionButton>
           </div>

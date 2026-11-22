@@ -23,6 +23,7 @@ export const PowerCanvas = (props: {
   const state = store.state;
   const [ready, setReady] = createSignal(false);
   const [loadFailed, setLoadFailed] = createSignal(false);
+  const [unavailable, setUnavailable] = createSignal(false);
   let canvas: HTMLCanvasElement | undefined;
   let container: HTMLDivElement | undefined;
   let controller: PowerScene | null = null;
@@ -30,7 +31,7 @@ export const PowerCanvas = (props: {
   createTrackedEffect(() => {
     if (!ready()) return;
 
-    controller?.update(state());
+    controller?.update(state(), store.running());
   });
 
   onSettled(() => {
@@ -58,7 +59,7 @@ export const PowerCanvas = (props: {
           });
 
           try {
-            next.update(state());
+            next.update(state(), store.running());
           } catch {
             next.dispose();
             throw new Error("power scene failed to initialise");
@@ -67,8 +68,16 @@ export const PowerCanvas = (props: {
           controller = next;
           setReady(true);
         })
-        .catch(() => {
-          if (!cancelled) setLoadFailed(true);
+        .catch((error) => {
+          if (cancelled) return;
+
+          if (String(error).includes("WebGL")) {
+            setUnavailable(true);
+
+            return;
+          }
+
+          setLoadFailed(true);
         })
         .finally(() => {
           loading = false;
@@ -174,14 +183,20 @@ export const PowerCanvas = (props: {
         </button>
       </div>
       <p class="scene-hint">Kéo để di chuyển · Lăn chuột để phóng · Chạm công trình để xem</p>
-      <Show when={!ready() && !loadFailed()}>
+      <Show when={!ready() && !loadFailed() && !unavailable()}>
         <div class="scene-loading" role="status" aria-live="polite">
           Đang dựng bản đồ lưới điện…
         </div>
       </Show>
+      <Show when={unavailable()}>
+        <div class="scene-empty" role="status">
+          <Icon icon="lucide:map" size={18} />
+          <span>Bản đồ 3D cần WebGL. Bảng điều hành vẫn hoạt động đầy đủ.</span>
+        </div>
+      </Show>
       <Show when={loadFailed()}>
         <div class="scene-error" role="alert">
-          <span>Không dựng được bản đồ lưới điện.</span>
+          <span>Không tải được bản đồ lưới điện.</span>
           <button type="button" class="scene-reset" onClick={() => window.location.reload()}>
             Thử lại
           </button>

@@ -125,7 +125,7 @@ export const SummaryModal = (): JSX.Element => {
   const { store } = useGame();
   const [open, setOpen] = createSignal(false);
   const [annual, setAnnual] = createSignal(false);
-  let lastShown = store.state().clock.tick;
+  let lastShown = -1;
   let wasRunning = false;
 
   createTrackedEffect(() => {
@@ -142,6 +142,7 @@ export const SummaryModal = (): JSX.Element => {
     if (ledger.month % 3 !== 0) return;
     lastShown = state.clock.tick;
     wasRunning = store.running();
+    store.setHold(true);
     store.setRunning(false);
     setAnnual(ledger.month === 12);
     setOpen(true);
@@ -149,6 +150,7 @@ export const SummaryModal = (): JSX.Element => {
 
   const close = (): void => {
     setOpen(false);
+    store.setHold(false);
 
     if (wasRunning) store.setRunning(true);
   };

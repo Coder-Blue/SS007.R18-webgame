@@ -161,16 +161,64 @@ export const TopBar = (props: {
 
       <div class="mobile-status">
         <span class="mobile-date">{formatDate(state().clock.year, state().clock.month)}</span>
-        <span>
+        <span
+          role="meter"
+          aria-label="Ngân quỹ"
+          aria-valuemin={0}
+          aria-valuemax={20_000}
+          aria-valuenow={Math.round(Math.max(0, Math.min(20_000, state().finance.cash)))}
+        >
           <Icon icon="lucide:wallet" size={14} /> {formatBillion(state().finance.cash)}
         </span>
-        <span>
+        <span
+          role="meter"
+          aria-label="Niềm tin người dân"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(state().metrics.citizenTrust)}
+        >
           <Icon icon="tabler:users" size={14} /> {formatPercent(state().metrics.citizenTrust)}
         </span>
-        <span>
+        <span
+          role="meter"
+          aria-label="Tín nhiệm thể chế"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(state().metrics.institutionalTrust)}
+        >
           <Icon icon="tabler:shield-check" size={14} />{" "}
           {formatPercent(state().metrics.institutionalTrust)}
         </span>
+        <span
+          role="meter"
+          aria-label="Biên dự phòng"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(Math.max(0, state().metrics.reserveMargin))}
+        >
+          <Icon icon="lucide:activity" size={14} /> {formatPercent(state().metrics.reserveMargin)}
+        </span>
+        <Show when={state().media.activeMonths > 0}>
+          <Badge tone="bad" pulse label="Truyền thông đưa tin lỗ EVN">
+            <Icon icon="tabler:speakerphone" size={14} />
+          </Badge>
+        </Show>
+        <div class="mobile-speed" role="group" aria-label="Tốc độ mô phỏng">
+          <For each={speeds}>
+            {(speed) => (
+              <button
+                type="button"
+                class="speed-btn"
+                data-active={store.speed() === speed ? "true" : "false"}
+                aria-pressed={store.speed() === speed ? "true" : "false"}
+                aria-label={`Tốc độ ${speed} lần`}
+                onClick={() => store.setSpeed(speed)}
+              >
+                {speed}x
+              </button>
+            )}
+          </For>
+        </div>
         <ActionButton
           size="sm"
           variant={paused() ? "primary" : "ghost"}
@@ -178,7 +226,7 @@ export const TopBar = (props: {
           onClick={store.togglePause}
           ariaLabel={paused() ? "Tiếp tục" : "Tạm dừng"}
         >
-          {paused() ? store.speed() + "x" : "Tạm dừng"}
+          {paused() ? "Tiếp tục" : "Tạm dừng"}
         </ActionButton>
       </div>
     </header>

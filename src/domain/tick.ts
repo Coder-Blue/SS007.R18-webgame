@@ -69,14 +69,32 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
   const market = marketStep.market;
   const base = { ...projectStep.state, tariffs, market };
   const demand = zoneDemand(base.zones, market, base.metrics);
-  const dispatch = dispatchWithinCaps(base.operations.dispatch, base.generation, market);
+
+  const dispatch = dispatchWithinCaps(
+    base.operations.dispatch,
+    base.generation,
+    market,
+    base.operations.supplierId,
+  );
 
   const supplier =
     market.suppliers.find((row) => row.id === base.operations.supplierId) ?? market.suppliers[0];
 
   if (supplier === undefined) return err("market.no-supplier");
-  const supplyStep = computeSupply(base.generation, dispatch, market, supplier.priceVndPerKwh);
-  const servedMw = Math.min(demand.total, supplyStep.supplyMw);
+
+  const supplyStep = computeSupply(
+    base.generation,
+    dispatch,
+    market,
+    supplier.priceVndPerKwh,
+    supplier.capacityMw,
+  );
+
+  // Private operators throttle unprofitable rural service in the counterfactual branch.
+  const serviceableDemand =
+    base.policy.branch === "private" ? demand.total - demand.rural * 0.5 : demand.total;
+
+  const servedMw = Math.min(serviceableDemand, supplyStep.supplyMw);
   const shortageMw = Math.max(0, demand.total - servedMw);
   const reliability = demand.total > 0 ? (servedMw / demand.total) * 100 : 100;
   const peak = peakDemandMw(demand.total);
@@ -218,6 +236,18 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
       debt: settled.debt,
       accumulatedLoss,
       recoveredTotal: base.finance.recoveredTotal + recovery.monthlyCredit,
+      recoveredYears:
+        recovery.monthlyCredit > 0
+          ? [
+              ...base.finance.recoveredYears.filter((row) => row.year !== recovery.eligibleYear),
+              {
+                year: recovery.eligibleYear,
+                amount:
+                  (base.finance.recoveredYears.find((row) => row.year === recovery.eligibleYear)
+                    ?.amount ?? 0) + recovery.monthlyCredit,
+              },
+            ]
+          : base.finance.recoveredYears,
       monthlyHistory,
       annualHistory,
     },

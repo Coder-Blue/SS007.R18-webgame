@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js";
+import { createMemo, createSignal, For, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import {
   Dialog,
@@ -49,14 +49,25 @@ export const SaveMenu = (props: {
   readonly onClose: () => void;
   readonly onNotice: (message: string) => void;
   readonly onLoaded: () => void;
+  readonly onNewGame: () => void;
 }): JSX.Element => {
   const { store, actions } = useGame();
   const state = store.state;
   const [refresh, setRefresh] = createSignal(0);
   const [confirmDelete, setConfirmDelete] = createSignal<SlotId | null>(null);
   const [reduced, setReduced] = createSignal(readSession().reducedMotion);
-  const slots = () => (refresh(), listSaves());
-  const autosave = () => (refresh(), slotMeta("autosave"));
+
+  const slots = createMemo(() => {
+    refresh();
+
+    return listSaves();
+  });
+
+  const autosave = createMemo(() => {
+    refresh();
+
+    return slotMeta("autosave");
+  });
 
   const reload = (): void => {
     setRefresh(refresh() + 1);
@@ -229,8 +240,8 @@ export const SaveMenu = (props: {
               variant="ghost"
               icon="lucide:play"
               onClick={() => {
-                actions.newGame();
-                props.onLoaded();
+                props.onNewGame();
+                props.onClose();
               }}
             >
               Nhiệm kỳ mới
@@ -267,8 +278,8 @@ export const SaveMenu = (props: {
             variant="danger"
             icon="lucide:trash"
             onClick={() => {
-              clearAllSaves();
               actions.newGame();
+              clearAllSaves();
               reload();
               props.onClose();
             }}

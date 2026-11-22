@@ -22,7 +22,6 @@ export type GenerationOutput = {
 export type SupplyStep = {
   readonly output: GenerationOutput;
   readonly supplyMw: number;
-  readonly reserveMargin: number;
   readonly costSupplyVariable: number;
 };
 
@@ -70,11 +69,12 @@ export const computeSupply = (
   dispatch: Dispatch,
   market: Market,
   importPriceVndPerKwh: number,
+  importCapacityMw: number,
 ): SupplyStep => {
   const hydro = Math.min(dispatch.hydroMw, availableHydroMw(generation));
   const thermal = Math.min(dispatch.thermalMw, generation.thermalCapacityMw);
   const renewable = generation.renewableCapacityMw * market.renewableFactor;
-  const importMw = Math.min(dispatch.importMw, supplierCapacity(market, dispatch.importMw));
+  const importMw = Math.min(dispatch.importMw, Math.max(0, importCapacityMw));
   const totalMw = hydro + thermal + renewable + importMw;
   const millionKwh = (mw: number): number => (mw * HOURS_PER_MONTH) / 1_000;
 
@@ -98,7 +98,6 @@ export const computeSupply = (
       importMillionKwh: millionKwh(importMw),
     },
     supplyMw: totalMw,
-    reserveMargin: reserveMargin(generation, market, 0, importMw),
     costSupplyVariable,
   };
 };
@@ -107,15 +106,13 @@ export const dispatchWithinCaps = (
   dispatch: Dispatch,
   generation: Generation,
   market: Market,
+  supplierId: string,
 ): Dispatch => {
-  const importFleet = market.suppliers.reduce(
-    (total, supplier) => Math.max(total, supplier.capacityMw),
-    0,
-  );
+  const supplier = market.suppliers.find((row) => row.id === supplierId);
 
   return {
     hydroMw: clamp(dispatch.hydroMw, 0, generation.hydroCapacityMw),
     thermalMw: clamp(dispatch.thermalMw, 0, generation.thermalCapacityMw),
-    importMw: clamp(dispatch.importMw, 0, importFleet),
+    importMw: clamp(dispatch.importMw, 0, supplier?.capacityMw ?? 0),
   };
 };

@@ -9,6 +9,7 @@ import {
   availableHydroMw,
   buildPlantAction,
   dispatchPreview,
+  supplierPreview,
   type PlantKind,
   type SupplierKind,
 } from "~/domain";
@@ -56,15 +57,17 @@ export const ProductionPanel = (): JSX.Element => {
   const { store } = useGame();
   const state = store.state;
   const [draft, setDraft] = createSignal(state().operations.dispatch);
+  const [supplierDraft, setSupplierDraft] = createSignal(state().operations.supplierId);
 
   createTrackedEffect(() => {
     setDraft(state().operations.dispatch);
+    setSupplierDraft(state().operations.supplierId);
   });
 
   const preview = () => dispatchPreview(state(), draft());
+  const supplierView = () => supplierPreview(state(), supplierDraft());
 
-  const activeSupplier = () =>
-    state().market.suppliers.find((row) => row.id === state().operations.supplierId);
+  const draftSupplier = () => state().market.suppliers.find((row) => row.id === supplierDraft());
 
   const hydroCap = () => availableHydroMw(state().generation);
 
@@ -105,19 +108,66 @@ export const ProductionPanel = (): JSX.Element => {
                 <Bar
                   value={supplier.capacityMw}
                   max={600}
-                  tone={supplier.id === state().operations.supplierId ? "electric" : "gold"}
+                  tone={supplier.id === supplierDraft() ? "electric" : "gold"}
                   label={`Công suất ${supplier.id}`}
                 />
               </button>
             )}
           </For>
         </div>
-        <Show when={activeSupplier() !== undefined}>
-          <div class="callout">
-            <Icon icon="lucide:info" size={16} />
-            <span>
-              {`Đang mua từ ${supplierLabel[activeSupplier()?.kind ?? "coal"]} · Giá nhập ${formatPrice(activeSupplier()?.priceVndPerKwh ?? 0)} · Tối đa ${formatPower(activeSupplier()?.capacityMw ?? 0)}`}
-            </span>
+        <Show when={draftSupplier() !== undefined}>
+          <div
+            class="preview-card"
+            data-tone={
+              supplierView().after.netResult >= supplierView().before.netResult ? "good" : "warn"
+            }
+          >
+            <div class="preview-head">
+              <span>Dự đoán đổi nhà cung cấp</span>
+              <Badge tone="electric">Trước → Sau</Badge>
+            </div>
+            <div class="preview-grid">
+              <div>
+                <span>Lãi/lỗ tháng</span>
+                <strong>
+                  {formatSignedBillion(supplierView().before.netResult)} →{" "}
+                  {formatSignedBillion(supplierView().after.netResult)}
+                </strong>
+              </div>
+              <div>
+                <span>Dự phòng</span>
+                <strong>
+                  {Math.round(supplierView().before.reserveMargin)}% →{" "}
+                  {Math.round(supplierView().after.reserveMargin)}%
+                </strong>
+              </div>
+              <div>
+                <span>Độ tin cậy</span>
+                <strong>
+                  {Math.round(supplierView().before.reliability)}% →{" "}
+                  {Math.round(supplierView().after.reliability)}%
+                </strong>
+              </div>
+              <div>
+                <span>Chấp thuận giá</span>
+                <strong>{Math.round(supplierView().after.approvalLikelihood)}%</strong>
+              </div>
+            </div>
+            <div class="action-row">
+              <ActionButton
+                size="sm"
+                variant="primary"
+                icon="lucide:check"
+                disabled={supplierDraft() === state().operations.supplierId}
+                onClick={() => store.setSupplier(supplierDraft())}
+              >
+                Áp dụng nhà cung cấp
+              </ActionButton>
+              <span class="tier-meta">
+                Giá nhập {formatPrice(draftSupplier()?.priceVndPerKwh ?? 0)} · Tối đa{" "}
+                {formatPower(draftSupplier()?.capacityMw ?? 0)}
+              </span>
+            </div>
           </div>
         </Show>
       </Panel>
@@ -174,7 +224,7 @@ export const ProductionPanel = (): JSX.Element => {
             <RangeSlider
               value={draft().importMw}
               min={0}
-              max={Math.round(activeSupplier()?.capacityMw ?? 0)}
+              max={Math.round(draftSupplier()?.capacityMw ?? 0)}
               step={10}
               label="Công suất nhập khẩu"
               onInput={(value) => setPart("importMw", value)}
@@ -214,7 +264,14 @@ export const ProductionPanel = (): JSX.Element => {
             </div>
             <div>
               <span>Niềm tin dân</span>
-              <strong>{preview().after.satisfactionDelta.toFixed(1)} điểm</strong>
+              <strong>
+                {Math.round(preview().before.trustBefore)}% →{" "}
+                {Math.round(preview().after.trustAfter)}%
+              </strong>
+            </div>
+            <div>
+              <span>Chấp thuận giá</span>
+              <strong>{Math.round(preview().after.approvalLikelihood)}%</strong>
             </div>
           </div>
         </div>

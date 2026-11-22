@@ -34,8 +34,12 @@ export const enablePolicyAction = (state: GameState, key: PolicyKey): Result<Gam
 
   if (key === "twoPart" && !current.vrem) return err("policy.requires-vrem");
 
-  if (key !== "n2" && key !== "twoPart" && state.clock.year < 2025) {
-    return err("policy.too-early");
+  if (
+    key !== "n2" &&
+    key !== "twoPart" &&
+    !state.events.flags.includes("event:revised-law:enact-law")
+  ) {
+    return err("policy.requires-law");
   }
 
   const next = {

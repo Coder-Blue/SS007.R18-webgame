@@ -190,6 +190,11 @@ export type AnnualReport = {
   readonly inflationAverage: number;
 };
 
+export type RecoveryYear = {
+  readonly year: number;
+  readonly amount: number;
+};
+
 export type Finance = {
   readonly cash: number;
   readonly debt: number;
@@ -197,6 +202,7 @@ export type Finance = {
   readonly accumulatedLoss: number;
   readonly interestRate: number;
   readonly recoveredTotal: number;
+  readonly recoveredYears: readonly RecoveryYear[];
   readonly monthlyHistory: readonly MonthlyLedger[];
   readonly annualHistory: readonly AnnualReport[];
 };
@@ -227,6 +233,7 @@ export type EventEffects = {
   readonly thermalCapacityDelta: number;
   readonly renewableCapacityDelta: number;
   readonly coverageDelta: number;
+  readonly gridStrengthDelta: number;
   readonly demandDelta: number;
   readonly mediaMonths: number;
   readonly unlockDecisions: readonly DecisionId[];

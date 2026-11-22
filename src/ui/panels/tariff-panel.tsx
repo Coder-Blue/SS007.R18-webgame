@@ -162,7 +162,24 @@ export const TariffPanel = (): JSX.Element => {
             </div>
             <div>
               <span>Niềm tin dân</span>
-              <strong>{preview().after.satisfactionDelta.toFixed(1)} điểm</strong>
+              <strong>
+                {Math.round(preview().before.trustBefore)}% →{" "}
+                {Math.round(preview().after.trustAfter)}%
+              </strong>
+            </div>
+            <div>
+              <span>Dự phòng</span>
+              <strong>
+                {Math.round(preview().before.reserveMargin)}% →{" "}
+                {Math.round(preview().after.reserveMargin)}%
+              </strong>
+            </div>
+            <div>
+              <span>Độ tin cậy</span>
+              <strong>
+                {Math.round(preview().before.reliability)}% →{" "}
+                {Math.round(preview().after.reliability)}%
+              </strong>
             </div>
             <div>
               <span>Giá bình quân</span>

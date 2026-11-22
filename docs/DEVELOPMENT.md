@@ -102,11 +102,12 @@ prefixed with `dhl:`. The UI also offers a reset in Settings.
 
 ## Balance work
 
-Use `scripts/simulate.ts` to run a deterministic session without a browser:
+Use the deterministic 60-month playthrough test as the balance harness:
 
 ```bash
-pnpm exec tsx scripts/simulate.ts --months 60 --strategy balanced
+pnpm test tests/domain/playthrough.test.ts
 ```
 
-The script prints monthly ledger rows and the ending. Keep a short before/after
-note in the PR when changing a constant in `src/domain/constants.ts`.
+For a longer inspection, add a temporary local script outside the repository
+and import `src/domain`. Keep a short before/after note in the PR when changing
+a constant in `src/domain/constants.ts`.

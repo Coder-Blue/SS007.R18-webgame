@@ -44,6 +44,10 @@ export const applyEffects = (state: GameState, effects: EventEffects): GameState
       state.generation.renewableCapacityMw + effects.renewableCapacityDelta,
     ),
   },
+  infrastructure: {
+    ...state.infrastructure,
+    gridStrength: clamp(state.infrastructure.gridStrength + effects.gridStrengthDelta, 0, 100),
+  },
   zones: {
     urban: shiftZone(state.zones.urban, effects.coverageDelta),
     industrial: shiftZone(state.zones.industrial, effects.coverageDelta),
