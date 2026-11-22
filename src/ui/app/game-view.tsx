@@ -35,7 +35,7 @@ export const GameView = (props: {
         <Show when={!store.running() && store.state().ending === null}>
           <div class="paused-banner" data-tutorial="pause">
             <Icon icon="lucide:pause" size={16} />
-            <span>ĐANG TẠM DỪNG</span>
+            <span>Đang tạm dừng</span>
             <span class="paused-hint">Space để tiếp tục · 1–3 đổi tốc độ</span>
           </div>
         </Show>

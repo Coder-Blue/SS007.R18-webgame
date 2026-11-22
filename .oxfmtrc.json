@@ -1,4 +1,14 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": ["src/routeTree.gen.ts", "node_modules", ".output", "coverage", "test-results"]
+  "ignorePatterns": [
+    "src/routeTree.gen.ts",
+    "node_modules",
+    ".output",
+    "coverage",
+    "test-results",
+    ".agents/**",
+    ".claude/**",
+    ".codex/**",
+    ".opencode/**"
+  ]
 }

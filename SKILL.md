@@ -14,6 +14,7 @@ the four supported runtimes: `.opencode/`, `.codex/`, `.claude/`, and
 | `mattpocock/skills/grill-me` | `grill-me` | design stress test |
 | `pbakaus/impeccable/impeccable` | `impeccable` | UI craft and audit |
 | `heydamir/unslop` | `unslop` | remove AI-looking UI tells and polish the design |
+| `nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max` | `ui-ux-pro-max` | searchable palettes, type, UX rules, charts and stack guidance |
 | `dietrichgebert/ponytail/ponytail` | `ponytail` | smallest complete change |
 | `juliusbrussee/caveman/caveman` | `caveman` | terse communication mode |
 | `herdrdev/herdr/herdr` | `herdr` | pane orchestration when requested |
@@ -43,7 +44,7 @@ non-negotiable:
 2. Use `context7` before changing a third-party API. Fetch the library ID, then
    the focused context, and cite the retrieved version in the pull request.
 
-UI work loads `ui-sdk`, `impeccable` and `unslop`. The UI engineer reads
+UI work loads `ui-sdk`, `impeccable`, `unslop` and `ui-ux-pro-max`. The UI engineer reads
 `node_modules/@ui-sdk/solid/docs/llms.txt`, runs the impeccable audit and the
 unslop nine-pass pass at the end, and captures `1440x900` and `390x844`
 evidence. The unslop pass keeps the product's content and order, starts from the

@@ -17,7 +17,6 @@
 
 .toast {
   align-items: center;
-  backdrop-filter: blur(12px);
   background: rgba(8, 24, 32, 0.94);
   border: 1px solid rgba(91, 214, 162, 0.35);
   border-radius: var(--radius-sm);
@@ -55,7 +54,6 @@
 }
 
 .monthly-toast {
-  backdrop-filter: blur(14px);
   background: rgba(8, 24, 32, 0.94);
   border: 1px solid rgba(57, 215, 255, 0.32);
   border-radius: var(--radius);

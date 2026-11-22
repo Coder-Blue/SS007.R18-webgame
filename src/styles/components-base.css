@@ -1,8 +1,12 @@
 .panel {
-  background: linear-gradient(160deg, rgba(16, 40, 51, 0.96), rgba(9, 26, 34, 0.96));
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow-panel);
+}
+
+.panel + .panel {
+  margin-top: 0;
 }
 
 .panel-head {
@@ -10,7 +14,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px 10px;
+  padding: 16px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -29,21 +33,19 @@
 
 .panel-kicker {
   color: var(--ink-faint);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .panel-title {
   color: var(--ink);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.3;
 }
 
 .panel-body {
-  padding: 14px 16px 16px;
+  padding: 16px;
 }
 
 .panel-lead {
@@ -79,14 +81,14 @@
 }
 
 .stat {
-  background: rgba(7, 22, 29, 0.7);
+  background: rgba(4, 14, 19, 0.55);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
-  padding: 10px 12px;
+  padding: 12px;
 }
 
 .stat[data-tone="good"] {
@@ -114,10 +116,8 @@
 
 .stat-label {
   color: var(--ink-faint);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .stat-icon {
@@ -128,8 +128,8 @@
 .stat-value {
   color: var(--ink);
   font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
@@ -214,7 +214,7 @@
 
 .badge {
   align-items: center;
-  background: rgba(120, 170, 185, 0.12);
+  background: rgba(120, 170, 185, 0.1);
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ink-soft);
@@ -222,7 +222,7 @@
   font-size: 10px;
   font-weight: 700;
   gap: 5px;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
   line-height: 1;
   padding: 5px 8px;
   white-space: nowrap;
@@ -300,19 +300,19 @@
 }
 
 .btn[data-variant="primary"] {
-  background: linear-gradient(180deg, #2cc3e8, #1a9fc4);
+  background: #33c3e5;
   border-color: transparent;
   color: #031018;
 }
 
 .btn[data-variant="primary"]:hover:not(:disabled) {
-  background: linear-gradient(180deg, #53d8f5, #23b2d8);
+  background: #56d6f2;
 }
 
 .btn[data-variant="gold"] {
-  background: linear-gradient(180deg, #f4d97f, #e2b64d);
+  background: #e9c45d;
   border-color: transparent;
-  color: #2a1c04;
+  color: #261a04;
 }
 
 .btn[data-variant="danger"] {
