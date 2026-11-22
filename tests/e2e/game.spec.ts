@@ -260,7 +260,7 @@ test("desktop workspace exposes every panel without overlapping chrome", async (
   await expect(
     page.locator(".workspace-drawer .panel-title").filter({ hasText: "Bản đồ phủ điện" }),
   ).toBeVisible();
-  await page.keyboard.press("Escape");
+  await page.locator(".workspace-head .icon-btn").click();
   await expect(page.locator(".workspace-drawer")).toHaveCount(0);
 });
 
