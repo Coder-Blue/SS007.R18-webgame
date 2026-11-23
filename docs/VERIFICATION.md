@@ -28,10 +28,10 @@ Observed sub-results:
 
 ```
 Line budget: OK (owned source files <= 500 lines; 36 vendored files exempt)
-Emoji audit: OK (168 text files scanned)
+Emoji audit: OK (169 text files scanned)
 Domain boundary: OK (32 pure files)
 Test Files  23 passed (23)
-Tests       174 passed (174)
+Tests       175 passed (175)
 
 Statements   : 100% (826/826)
 Branches     : 100% (460/460)
@@ -51,15 +51,29 @@ pnpm check:bundle
 ```
 
 All 15 client chunks are below 500 kB minified. The initial shell preloads
-625.1 kB minified / 210.4 kB gzip and contains no Three.js or GSAP. The deferred
+625.2 kB minified / 210.5 kB gzip and contains no Three.js or GSAP. The deferred
 `create-power-scene-*.js` chunk is loaded only after the game starts.
+
+## Favicon set
+
+```
+public/favicon.png:          PNG image data, 64 x 64, 8-bit/color RGBA
+public/favicon.ico:          MS Windows icon resource - 4 icons, 16x16, 32x32, 48x48, 64x64
+public/apple-touch-icon.png: PNG image data, 180 x 180, 8-bit/color RGB
+```
+
+The SVG uses the game palette (`#07121b`, `#39d7ff`, `#f2d06b`, `#5bd6a2`) and
+a transmission-pylon mark. The SEO test verifies the 16/32/48/64 ICO frames, every declared PNG
+dimension, Apple's opaque color type and the Nitro/Vercel cache rules;
+`tests/e2e/branding.spec.ts` fetches all four assets and checks all four
+versioned document links at every viewport.
 
 ## Browser matrix
 
 ```
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
   pnpm exec playwright test
-70 passed, 14 skipped
+74 passed, 14 skipped
 ```
 
 The skipped checks are desktop-only workspace/overlap tests on mobile projects,

@@ -9,7 +9,9 @@
   and amber warnings.
 - **Moments**: the isometric grid map and the revenue/cost breakdown chart.
 - **Signature**: a live status dot on the brand mark (green running, amber
-  paused) and pulsing MW trust meters.
+  paused) and pulsing MW trust meters. The favicon carries the same dark
+  `#07121b` tile, cyan transmission pylon, amber insulator nodes and green live
+  dot into the browser tab and home screen.
 
 ## Visual system
 

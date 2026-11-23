@@ -176,6 +176,10 @@ on coarse pointers.
 
 `routes/og.png.ts` renders a 1200x630 card with Takumi and the local Be Vietnam
 Pro fonts under `public/fonts/`. Nitro bundles the fonts and WASM backend for
-production; Vite dev feeds the WASM bytes directly. The root route owns social
+production; Vite dev feeds the WASM bytes directly. The favicon set uses the
+same brand system: a cyan transmission pylon with amber insulator nodes and the
+green live dot on a `#07121b` tile. `favicon.svg` is the primary icon,
+`favicon.ico` bundles 16/32/48/64 px images, `favicon.png` is the 64 px fallback
+and `apple-touch-icon.png` is an opaque 180 px home-screen tile. The root route owns social
 metadata, while the index route owns canonical and robots directives so a 404
 is never advertised as indexable.
