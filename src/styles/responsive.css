@@ -101,7 +101,7 @@
   }
 
   .paused-banner {
-    top: 250px;
+    top: 270px;
   }
 }
 
@@ -232,6 +232,10 @@
 
   .toast {
     top: 210px;
+  }
+
+  .scene-stage[data-paused="true"] .scene-empty {
+    top: 58%;
   }
 
   .paused-hint {

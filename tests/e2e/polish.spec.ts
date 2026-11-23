@@ -64,6 +64,12 @@ test("offers the dashboard from the WebGL fallback", async ({ page }) => {
 
   const empty = page.locator(".scene-empty");
   await expect(empty).toBeVisible({ timeout: 20_000 });
+
+  const emptyBox = await empty.boundingBox();
+  const pausedBox = await page.locator(".paused-banner").boundingBox();
+
+  expect(emptyBox?.y ?? 0).toBeGreaterThanOrEqual((pausedBox?.y ?? 0) + (pausedBox?.height ?? 0));
+
   await expect(page.locator("#scene-summary")).toContainText("phủ điện");
   await empty.getByRole("button", { name: "Mở bảng điều hành" }).click();
   await expect(page.locator(".workspace-drawer")).toBeVisible();
