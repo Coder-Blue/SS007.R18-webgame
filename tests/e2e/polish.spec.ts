@@ -68,7 +68,12 @@ test("offers the dashboard from the WebGL fallback", async ({ page }) => {
   const emptyBox = await empty.boundingBox();
   const pausedBox = await page.locator(".paused-banner").boundingBox();
 
-  expect(emptyBox?.y ?? 0).toBeGreaterThanOrEqual((pausedBox?.y ?? 0) + (pausedBox?.height ?? 0));
+  expect(emptyBox).not.toBeNull();
+  expect(pausedBox).not.toBeNull();
+
+  if (emptyBox && pausedBox) {
+    expect(emptyBox.y).toBeGreaterThanOrEqual(pausedBox.y + pausedBox.height);
+  }
 
   await expect(page.locator("#scene-summary")).toContainText("phủ điện");
   await empty.getByRole("button", { name: "Mở bảng điều hành" }).click();
