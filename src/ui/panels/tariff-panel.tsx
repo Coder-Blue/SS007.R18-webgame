@@ -84,10 +84,10 @@ export const TariffPanel = (): JSX.Element => {
             <dt class="text-[11px] text-ink-faint">Giá bình quân</dt>
             <dd class="mt-1 text-base font-semibold tabular-nums text-gold">
               {formatPrice(preview().after.averageTariff)}
+              <span class="mt-1 block text-[11px] font-normal leading-4 text-ink-faint">
+                {`Trần năm: ${formatPrice(state().tariffs.ceiling)}`}
+              </span>
             </dd>
-            <p class="mt-1 text-[11px] leading-4 text-ink-faint">
-              {`Trần năm: ${formatPrice(state().tariffs.ceiling)}`}
-            </p>
           </div>
           <div>
             <dt class="text-[11px] text-ink-faint">Thay đổi dự kiến</dt>
@@ -97,17 +97,19 @@ export const TariffPanel = (): JSX.Element => {
               }`}
             >
               {formatSignedPercent(change())}
+              <span class="mt-1 block text-[11px] font-normal leading-4 text-ink-faint">
+                {change() > DIRECT_TARIFF_CAP_PCT ? "Cần trình Nhà nước" : "Điều chỉnh trực tiếp"}
+              </span>
             </dd>
-            <p class="mt-1 text-[11px] leading-4 text-ink-faint">
-              {change() > DIRECT_TARIFF_CAP_PCT ? "Cần trình Nhà nước" : "Điều chỉnh trực tiếp"}
-            </p>
           </div>
           <div>
             <dt class="text-[11px] text-ink-faint">Giá công nghiệp</dt>
             <dd class="mt-1 text-base font-semibold tabular-nums text-amber">
               {formatPrice(industrial())}
+              <span class="mt-1 block text-[11px] font-normal leading-4 text-ink-faint">
+                Thấp hơn chi phí biên
+              </span>
             </dd>
-            <p class="mt-1 text-[11px] leading-4 text-ink-faint">Thấp hơn chi phí biên</p>
           </div>
           <div>
             <dt class="text-[11px] text-ink-faint">Lợi nhuận tháng</dt>
@@ -117,10 +119,10 @@ export const TariffPanel = (): JSX.Element => {
               }`}
             >
               {formatSignedBillion(preview().after.netResult)}
+              <span class="mt-1 block text-[11px] font-normal leading-4 text-ink-faint">
+                {`Trước điều chỉnh: ${formatSignedBillion(preview().before.netResult)}`}
+              </span>
             </dd>
-            <p class="mt-1 text-[11px] leading-4 text-ink-faint">
-              {`Trước điều chỉnh: ${formatSignedBillion(preview().before.netResult)}`}
-            </p>
           </div>
         </dl>
         <div class="tier-list">

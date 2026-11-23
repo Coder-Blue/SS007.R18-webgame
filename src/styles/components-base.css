@@ -409,13 +409,3 @@
   color: var(--ink-faint);
   font-size: 12px;
 }
-
-.empty-state {
-  align-items: center;
-  color: var(--ink-faint);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 22px;
-  text-align: center;
-}

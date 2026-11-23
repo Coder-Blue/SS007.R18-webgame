@@ -34,7 +34,7 @@ const mixRows = (row: {
     { label: "Thủy điện", value: row.hydroMillionKwh / total, color: "var(--cyan-soft)" },
     { label: "Nhiệt điện", value: row.thermalMillionKwh / total, color: "var(--amber)" },
     { label: "Tái tạo", value: row.renewableMillionKwh / total, color: "var(--lime)" },
-    { label: "Nhập khẩu", value: row.importMillionKwh / total, color: "var(--electric)" },
+    { label: "Nhập khẩu", value: row.importMillionKwh / total, color: "var(--ink-faint)" },
   ];
 };
 
@@ -220,11 +220,17 @@ export const SummaryModal = (): JSX.Element => {
   const energyDelta = () => {
     const current = report();
 
-    if (current?.previousEnergyMillionKwh === null || current === null) return null;
+    if (
+      current === null ||
+      current.previousEnergyMillionKwh === null ||
+      current.previousEnergyMillionKwh <= 0
+    ) {
+      return null;
+    }
 
     return (
       ((current.energyMillionKwh - current.previousEnergyMillionKwh) /
-        Math.max(1, current.previousEnergyMillionKwh)) *
+        current.previousEnergyMillionKwh) *
       100
     );
   };

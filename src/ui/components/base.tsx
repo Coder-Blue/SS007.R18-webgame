@@ -49,7 +49,6 @@ export const Stat = (props: {
   readonly value: string;
   readonly hint?: string;
   readonly tone?: "neutral" | "good" | "warn" | "bad" | "gold";
-  readonly icon?: IconName;
   readonly class?: string;
 }): JSX.Element => (
   <div class={cx("stat", props.class)} data-tone={props.tone ?? "neutral"}>
@@ -169,18 +168,6 @@ export const SectionHeading = (props: {
       {props.hint === undefined ? null : <p>{props.hint}</p>}
     </div>
     {props.action}
-  </div>
-);
-
-export const EmptyState = (props: {
-  readonly title: string;
-  readonly body?: string;
-  readonly icon?: IconName;
-}): JSX.Element => (
-  <div class="empty-state">
-    <Icon icon={props.icon ?? "lucide:info"} size={26} />
-    <strong>{props.title}</strong>
-    {props.body === undefined ? null : <span>{props.body}</span>}
   </div>
 );
 

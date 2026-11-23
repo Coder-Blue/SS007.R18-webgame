@@ -130,13 +130,11 @@ export const EndingScreen = (props: { readonly onNewGame: () => void }): JSX.Ele
               label="Niềm tin dân"
               value={formatPercent(state().metrics.citizenTrust)}
               tone={state().metrics.citizenTrust > 0 ? "good" : "bad"}
-              icon="tabler:users"
             />
             <Stat
               label="Tín nhiệm"
               value={formatPercent(state().metrics.institutionalTrust)}
               tone={state().metrics.institutionalTrust > 0 ? "good" : "bad"}
-              icon="tabler:shield-check"
             />
             <Stat
               label="Dư nợ"

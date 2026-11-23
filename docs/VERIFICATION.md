@@ -28,10 +28,10 @@ Observed sub-results:
 
 ```
 Line budget: OK (owned source files <= 500 lines; 36 vendored files exempt)
-Emoji audit: OK (173 text files scanned)
+Emoji audit: OK (175 text files scanned)
 Domain boundary: OK (32 pure files)
-Test Files  25 passed (25)
-Tests       181 passed (181)
+Test Files  26 passed (26)
+Tests       185 passed (185)
 
 Statements   : 100% (826/826)
 Branches     : 100% (460/460)
@@ -51,7 +51,7 @@ pnpm check:bundle
 ```
 
 All 15 client chunks are below 500 kB minified. The initial shell preloads
-628.5 kB minified / 211.5 kB gzip and contains no Three.js or GSAP. The deferred
+629.5 kB minified / 211.8 kB gzip and contains no Three.js or GSAP. The deferred
 `create-power-scene-*.js` chunk is loaded only after the game starts.
 
 ## Favicon set
@@ -73,16 +73,19 @@ versioned document links at every viewport.
 The theme now uses oklch tokens and Tailwind utilities in components. The
 quarter summary aggregates the last three ledgers into one report; its monthly
 toast is suppressed, its continue action is sticky on mobile, and the
-integrity mix shares always sum to 100. Overview, finance and grid empty/action
-states were rewritten with Tailwind utilities and shared empty states.
+generation mix shares always sum to 100. Overview and finance empty states, the grid action hierarchy and the
+tariff/supplier strips were rewritten with Tailwind utilities and shared empty
+states.
 
 ```
-Tests       181 passed (181)
+Tests       185 passed (185)
 Playwright  78 passed, 14 skipped
 ```
 
 The summary selector tests cover two- and three-month windows, previous-quarter
-comparison, zero-energy tariff fallback and closing balance selection. The
+comparison, zero-energy tariff fallback and closing balance selection. A
+hold-lease unit test covers the approval guard so a closed approval cannot
+release a hold owned by another modal. The
 summary browser test runs at 1440x900, 768x1024, 390x844 and 360x740 and checks
 that no stat cards remain, the toast is gone and the 44 px continue action is
 inside the viewport. The chart/table overlap audit advances to month 2 first so

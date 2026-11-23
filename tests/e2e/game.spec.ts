@@ -450,6 +450,10 @@ test("chart and table legends do not overlap their plots", async ({ page }) => {
     await page.locator(".event-modal").getByRole("button", { name: "Chọn" }).first().click();
   }
 
+  const pause = page.getByRole("button", { name: "Tạm dừng mô phỏng" });
+
+  if ((await pause.count()) > 0) await pause.click();
+
   await page.locator(".dock-tab").filter({ hasText: "Tổng quan" }).click();
 
   const overlaps = await page.evaluate(() => {

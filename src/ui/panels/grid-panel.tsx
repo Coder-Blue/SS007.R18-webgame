@@ -128,7 +128,6 @@ export const GridPanel = (): JSX.Element => {
             label="Độ mạnh lưới"
             value={formatPercent(state().infrastructure.gridStrength)}
             tone={state().infrastructure.gridStrength >= 75 ? "good" : "warn"}
-            icon="lucide:activity"
           />
         </div>
         <div class="callout">

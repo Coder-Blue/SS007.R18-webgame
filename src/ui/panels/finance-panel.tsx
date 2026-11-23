@@ -24,7 +24,7 @@ export const FinancePanel = (): JSX.Element => {
   return (
     <div class="stack-lg">
       <Panel title="Sổ tài chính" kicker="Doanh thu và chi phí" icon="tabler:report-money">
-        <div class="stat-grid">
+        <div class="grid grid-cols-2 gap-3 lg:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
           <Stat
             label="Ngân quỹ"
             value={formatBillion(state().finance.cash)}
@@ -36,20 +36,25 @@ export const FinancePanel = (): JSX.Element => {
             value={formatBillion(state().finance.debt)}
             hint={`Trần ${formatBillion(state().finance.debtLimit)}`}
             tone={state().finance.debt > 80_000 ? "bad" : "warn"}
-            icon="tabler:building-bank"
           />
           <Stat
             label="Lỗ lũy kế"
-            value={formatBillion(state().finance.accumulatedLoss)}
+            value={
+              state().finance.accumulatedLoss === 0
+                ? "Chưa phát sinh"
+                : formatBillion(state().finance.accumulatedLoss)
+            }
             hint="Mục tiêu cấu trúc 5 năm"
             tone="bad"
           />
-          <Stat
-            label="Thu hồi N-2 tháng"
-            value={formatBillion(recovery().monthlyCredit)}
-            hint={`Năm kiểm toán ${recovery().eligibleYear}`}
-            tone="good"
-          />
+          <Show when={recovery().eligibleLoss > 0}>
+            <Stat
+              label="Thu hồi N-2 tháng"
+              value={formatBillion(recovery().monthlyCredit)}
+              hint={`Năm kiểm toán ${recovery().eligibleYear}`}
+              tone="good"
+            />
+          </Show>
         </div>
         <Show
           when={last() !== undefined}
@@ -194,44 +199,50 @@ export const FinancePanel = (): JSX.Element => {
           liệu, truyền tải và lãi vay vẫn tăng. Vì vậy nhiệm kỳ được thiết kế để lỗ có kiểm soát,
           không phải để có lãi trước năm 2027.
         </p>
-        <div class="stat-grid">
-          <Stat
-            label="Doanh thu lũy kế"
-            value={formatBillion(
-              state().finance.monthlyHistory.reduce((sum, row) => sum + row.revenueTotal, 0),
-            )}
-            tone="gold"
-            icon="lucide:trending-up"
-          />
-          <Stat
-            label="Chi phí lũy kế"
-            value={formatBillion(
-              state().finance.monthlyHistory.reduce((sum, row) => sum + row.costTotal, 0),
-            )}
+        <Show
+          when={state().finance.monthlyHistory.length > 0}
+          fallback={
+            <EmptyState
+              title="Chưa có chẩn đoán lũy kế"
+              body="Doanh thu, chi phí và chênh lệch lũy kế sẽ có sau tháng đầu tiên. Tỷ lệ nợ hiện tại vẫn được theo dõi trên thanh bên."
+            />
+          }
+        >
+          <div class="stat-grid">
+            <Stat
+              label="Doanh thu lũy kế"
+              value={formatBillion(
+                state().finance.monthlyHistory.reduce((sum, row) => sum + row.revenueTotal, 0),
+              )}
+              tone="gold"
+            />
+            <Stat
+              label="Chi phí lũy kế"
+              value={formatBillion(
+                state().finance.monthlyHistory.reduce((sum, row) => sum + row.costTotal, 0),
+              )}
+              tone="warn"
+            />
+            <Stat
+              label="Chênh lệch lũy kế"
+              value={formatSignedBillion(
+                state().finance.monthlyHistory.reduce((sum, row) => sum + row.netResult, 0),
+              )}
+              tone="bad"
+            />
+            <Stat
+              label="Tỷ lệ nợ"
+              value={formatPercent((state().finance.debt / state().finance.debtLimit) * 100)}
+              tone={state().finance.debt > 80_000 ? "bad" : "warn"}
+            />
+          </div>
+          <Bar
+            value={state().finance.debt}
+            max={state().finance.debtLimit}
             tone="warn"
-            icon="lucide:trending-down"
+            label="Tỷ lệ nợ trên trần"
           />
-          <Stat
-            label="Chênh lệch lũy kế"
-            value={formatSignedBillion(
-              state().finance.monthlyHistory.reduce((sum, row) => sum + row.netResult, 0),
-            )}
-            tone="bad"
-            icon="tabler:report-money"
-          />
-          <Stat
-            label="Tỷ lệ nợ"
-            value={formatPercent((state().finance.debt / state().finance.debtLimit) * 100)}
-            tone={state().finance.debt > 80_000 ? "bad" : "warn"}
-            icon="lucide:gauge"
-          />
-        </div>
-        <Bar
-          value={state().finance.debt}
-          max={state().finance.debtLimit}
-          tone="warn"
-          label="Tỷ lệ nợ trên trần"
-        />
+        </Show>
         <div class="callout">
           <Icon icon="tabler:alert-triangle" size={16} />
           <span>

@@ -24,7 +24,12 @@ export const TopBar = (props: {
   const paused = () => !store.running();
 
   return (
-    <header class="top-bar" data-paused={paused() ? "true" : "false"}>
+    <header
+      class="top-bar"
+      data-paused={paused() ? "true" : "false"}
+      data-hold={store.hold() ? "true" : "false"}
+      data-approval={state().approval !== null ? "true" : "false"}
+    >
       <div class="brand-block">
         <div class="brand-mark">
           <Icon icon="tabler:bolt" size={22} />

@@ -40,7 +40,8 @@
 - Use Tailwind utilities in the component. Keep CSS files for tokens, resets,
   UI SDK integration and shared primitives; do not add pane-specific blocks.
 - Every color is oklch, through a semantic token such as `--panel` or a
-  Tailwind utility such as `bg-panel`. No hex or rgba in CSS or JSX.
+  Tailwind utility such as `bg-panel`. No hex or rgba in CSS or JSX. Three.js
+  material colors are numeric GPU uniforms, not CSS colors.
 - Use UI SDK primitives for dialogs, drawers, sliders, switches and tabs.
 - Every interactive control has an accessible name and a visible focus state.
 - Touch targets are at least 44x44 px.
