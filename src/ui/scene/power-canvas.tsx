@@ -3,6 +3,7 @@ import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { Icon } from "../components/icons";
 import type { PowerScene, SceneSelection } from "~/scene/create-power-scene";
+import type { PanelId } from "../mobile/mobile-nav";
 import { seasonOf } from "~/domain";
 import { selectionLabel } from "./scene-labels";
 import { WIDE_DESKTOP_MIN } from "../tour-config";
@@ -28,6 +29,7 @@ const rectOf = (element: Element | null): ScreenRect | null => {
 
 export const PowerCanvas = (props: {
   readonly onSelect: (selection: SceneSelection) => void;
+  readonly onOpenPanel: (panel: PanelId) => void;
 }): JSX.Element => {
   const { store } = useGame();
   const state = store.state;
@@ -238,6 +240,9 @@ export const PowerCanvas = (props: {
       state().zones.rural.coverage) /
     3;
 
+  const sceneSummary = () =>
+    `Bản đồ lưới điện quốc gia: ${Math.round(coverage())}% phủ điện, ${weatherLabel().toLowerCase()}, dự phòng ${Math.round(state().metrics.reserveMargin)}%. ${state().policy.reformProgress.length} cải cách đang thực thi. Chọn một công trình trên bản đồ để xem chi tiết.`;
+
   return (
     <div
       class="scene-wrap"
@@ -251,8 +256,12 @@ export const PowerCanvas = (props: {
         }}
         class="power-canvas"
         aria-label="Bản đồ lưới điện quốc gia"
+        aria-describedby="scene-summary"
         role="img"
       />
+      <p id="scene-summary" class="sr-only">
+        {sceneSummary()}
+      </p>
       <div class="scene-vignette" />
       <div class="scene-badges">
         <span class="scene-badge">
@@ -315,9 +324,13 @@ export const PowerCanvas = (props: {
         </div>
       </Show>
       <Show when={unavailable()}>
-        <div class="scene-empty" role="status">
+        <div class="scene-empty">
           <Icon icon="lucide:map" size={18} />
-          <span>Bản đồ 3D cần WebGL. Bảng điều hành vẫn hoạt động đầy đủ.</span>
+          <span role="status">Bản đồ 3D cần WebGL. Bảng điều hành vẫn hoạt động đầy đủ.</span>
+          <button type="button" class="scene-reset" onClick={() => props.onOpenPanel("overview")}>
+            <Icon icon="tabler:checklist" size={16} />
+            <span>Mở bảng điều hành</span>
+          </button>
         </div>
       </Show>
       <Show when={loadFailed()}>

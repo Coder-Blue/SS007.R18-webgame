@@ -30,7 +30,7 @@ export const GameView = (props: {
   return (
     <>
       <div class="scene-stage" data-tutorial="scene">
-        <PowerCanvas onSelect={props.onSelect} />
+        <PowerCanvas onSelect={props.onSelect} onOpenPanel={props.onOpenPanel} />
         <div class="scene-veil" aria-hidden="true" />
         <Show when={!store.running() && store.state().ending === null}>
           <div class="paused-banner" data-tutorial="pause">

@@ -337,6 +337,8 @@ test("title and first month stay inside every viewport", async ({ page }) => {
   await startGame(page);
   await expect(page.locator(".top-bar")).toBeVisible();
   await expect(page.locator(".power-canvas")).toBeVisible();
+  await expect(page.locator(".power-canvas")).toHaveAttribute("aria-describedby", "scene-summary");
+  await expect(page.locator("#scene-summary")).toContainText("phủ điện");
   await expectNoOverflow(page);
   await expectMonth(page, "Tháng 1/2022");
 });
