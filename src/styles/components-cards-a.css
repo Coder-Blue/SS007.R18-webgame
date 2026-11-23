@@ -22,7 +22,7 @@
 }
 
 .data-table tbody tr:hover {
-  background: rgba(57, 215, 255, 0.04);
+  background: oklch(0.8167 0.1361 219.52 / 0.04);
 }
 
 .data-table td[data-tone="good"] {
@@ -53,15 +53,8 @@
   max-width: 62ch;
 }
 
-.hero-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-
 .overview-score {
-  background: rgba(7, 22, 29, 0.65);
+  background: oklch(0.1904 0.0253 229.73 / 0.65);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   display: flex;
@@ -126,7 +119,7 @@
 .supplier-card,
 .build-card,
 .decision-card {
-  background: rgba(7, 22, 29, 0.62);
+  background: oklch(0.1904 0.0253 229.73 / 0.62);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   display: flex;
@@ -148,8 +141,8 @@
 }
 
 .supplier-card[data-active="true"] {
-  background: rgba(57, 215, 255, 0.08);
-  border-color: rgba(57, 215, 255, 0.5);
+  background: oklch(0.8167 0.1361 219.52 / 0.08);
+  border-color: oklch(0.8167 0.1361 219.52 / 0.5);
 }
 
 .supplier-head,
@@ -216,7 +209,7 @@
 
 .zone-icon {
   align-items: center;
-  background: rgba(57, 215, 255, 0.1);
+  background: oklch(0.8167 0.1361 219.52 / 0.1);
   border-radius: 8px;
   color: var(--electric);
   display: inline-flex;
@@ -226,11 +219,11 @@
 }
 
 .zone-card[data-complete="true"] {
-  border-color: rgba(91, 214, 162, 0.38);
+  border-color: oklch(0.7925 0.1341 162.76 / 0.38);
 }
 
 .zone-card[data-complete="true"] .zone-icon {
-  background: rgba(91, 214, 162, 0.12);
+  background: oklch(0.7925 0.1341 162.76 / 0.12);
   color: var(--green);
 }
 
@@ -310,7 +303,7 @@
 }
 
 .reform-row[data-pending="true"] {
-  background: rgba(57, 215, 255, 0.04);
+  background: oklch(0.8167 0.1361 219.52 / 0.04);
 }
 
 .reform-mini {

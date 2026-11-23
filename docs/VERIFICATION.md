@@ -28,10 +28,10 @@ Observed sub-results:
 
 ```
 Line budget: OK (owned source files <= 500 lines; 36 vendored files exempt)
-Emoji audit: OK (169 text files scanned)
+Emoji audit: OK (175 text files scanned)
 Domain boundary: OK (32 pure files)
-Test Files  23 passed (23)
-Tests       175 passed (175)
+Test Files  26 passed (26)
+Tests       185 passed (185)
 
 Statements   : 100% (826/826)
 Branches     : 100% (460/460)
@@ -51,7 +51,7 @@ pnpm check:bundle
 ```
 
 All 15 client chunks are below 500 kB minified. The initial shell preloads
-625.2 kB minified / 210.5 kB gzip and contains no Three.js or GSAP. The deferred
+629.6 kB minified / 211.8 kB gzip and contains no Three.js or GSAP. The deferred
 `create-power-scene-*.js` chunk is loaded only after the game starts.
 
 ## Favicon set
@@ -68,12 +68,35 @@ dimension, Apple's opaque color type and the Nitro/Vercel cache rules;
 `tests/e2e/branding.spec.ts` fetches all four assets and checks all four
 versioned document links at every viewport.
 
+## De-slop pass
+
+The theme now uses oklch tokens and Tailwind utilities in components. The
+quarter summary aggregates the last three ledgers into one report; its monthly
+toast is suppressed, its continue action is sticky on mobile, and the
+generation mix shares always sum to 100. Overview and finance empty states and the tariff/supplier strips were rewritten
+with Tailwind utilities and shared empty states. The grid action hierarchy was
+quieted through the shared ActionButton primitive.
+
+```
+Tests       185 passed (185)
+Playwright  78 passed, 14 skipped
+```
+
+The summary selector tests cover two- and three-month windows, previous-quarter
+comparison, zero-energy tariff fallback and closing balance selection. A
+hold-lease unit test covers the approval guard so a closed approval cannot
+release a hold owned by another modal. The
+summary browser test runs at 1440x900, 768x1024, 390x844 and 360x740 and checks
+that no stat cards remain, the toast is gone and the 44 px continue action is
+inside the viewport. The chart/table overlap audit advances to month 2 first so
+it exercises populated plots and the real ledger table.
+
 ## Browser matrix
 
 ```
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
   pnpm exec playwright test
-74 passed, 14 skipped
+78 passed, 14 skipped
 ```
 
 The skipped checks are desktop-only workspace/overlap tests on mobile projects,

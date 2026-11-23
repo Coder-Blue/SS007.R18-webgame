@@ -1,7 +1,7 @@
 import { For, createSignal, createTrackedEffect } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
-import { ActionButton, Badge, Bar, Panel, RangeSlider, Stat } from "../components/base";
+import { ActionButton, Badge, Bar, Panel, RangeSlider } from "../components/base";
 import { Icon } from "../components/icons";
 import {
   formatPercent,
@@ -79,38 +79,52 @@ export const TariffPanel = (): JSX.Element => {
           Sáu bậc lũy tiến cho hộ dân, một giá trợ cấp cho khu công nghiệp. Tăng đến{" "}
           {DIRECT_TARIFF_CAP_PCT}% được thực hiện ngay; vượt mức đó phải trình Nhà nước thẩm định.
         </p>
-        <div class="stat-grid">
-          <Stat
-            label="Giá bình quân"
-            value={formatPrice(preview().after.averageTariff)}
-            hint={`Trần năm: ${formatPrice(state().tariffs.ceiling)}`}
-            tone="gold"
-            icon="tabler:cash-banknote"
-          />
-          <Stat
-            label="Thay đổi dự kiến"
-            value={formatSignedPercent(change())}
-            hint={
-              change() > DIRECT_TARIFF_CAP_PCT ? "Cần trình Nhà nước" : "Được điều chỉnh trực tiếp"
-            }
-            tone={change() > DIRECT_TARIFF_CAP_PCT ? "warn" : "good"}
-            icon="lucide:trending-up"
-          />
-          <Stat
-            label="Giá công nghiệp"
-            value={formatPrice(industrial())}
-            hint="Giá trợ cấp, thấp hơn chi phí biên"
-            tone="warn"
-            icon="tabler:building-factory-2"
-          />
-          <Stat
-            label="Lợi nhuận tháng"
-            value={formatSignedBillion(preview().after.netResult)}
-            hint={`Trước điều chỉnh: ${formatSignedBillion(preview().before.netResult)}`}
-            tone={preview().after.netResult >= preview().before.netResult ? "good" : "bad"}
-            icon="tabler:report-money"
-          />
-        </div>
+        <dl class="grid grid-cols-2 gap-x-6 gap-y-4 border-y border-line py-4 sm:grid-cols-4">
+          <div>
+            <dt class="text-[11px] text-ink-faint">Giá bình quân</dt>
+            <dd class="mt-1 text-base font-semibold tabular-nums text-gold">
+              {formatPrice(preview().after.averageTariff)}
+              <span class="mt-1 block text-[11px] font-normal leading-4 text-ink-faint">
+                {`Trần năm: ${formatPrice(state().tariffs.ceiling)}`}
+              </span>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-[11px] text-ink-faint">Thay đổi dự kiến</dt>
+            <dd
+              class={`mt-1 text-base font-semibold tabular-nums ${
+                change() > DIRECT_TARIFF_CAP_PCT ? "text-amber" : "text-green"
+              }`}
+            >
+              {formatSignedPercent(change())}
+              <span class="mt-1 block text-[11px] font-normal leading-4 text-ink-faint">
+                {change() > DIRECT_TARIFF_CAP_PCT ? "Cần trình Nhà nước" : "Điều chỉnh trực tiếp"}
+              </span>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-[11px] text-ink-faint">Giá công nghiệp</dt>
+            <dd class="mt-1 text-base font-semibold tabular-nums text-amber">
+              {formatPrice(industrial())}
+              <span class="mt-1 block text-[11px] font-normal leading-4 text-ink-faint">
+                Thấp hơn chi phí biên
+              </span>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-[11px] text-ink-faint">Lợi nhuận tháng</dt>
+            <dd
+              class={`mt-1 text-base font-semibold tabular-nums ${
+                preview().after.netResult >= preview().before.netResult ? "text-green" : "text-rose"
+              }`}
+            >
+              {formatSignedBillion(preview().after.netResult)}
+              <span class="mt-1 block text-[11px] font-normal leading-4 text-ink-faint">
+                {`Trước điều chỉnh: ${formatSignedBillion(preview().before.netResult)}`}
+              </span>
+            </dd>
+          </div>
+        </dl>
         <div class="tier-list">
           <For each={tiers()}>
             {(value, index) => (

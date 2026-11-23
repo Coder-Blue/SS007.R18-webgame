@@ -1,12 +1,9 @@
-.summary-trust strong {
-  color: var(--ink);
-}
 /* Ending */
 
 .ending-overlay {
   align-items: flex-start;
   backdrop-filter: blur(16px);
-  background: rgba(2, 8, 11, 0.86);
+  background: oklch(0.1269 0.016 221.61 / 0.86);
   display: flex;
   inset: 0;
   justify-content: center;
@@ -18,12 +15,16 @@
 
 .ending-overlay[data-tone="bad"] {
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(255, 107, 107, 0.12), transparent 55%),
-    rgba(2, 8, 11, 0.9);
+    radial-gradient(ellipse at 50% 0%, oklch(0.7116 0.1812 22.84 / 0.12), transparent 55%),
+    oklch(0.1269 0.016 221.61 / 0.9);
 }
 
 .ending-panel {
-  background: linear-gradient(165deg, rgba(15, 38, 48, 0.98), rgba(6, 18, 24, 0.98));
+  background: linear-gradient(
+    165deg,
+    oklch(0.255 0.0345 228.65 / 0.98),
+    oklch(0.1738 0.0218 230.41 / 0.98)
+  );
   border: 1px solid var(--line-strong);
   border-radius: 18px;
   box-shadow: var(--shadow-lift);
@@ -77,7 +78,7 @@
 }
 
 .ending-missions .goal {
-  background: rgba(4, 14, 19, 0.55);
+  background: oklch(0.1557 0.0199 228.03 / 0.55);
   border: 1px solid var(--line);
   border-radius: 999px;
   display: inline-flex;
@@ -97,7 +98,7 @@
 
 .ending-table > div {
   align-items: center;
-  background: rgba(4, 14, 19, 0.55);
+  background: oklch(0.1557 0.0199 228.03 / 0.55);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   display: flex;

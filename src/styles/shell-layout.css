@@ -7,9 +7,9 @@
 
 .scene-stage {
   background:
-    radial-gradient(ellipse at 50% 45%, rgba(57, 215, 255, 0.06), transparent 60%),
-    linear-gradient(rgba(137, 199, 214, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(137, 199, 214, 0.04) 1px, transparent 1px), var(--bg-deep);
+    radial-gradient(ellipse at 50% 45%, oklch(0.8167 0.1361 219.52 / 0.06), transparent 60%),
+    linear-gradient(oklch(0.7928 0.0667 214.51 / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.7928 0.0667 214.51 / 0.04) 1px, transparent 1px), var(--bg-deep);
   background-size:
     auto,
     48px 48px,
@@ -37,19 +37,23 @@
   background:
     linear-gradient(
       180deg,
-      rgba(4, 11, 16, 0.55) 0%,
+      oklch(0.1437 0.0171 235.16 / 0.55) 0%,
       transparent 22%,
       transparent 70%,
-      rgba(4, 11, 16, 0.7) 100%
+      oklch(0.1437 0.0171 235.16 / 0.7) 100%
     ),
-    radial-gradient(ellipse at 50% 45%, transparent 35%, rgba(4, 11, 16, 0.45) 100%);
+    radial-gradient(ellipse at 50% 45%, transparent 35%, oklch(0.1437 0.0171 235.16 / 0.45) 100%);
   inset: 0;
   pointer-events: none;
   position: absolute;
 }
 
 .scene-vignette {
-  background: radial-gradient(ellipse at center, transparent 45%, rgba(3, 10, 14, 0.55) 100%);
+  background: radial-gradient(
+    ellipse at center,
+    transparent 45%,
+    oklch(0.1378 0.0167 227.29 / 0.55) 100%
+  );
   inset: 0;
   pointer-events: none;
   position: absolute;
@@ -67,7 +71,7 @@
 
 .scene-badge {
   align-items: center;
-  background: rgba(7, 22, 29, 0.92);
+  background: oklch(0.1904 0.0253 229.73 / 0.92);
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ink-soft);
@@ -79,7 +83,7 @@
 }
 
 .scene-badge[data-tone="bad"] {
-  border-color: rgba(255, 107, 107, 0.4);
+  border-color: oklch(0.7116 0.1812 22.84 / 0.4);
   color: var(--rose);
 }
 
@@ -92,7 +96,7 @@
 
 .scene-reset {
   align-items: center;
-  background: rgba(7, 22, 29, 0.92);
+  background: oklch(0.1904 0.0253 229.73 / 0.92);
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ink-soft);
@@ -108,7 +112,7 @@
 }
 
 .scene-hint {
-  background: rgba(7, 22, 29, 0.88);
+  background: oklch(0.1904 0.0253 229.73 / 0.88);
   border: 1px solid var(--line);
   border-radius: 999px;
   bottom: 92px;
@@ -125,7 +129,7 @@
 .scene-loading,
 .scene-error {
   align-items: center;
-  background: rgba(7, 22, 29, 0.85);
+  background: oklch(0.1904 0.0253 229.73 / 0.85);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   color: var(--ink-soft);
@@ -153,8 +157,8 @@
 
 .paused-banner {
   align-items: center;
-  background: rgba(7, 22, 29, 0.94);
-  border: 1px solid rgba(255, 179, 71, 0.45);
+  background: oklch(0.1904 0.0253 229.73 / 0.94);
+  border: 1px solid oklch(0.8208 0.1486 72.1 / 0.45);
   border-radius: 999px;
   color: var(--amber);
   display: flex;
@@ -179,8 +183,8 @@
 
 .scene-selection {
   align-items: center;
-  background: rgba(7, 22, 29, 0.85);
-  border: 1px solid rgba(57, 215, 255, 0.4);
+  background: oklch(0.1904 0.0253 229.73 / 0.85);
+  border: 1px solid oklch(0.8167 0.1361 219.52 / 0.4);
   border-radius: 999px;
   bottom: 92px;
   color: var(--ink);
@@ -203,7 +207,7 @@
 
 .top-bar {
   align-items: center;
-  background: #081820;
+  background: oklch(0.1992 0.0271 231.88);
   border: 1px solid var(--line);
   border-radius: 12px;
   box-shadow: var(--shadow-panel);
@@ -219,7 +223,7 @@
 }
 
 .top-bar[data-paused="true"] {
-  border-color: rgba(255, 179, 71, 0.36);
+  border-color: oklch(0.8208 0.1486 72.1 / 0.36);
 }
 
 .brand-block {
@@ -240,8 +244,8 @@
 
 .brand-mark {
   align-items: center;
-  background: rgba(57, 215, 255, 0.1);
-  border: 1px solid rgba(57, 215, 255, 0.3);
+  background: oklch(0.8167 0.1361 219.52 / 0.1);
+  border: 1px solid oklch(0.8167 0.1361 219.52 / 0.3);
   border-radius: 10px;
   color: var(--electric);
   display: inline-flex;
@@ -254,7 +258,7 @@
 
 .brand-mark::after {
   background: var(--green);
-  border: 2px solid #081820;
+  border: 2px solid oklch(0.1992 0.0271 231.88);
   border-radius: 50%;
   bottom: 4px;
   content: "";
@@ -320,7 +324,7 @@
 }
 
 .top-gauge {
-  background: rgba(4, 14, 19, 0.55);
+  background: oklch(0.1557 0.0199 228.03 / 0.55);
   border: 1px solid var(--line);
   border-radius: 8px;
   display: flex;
@@ -331,11 +335,11 @@
 }
 
 .top-gauge[data-tone="bad"] {
-  border-color: rgba(255, 107, 107, 0.35);
+  border-color: oklch(0.7116 0.1812 22.84 / 0.35);
 }
 
 .top-gauge[data-tone="warn"] {
-  border-color: rgba(255, 179, 71, 0.28);
+  border-color: oklch(0.8208 0.1486 72.1 / 0.28);
 }
 
 .top-gauge-label {
@@ -369,8 +373,8 @@
 
 .pause-btn {
   align-items: center;
-  background: rgba(255, 179, 71, 0.1);
-  border: 1px solid rgba(255, 179, 71, 0.45);
+  background: oklch(0.8208 0.1486 72.1 / 0.1);
+  border: 1px solid oklch(0.8208 0.1486 72.1 / 0.45);
   border-radius: 9px;
   color: var(--amber);
   display: inline-flex;
@@ -383,8 +387,8 @@
 }
 
 .pause-btn[data-running="true"] {
-  background: rgba(57, 215, 255, 0.12);
-  border-color: rgba(57, 215, 255, 0.45);
+  background: oklch(0.8167 0.1361 219.52 / 0.12);
+  border-color: oklch(0.8167 0.1361 219.52 / 0.45);
   color: var(--electric);
 }
 
@@ -393,7 +397,7 @@
 }
 
 .speed-group {
-  background: rgba(4, 14, 19, 0.6);
+  background: oklch(0.1557 0.0199 228.03 / 0.6);
   border: 1px solid var(--line);
   border-radius: 9px;
   display: inline-flex;
@@ -414,7 +418,7 @@
 
 .scene-empty {
   align-items: center;
-  background: rgba(7, 22, 29, 0.82);
+  background: oklch(0.1904 0.0253 229.73 / 0.82);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   color: var(--ink-faint);
@@ -434,7 +438,7 @@
 
 .mobile-speed {
   align-items: center;
-  background: rgba(4, 14, 19, 0.6);
+  background: oklch(0.1557 0.0199 228.03 / 0.6);
   border: 1px solid var(--line);
   border-radius: 8px;
   display: inline-flex;
@@ -453,8 +457,8 @@
 
 .scene-tour-focus {
   align-items: center;
-  background: rgba(7, 22, 29, 0.9);
-  border: 1px solid rgba(57, 215, 255, 0.45);
+  background: oklch(0.1904 0.0253 229.73 / 0.9);
+  border: 1px solid oklch(0.8167 0.1361 219.52 / 0.45);
   border-radius: 999px;
   color: var(--ink);
   display: inline-flex;

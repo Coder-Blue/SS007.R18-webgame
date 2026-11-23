@@ -17,18 +17,20 @@
 
 | Role | Token | Value |
 | --- | --- | --- |
-| Page | `--bg` | `#07121b` |
-| Panel | `--panel` | `#0c1f28` |
-| Raised | `--panel-2` | `#102730` |
-| Text primary | `--ink` | `#e7f2f4` |
-| Text secondary | `--ink-soft` | `#a8bec4` |
-| Text muted | `--ink-faint` | `#8aa4ab` |
-| Accent | `--electric` | `#39d7ff` |
-| Warning | `--amber` | `#ffb347` |
-| Positive | `--green` | `#5bd6a2` |
-| Danger | `--rose` | `#ff6b6b` |
-| Cost series / reform execution | `--gold` | `#f2d06b` |
+| Page | `--bg` | `oklch(0.1765 0.025 243.87)` |
+| Panel | `--panel` | `oklch(0.2278 0.0304 230.63)` |
+| Raised | `--panel-2` | `oklch(0.2585 0.0335 225.88)` |
+| Text primary | `--ink` | `oklch(0.9535 0.012 209.8)` |
+| Text secondary | `--ink-soft` | `oklch(0.7867 0.0256 215.95)` |
+| Text muted | `--ink-faint` | `oklch(0.7012 0.0307 215.82)` |
+| Accent | `--electric` | `oklch(0.8167 0.1361 219.52)` |
+| Warning | `--amber` | `oklch(0.8208 0.1486 72.1)` |
+| Positive | `--green` | `oklch(0.7925 0.1341 162.76)` |
+| Danger | `--rose` | `oklch(0.7116 0.1812 22.84)` |
+| Cost series / reform execution | `--gold` | `oklch(0.8666 0.1262 91.02)` |
 
+Tokens are oklch, and components consume them through Tailwind utilities
+(`bg-panel`, `text-ink`, `border-line`) rather than one-off component CSS.
 Surfaces are neutral navy steps with hairline borders. The bright color belongs
 to the map, the charts and live status, not to the chrome. Electric cyan marks
 missions and the grid; gold marks money and structural reform, including the
@@ -58,6 +60,10 @@ sub-11 px data text, 44 px controls, visible focus and reduced-motion support.
 - **Policy**: active reforms first with gold 0-100% bars, then long-term
   missions, post-event decisions, available reforms and the private-branch
   warning.
+- **Quarter summary**: one energy figure and generation mix, a bottom-line
+  ledger, trust at quarter close, and a single continue action. It aggregates
+  the completed three months instead of repeating the latest month in stat
+  cards.
 - **Finance**: monthly ledger, annual audit and the structural-deficit
   diagnosis.
 

@@ -1,8 +1,9 @@
 import { For, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
-import { Badge, Bar, Panel, Stat } from "../components/base";
+import { Bar, Panel, Stat } from "../components/base";
 import { Icon } from "../components/icons";
+import { EmptyState } from "../components/empty-state";
 import { GenerationMix, RevenueCostChart, TrustTrendChart } from "../components/charts";
 import {
   formatBillion,
@@ -48,11 +49,7 @@ export const OverviewPanel = (): JSX.Element => {
               Mua điện cạnh tranh ở thượng nguồn, giữ cân bằng MW trên lưới truyền tải và bán điện
               theo biểu giá nhà nước. Mọi lựa chọn đều đổi lấy niềm tin hoặc nợ.
             </p>
-            <div class="hero-chips">
-              <Badge tone="gold">Sản xuất & mua điện</Badge>
-              <Badge tone="electric">Truyền tải</Badge>
-              <Badge tone="good">Phân phối</Badge>
-            </div>
+            <p class="mt-4 text-[11px] text-ink-faint">Sản xuất · Truyền tải · Phân phối</p>
           </div>
           <div class="overview-score">
             <span class="score-label">Lỗ lũy kế</span>
@@ -70,36 +67,73 @@ export const OverviewPanel = (): JSX.Element => {
             </span>
           </div>
         </div>
-        <div class="stat-grid">
-          <Stat
-            label="Doanh thu tháng"
-            value={formatBillion(revenueTotal())}
-            hint={`Điện: ${formatBillion(last()?.revenueElectricity ?? 0)} · Khác: ${formatBillion(last()?.revenueOther ?? 0)}`}
-            tone="gold"
-            icon="tabler:cash-banknote"
-          />
-          <Stat
-            label="Chi phí tháng"
-            value={formatBillion(costTotal())}
-            hint={`Cung ứng: ${formatBillion(last()?.costSupply ?? 0)} · Quản lý: ${formatBillion(last()?.costManagement ?? 0)}`}
-            tone="warn"
-            icon="tabler:report-money"
-          />
-          <Stat
-            label="Kết quả tháng"
-            value={formatSignedBillion(last()?.netResult ?? 0)}
-            hint={`Nợ: ${formatBillion(state().finance.debt)}`}
-            tone={(last()?.netResult ?? 0) >= 0 ? "good" : "bad"}
-            icon="lucide:trending-down"
-          />
-          <Stat
-            label="Điện thương phẩm"
-            value={formatEnergy(last()?.energySoldMillionKwh ?? 0)}
-            hint={`Phủ điện: ${formatPercent(totalCoverage(state()))}`}
-            tone="good"
-            icon="tabler:bolt"
-          />
-        </div>
+        <Show
+          when={last() !== undefined}
+          fallback={
+            <div class="mt-5 grid gap-5 border-t border-line pt-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+              <div>
+                <p class="text-sm font-medium text-ink">Tháng đầu tiên chưa chốt sổ</p>
+                <p class="mt-1 max-w-[52ch] text-xs leading-5 text-ink-faint">
+                  Bấm Tiếp tục để chạy tháng 1. Báo cáo tháng, biểu đồ sáu tháng và cơ cấu nguồn
+                  điện sẽ xuất hiện sau nhịp đầu tiên.
+                </p>
+              </div>
+              <dl class="grid grid-cols-2 gap-x-8 gap-y-3 text-right">
+                <div>
+                  <dt class="text-[11px] text-ink-faint">Ngân quỹ</dt>
+                  <dd class="mt-1 text-sm font-medium tabular-nums text-gold">
+                    {formatBillion(state().finance.cash)}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-[11px] text-ink-faint">Dư nợ</dt>
+                  <dd class="mt-1 text-sm font-medium tabular-nums text-amber">
+                    {formatBillion(state().finance.debt)}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-[11px] text-ink-faint">Phủ điện</dt>
+                  <dd class="mt-1 text-sm font-medium tabular-nums text-electric">
+                    {formatPercent(totalCoverage(state()))}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="text-[11px] text-ink-faint">Dự phòng</dt>
+                  <dd class="mt-1 text-sm font-medium tabular-nums text-green">
+                    {formatPercent(state().metrics.reserveMargin)}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          }
+        >
+          <div class="stat-grid">
+            <div class="stat" data-tone="gold">
+              <span class="stat-label">Doanh thu tháng</span>
+              <span class="stat-value">{formatBillion(revenueTotal())}</span>
+              <span class="stat-hint">
+                {`Điện: ${formatBillion(last()?.revenueElectricity ?? 0)} · Khác: ${formatBillion(last()?.revenueOther ?? 0)}`}
+              </span>
+            </div>
+            <div class="stat" data-tone="warn">
+              <span class="stat-label">Chi phí tháng</span>
+              <span class="stat-value">{formatBillion(costTotal())}</span>
+              <span class="stat-hint">
+                {`Cung ứng: ${formatBillion(last()?.costSupply ?? 0)} · Quản lý: ${formatBillion(last()?.costManagement ?? 0)}`}
+              </span>
+            </div>
+            <div class="stat" data-tone={(last()?.netResult ?? 0) >= 0 ? "good" : "bad"}>
+              <span class="stat-label">Kết quả tháng</span>
+              <span class="stat-value">{formatSignedBillion(last()?.netResult ?? 0)}</span>
+              <span class="stat-hint">{`Nợ: ${formatBillion(state().finance.debt)}`}</span>
+            </div>
+            <div class="stat" data-tone="good">
+              <span class="stat-label">Điện thương phẩm</span>
+              <span class="stat-value">{formatEnergy(last()?.energySoldMillionKwh ?? 0)}</span>
+              <span class="stat-hint">{`Phủ điện: ${formatPercent(totalCoverage(state()))}`}</span>
+            </div>
+          </div>
+        </Show>
       </Panel>
 
       <Panel
@@ -107,8 +141,16 @@ export const OverviewPanel = (): JSX.Element => {
         kicker="Sáu tháng gần nhất"
         icon="tabler:chart-bar"
       >
-        <RevenueCostChart rows={state().finance.monthlyHistory} />
-        <Show when={last() !== undefined}>
+        <Show
+          when={last() !== undefined}
+          fallback={
+            <EmptyState
+              title="Chưa có sổ tháng"
+              body="Biểu đồ doanh thu, chi phí và cơ cấu nguồn điện sẽ có dữ liệu sau tháng đầu tiên."
+            />
+          }
+        >
+          <RevenueCostChart rows={state().finance.monthlyHistory} />
           <div class="breakdown-grid">
             <div class="breakdown-card">
               <div class="breakdown-head">
@@ -137,7 +179,17 @@ export const OverviewPanel = (): JSX.Element => {
 
       <div class="split-grid">
         <Panel title="Cơ cấu nguồn điện" kicker="Tháng gần nhất" icon="tabler:plug-connected">
-          <GenerationMix rows={state().finance.monthlyHistory} />
+          <Show
+            when={last() !== undefined}
+            fallback={
+              <EmptyState
+                title="Chưa có cơ cấu nguồn"
+                body="Chạy tháng đầu tiên để xem tỷ trọng thủy điện, nhiệt điện, tái tạo và nhập khẩu."
+              />
+            }
+          >
+            <GenerationMix rows={state().finance.monthlyHistory} />
+          </Show>
           <div class="mini-grid">
             <Stat
               label="Độ tin cậy"
@@ -152,7 +204,17 @@ export const OverviewPanel = (): JSX.Element => {
           </div>
         </Panel>
         <Panel title="Hai chỉ số niềm tin" kicker="Hai mươi bốn tháng" icon="tabler:users">
-          <TrustTrendChart rows={state().finance.monthlyHistory} />
+          <Show
+            when={last() !== undefined}
+            fallback={
+              <EmptyState
+                title="Chưa có đường niềm tin"
+                body="Hai chỉ số sẽ được ghi lại sau tháng đầu tiên."
+              />
+            }
+          >
+            <TrustTrendChart rows={state().finance.monthlyHistory} />
+          </Show>
           <div class="mini-grid">
             <Stat
               label="Người dân"

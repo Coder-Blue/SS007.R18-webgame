@@ -24,11 +24,3 @@ export const PALETTE = {
   privateLine: 0xff8c5a,
   selection: 0x9bf3ff,
 } as const;
-
-export const CSS_COLORS = {
-  electric: "#39d7ff",
-  amber: "#ffb347",
-  lime: "#7ee787",
-  ink: "#07121b",
-  panel: "#0d2029",
-} as const;

@@ -442,6 +442,18 @@ test("mobile navigation opens the tariff sheet with large touch targets", async 
 test("chart and table legends do not overlap their plots", async ({ page }) => {
   test.skip((page.viewportSize()?.width ?? 0) < 1181, "analysis panels are desktop only");
   await startGame(page);
+  await page.getByRole("button", { name: "Tiếp tục mô phỏng" }).click();
+  await page.keyboard.press("3");
+  await expectMonth(page, "Tháng 2/2022");
+
+  if ((await page.locator(".event-modal").count()) > 0) {
+    await page.locator(".event-modal").getByRole("button", { name: "Chọn" }).first().click();
+  }
+
+  const pause = page.getByRole("button", { name: "Tạm dừng mô phỏng" });
+
+  if ((await pause.count()) > 0) await pause.click();
+
   await page.locator(".dock-tab").filter({ hasText: "Tổng quan" }).click();
 
   const overlaps = await page.evaluate(() => {

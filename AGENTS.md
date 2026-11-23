@@ -65,6 +65,11 @@ Valibot.
 
 ## Non-negotiable rules
 
+- **Tailwind first.** Compose UI with Tailwind utility classes in the Solid
+  component that renders it. Keep `src/styles/*.css` for theme tokens, resets,
+  UI SDK integration and shared primitives; do not add pane-specific CSS
+  blocks. Every color is an oklch token or an oklch literal, never hex or rgba
+  in UI code; Three.js material colors are numeric GPU uniforms.
 - **Zero classes.** No `class`, `this`, inheritance, or prototype mutation.
   Factories return closures and plain records. Signals and stores are the only
   sanctioned mutable edge.

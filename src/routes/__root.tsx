@@ -14,7 +14,7 @@ export const Route = createRootRoute({
         name: "viewport",
         content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5",
       },
-      { name: "theme-color", content: "#07121b" },
+      { name: "theme-color", content: "oklch(0.1765 0.025 243.87)" },
       {
         title: "Điều Hành Lưới Điện Quốc Gia · National Grid Command",
       },

@@ -12,6 +12,7 @@ import { ActionButton, Badge, Bar, IconButton, Stat } from "../components/base";
 import { Icon } from "../components/icons";
 import { formatBillion, formatPercent, formatPrice, formatSignedBillion } from "~/state/format";
 import { tariffPreview } from "~/domain";
+import { createHoldLease } from "./hold-lease";
 import type { ApprovalResult } from "~/state/game-store";
 
 export const ApprovalModal = (): JSX.Element => {
@@ -20,11 +21,11 @@ export const ApprovalModal = (): JSX.Element => {
   const approval = () => store.state().approval;
   const open = () => approval() !== null || result() !== null;
 
-  createTrackedEffect(() => {
-    store.setHold(open());
-  });
+  const hold = createHoldLease(store.setHold);
 
-  onCleanup(() => store.setHold(false));
+  createTrackedEffect(() => hold.sync(open()));
+
+  onCleanup(hold.release);
 
   const preview = () => {
     const request = approval();
@@ -44,6 +45,7 @@ export const ApprovalModal = (): JSX.Element => {
     if (approval() !== null) store.cancelApproval();
     store.clearApprovalResult();
     setResult(null);
+    hold.release();
   };
 
   return (
@@ -88,26 +90,22 @@ export const ApprovalModal = (): JSX.Element => {
                   label="Mức tăng"
                   value={formatPercent(approval()?.changePct ?? 0)}
                   tone="warn"
-                  icon="lucide:trending-up"
                 />
                 <Stat
                   label="Giá bình quân mới"
                   value={formatPrice(approval()?.average ?? 0)}
                   hint={`Hiện tại ${formatPrice(preview()?.before.averageTariff ?? 0)}`}
-                  icon="tabler:cash-banknote"
                 />
                 <Stat
                   label="Lãi/lỗ tháng"
                   value={formatSignedBillion(preview()?.after.netResult ?? 0)}
                   hint={`Hiện tại ${formatSignedBillion(preview()?.before.netResult ?? 0)}`}
                   tone={(preview()?.after.netResult ?? 0) >= 0 ? "good" : "bad"}
-                  icon="tabler:report-money"
                 />
                 <Stat
                   label="Khả năng chấp thuận"
                   value={formatPercent(approval()?.likelihood ?? 0)}
                   tone={(approval()?.likelihood ?? 0) >= 55 ? "good" : "bad"}
-                  icon="tabler:shield-check"
                 />
               </div>
               <div class="approval-audit">

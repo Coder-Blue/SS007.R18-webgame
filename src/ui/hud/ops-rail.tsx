@@ -118,8 +118,8 @@ export const OpsRail = (props: { readonly onOpenPanel: (panel: PanelId) => void 
         class="dock-panel"
       >
         <div class="balance-row">
-          <Stat label="Phụ tải" value={formatPower(demandMw())} icon="tabler:plug-connected" />
-          <Stat label="Công suất" value={formatPower(supplyMw())} icon="tabler:bolt" />
+          <Stat label="Phụ tải" value={formatPower(demandMw())} />
+          <Stat label="Công suất" value={formatPower(supplyMw())} />
         </div>
         <Bar value={balance()} tone={balance() >= 98 ? "good" : "bad"} label="Cân bằng cung cầu" />
         <div class="balance-meta">

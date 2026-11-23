@@ -1,5 +1,5 @@
 .speed-btn[data-active="true"] {
-  background: rgba(57, 215, 255, 0.14);
+  background: oklch(0.8167 0.1361 219.52 / 0.14);
   color: var(--electric);
 }
 
@@ -47,7 +47,7 @@
 
 .dock::-webkit-scrollbar-thumb,
 .workspace-drawer::-webkit-scrollbar-thumb {
-  background: rgba(120, 170, 185, 0.25);
+  background: oklch(0.708 0.0572 218.44 / 0.25);
   border-radius: 999px;
 }
 
@@ -57,7 +57,7 @@
 
 .bottom-dock {
   align-items: stretch;
-  background: rgba(8, 24, 32, 0.92);
+  background: oklch(0.1992 0.0271 231.88 / 0.92);
   border: 1px solid var(--line);
   border-radius: 14px;
   bottom: 14px;
@@ -87,7 +87,7 @@
 }
 
 .dock-tab:hover {
-  background: rgba(120, 170, 185, 0.1);
+  background: oklch(0.708 0.0572 218.44 / 0.1);
   color: var(--ink);
 }
 
@@ -98,7 +98,7 @@
 /* Mobile nav */
 
 .mobile-nav {
-  background: rgba(8, 24, 32, 0.96);
+  background: oklch(0.1992 0.0271 231.88 / 0.96);
   border-top: 1px solid var(--line);
   bottom: 0;
   display: none;
@@ -127,7 +127,7 @@
 }
 
 .mobile-tab:active {
-  background: rgba(57, 215, 255, 0.1);
+  background: oklch(0.8167 0.1361 219.52 / 0.1);
   color: var(--electric);
 }
 

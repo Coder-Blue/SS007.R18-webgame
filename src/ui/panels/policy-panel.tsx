@@ -292,26 +292,18 @@ export const PolicyPanel = (): JSX.Element => {
             label="Kiến nghị chính sách"
             value={state().policy.petitionDone ? "Đã hoàn tất" : "Chưa có"}
             tone={state().policy.petitionDone ? "good" : "warn"}
-            icon="lucide:file-text"
           />
-          <Stat
-            label="Năm hiện tại"
-            value={`${state().clock.year}`}
-            hint="N-2 mở từ 2024"
-            icon="lucide:calendar"
-          />
+          <Stat label="Năm hiện tại" value={`${state().clock.year}`} hint="N-2 mở từ 2024" />
           <Stat
             label="Nhánh"
             value={state().policy.branch === "state" ? "Nhà nước" : "Tư nhân hóa"}
             tone={state().policy.branch === "state" ? "good" : "bad"}
-            icon="tabler:route"
           />
           <Stat
             label="Giá trần"
             value={formatPercent(state().policy.priceCap ? 100 : 0)}
             hint={state().policy.priceCap ? "Đang giữ trần bán lẻ" : "Trần đã bị bãi bỏ"}
             tone={state().policy.priceCap ? "good" : "bad"}
-            icon="tabler:shield-check"
           />
         </div>
       </Panel>

@@ -7,6 +7,14 @@ the project uses semantic versioning for save-compatible releases.
 
 ### Changed
 
+- Replaced the quarterly stat-card grid with a quarter ledger that aggregates
+  three months, hides the monthly toast behind the modal, keeps the continue
+  action visible on mobile and drops decorative stat icons.
+- Moved the theme to oklch tokens and Tailwind utilities in components; the
+  summary, empty states and shared stat shell no longer carry one-off CSS.
+- Turned the tariff metrics into one ledger strip and kept the supplier badge
+  only on the selected quote; the analysis test now advances a month before
+  checking real charts and tables.
 - Replaced the house-and-bolt favicon with a transmission-pylon mark that
   carries the game's cyan grid, amber insulator nodes and green live-status dot;
   the set now ships an SVG, a 16/32/48/64 ICO, a 64 px PNG and a 180 px Apple
@@ -17,7 +25,7 @@ the project uses semantic versioning for save-compatible releases.
 - The title screen uses a lightweight CSS/SVG poster and renders the Three.js
   scene only during play, so the first visit does not pay for the renderer.
 - The game surface, save menu and tutorial are lazy chunks; the current initial
-  shell preloads 625.2 kB minified / 210.5 kB gzip with no Three.js or GSAP.
+  shell preloads 629.6 kB minified / 211.8 kB gzip with no Three.js or GSAP.
 - The title and HUD reserve their layout, preload the visible font weights, and
   expose named meters, a single main landmark, accessible mobile tabs and the
   reduced-motion switch.

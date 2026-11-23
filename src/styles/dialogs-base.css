@@ -1,6 +1,6 @@
 .modal-backdrop,
 .sheet-backdrop {
-  background: rgba(2, 8, 11, 0.66);
+  background: oklch(0.1269 0.016 221.61 / 0.66);
   inset: 0;
   position: fixed;
   z-index: 50;
@@ -67,26 +67,26 @@
 
 .event-choice {
   align-items: center;
-  background: rgba(4, 14, 19, 0.6);
+  background: oklch(0.1557 0.0199 228.03 / 0.6);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 12px;
 }
 
 .event-choice[data-tone="good"] {
-  border-color: rgba(91, 214, 162, 0.32);
+  border-color: oklch(0.7925 0.1341 162.76 / 0.32);
 }
 
 .event-choice[data-tone="gold"] {
-  border-color: rgba(242, 208, 107, 0.32);
+  border-color: oklch(0.8666 0.1262 91.02 / 0.32);
 }
 
 .event-choice[data-tone="warn"] {
-  border-color: rgba(255, 179, 71, 0.32);
+  border-color: oklch(0.8208 0.1486 72.1 / 0.32);
 }
 
 .event-choice[data-tone="bad"] {
-  border-color: rgba(255, 107, 107, 0.38);
+  border-color: oklch(0.7116 0.1812 22.84 / 0.38);
 }
 
 .event-choice-copy {
@@ -107,7 +107,7 @@
 }
 
 .approval-audit {
-  background: rgba(4, 14, 19, 0.55);
+  background: oklch(0.1557 0.0199 228.03 / 0.55);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   display: grid;
@@ -135,8 +135,8 @@
 
 .approval-result {
   align-items: flex-start;
-  background: rgba(91, 214, 162, 0.08);
-  border: 1px solid rgba(91, 214, 162, 0.32);
+  background: oklch(0.7925 0.1341 162.76 / 0.08);
+  border: 1px solid oklch(0.7925 0.1341 162.76 / 0.32);
   border-radius: var(--radius-sm);
   display: flex;
   gap: 12px;
@@ -144,8 +144,8 @@
 }
 
 .approval-result[data-result="refused"] {
-  background: rgba(255, 107, 107, 0.08);
-  border-color: rgba(255, 107, 107, 0.36);
+  background: oklch(0.7116 0.1812 22.84 / 0.08);
+  border-color: oklch(0.7116 0.1812 22.84 / 0.36);
 }
 
 .approval-result svg {
@@ -168,7 +168,7 @@
 }
 
 .tutorial-backdrop {
-  background: rgba(2, 8, 11, 0.45);
+  background: oklch(0.1269 0.016 221.61 / 0.45);
 }
 
 .tutorial-modal {
@@ -192,7 +192,7 @@
 }
 
 .tutorial-dot {
-  background: rgba(120, 170, 185, 0.2);
+  background: oklch(0.708 0.0572 218.44 / 0.2);
   border-radius: 999px;
   flex: 1;
   height: 4px;
@@ -203,7 +203,7 @@
 }
 
 .tutorial-dot[data-done="true"] {
-  background: rgba(57, 215, 255, 0.45);
+  background: oklch(0.8167 0.1361 219.52 / 0.45);
 }
 
 .tutorial-actions {
@@ -220,7 +220,7 @@
 }
 
 .workspace-drawer {
-  background: linear-gradient(180deg, #0b1f28, #07161e);
+  background: linear-gradient(180deg, oklch(0.2273 0.0312 229.57), oklch(0.191 0.0265 233.28));
   border-left: 1px solid var(--line-strong);
   box-shadow: var(--shadow-lift);
   bottom: 0;
@@ -257,7 +257,7 @@
 
 .slot-card {
   align-items: center;
-  background: rgba(4, 14, 19, 0.55);
+  background: oklch(0.1557 0.0199 228.03 / 0.55);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   display: flex;
@@ -297,8 +297,8 @@
 
 .autosave-row {
   align-items: center;
-  background: rgba(57, 215, 255, 0.06);
-  border: 1px solid rgba(57, 215, 255, 0.2);
+  background: oklch(0.8167 0.1361 219.52 / 0.06);
+  border: 1px solid oklch(0.8167 0.1361 219.52 / 0.2);
   border-radius: var(--radius-sm);
   display: flex;
   flex-wrap: wrap;
@@ -329,7 +329,7 @@
 
 .file-button {
   align-items: center;
-  background: rgba(120, 170, 185, 0.1);
+  background: oklch(0.708 0.0572 218.44 / 0.1);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
   color: var(--ink);
@@ -352,7 +352,7 @@
 
 .switch-label [role="switch"] {
   align-items: center;
-  background: rgba(120, 170, 185, 0.2);
+  background: oklch(0.708 0.0572 218.44 / 0.2);
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   display: inline-flex;
@@ -362,8 +362,8 @@
 }
 
 .switch-label [role="switch"][data-checked="true"] {
-  background: rgba(57, 215, 255, 0.25);
-  border-color: rgba(57, 215, 255, 0.5);
+  background: oklch(0.8167 0.1361 219.52 / 0.25);
+  border-color: oklch(0.8167 0.1361 219.52 / 0.5);
 }
 
 .switch-label [role="switch"] > * {
@@ -378,34 +378,6 @@
 .switch-label [role="switch"][data-checked="true"] > * {
   background: var(--electric);
   transform: translateX(22px);
-}
-
-.summary-modal {
-  max-width: min(680px, calc(100vw - 24px));
-}
-
-.summary-mix {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 12px 0;
-}
-
-.summary-trust {
-  display: grid;
-  gap: 6px;
-  grid-template-columns: minmax(0, 1fr);
-  margin-top: 8px;
-}
-
-.summary-trust > span {
-  align-items: center;
-  color: var(--ink-soft);
-  display: flex;
-  font-size: 12px;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 4px;
 }
 
 .tutorial-modal {
