@@ -244,7 +244,6 @@ export type EventEffects = {
   readonly demandDelta: number;
   readonly mediaMonths: number;
   readonly unlockDecisions: readonly DecisionId[];
-  readonly enablePolicy: readonly PolicyKey[];
   readonly setBranch?: Branch;
   readonly disablePriceCap: boolean;
 };

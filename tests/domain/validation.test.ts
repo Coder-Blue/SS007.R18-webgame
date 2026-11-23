@@ -73,6 +73,19 @@ describe("validation", () => {
     expect(parseGameState(reform(2, 0)).ok).toBe(false);
     expect(parseGameState(reform(5, 4)).ok).toBe(false);
     expect(parseGameState(reform(1.5, 4)).ok).toBe(false);
+
+    const duplicate = json({
+      ...initial,
+      policy: {
+        ...initial.policy,
+        reformProgress: [
+          { key: "n2" as const, monthsLeft: 2, totalMonths: 4 },
+          { key: "n2" as const, monthsLeft: 3, totalMonths: 4 },
+        ],
+      },
+    });
+
+    expect(parseGameState(duplicate).ok).toBe(false);
   });
 
   it("decodes a valid save file", () => {

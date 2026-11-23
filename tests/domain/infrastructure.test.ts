@@ -88,7 +88,6 @@ describe("event effects", () => {
         demandDelta: 1,
         mediaMonths: 3,
         unlockDecisions: ["keep-fuel"],
-        enablePolicy: ["n2", "nsmo", "dppa", "vrem", "twoPart"],
         setBranch: "private",
         disablePriceCap: true,
       }),
@@ -104,7 +103,6 @@ describe("event effects", () => {
     expect(next.zones.rural.coverage).toBe(100);
     expect(next.media.activeMonths).toBe(3);
     expect(next.events.decisions).toContain("keep-fuel");
-    expect(next.policy.n2Enabled).toBe(true);
     expect(next.policy.branch).toBe("private");
     expect(next.policy.priceCap).toBe(false);
   });

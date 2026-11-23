@@ -163,7 +163,6 @@ const noEffects = {
   demandDelta: 0,
   mediaMonths: 0,
   unlockDecisions: [],
-  enablePolicy: [],
   disablePriceCap: false,
 } as const;
 

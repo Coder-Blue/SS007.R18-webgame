@@ -129,6 +129,12 @@ describe("five-year playthrough", () => {
     expect(cumulative).toBeGreaterThan(-46_000);
     expect(state.finance.debt).toBeLessThan(100_000);
     expect(state.finance.debt).toBeGreaterThan(85_000);
+    expect(state.policy.n2Enabled).toBe(true);
+    expect(state.policy.nsmo).toBe(true);
+    expect(state.policy.dppa).toBe(true);
+    expect(state.policy.vrem).toBe(true);
+    expect(state.policy.twoPartTariff).toBe(true);
+    expect(state.policy.reformProgress).toEqual([]);
     expect(state.ending).not.toBeNull();
   });
 

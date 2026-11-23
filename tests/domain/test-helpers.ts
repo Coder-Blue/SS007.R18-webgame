@@ -58,7 +58,6 @@ export const effects = (overrides: Partial<EventEffects> = {}): EventEffects => 
   demandDelta: 0,
   mediaMonths: 0,
   unlockDecisions: [],
-  enablePolicy: [],
   disablePriceCap: false,
   ...overrides,
 });
