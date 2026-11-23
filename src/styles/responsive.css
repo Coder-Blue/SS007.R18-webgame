@@ -367,7 +367,7 @@
   }
 }
 
-@media (min-width: 1340px) {
+@media (min-width: 1181px) {
   html[data-tour="open"] .workspace-drawer {
     width: min(840px, 60vw);
   }

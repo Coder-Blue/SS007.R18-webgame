@@ -18,6 +18,13 @@ const reduced = (): boolean => {
   return document.documentElement.dataset.motion === "reduced";
 };
 
+const rectOf = (element: Element | null): ScreenRect | null => {
+  if (element === null) return null;
+  const rect = element.getBoundingClientRect();
+
+  return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom };
+};
+
 export const PowerCanvas = (props: {
   readonly onSelect: (selection: SceneSelection) => void;
 }): JSX.Element => {
@@ -28,11 +35,13 @@ export const PowerCanvas = (props: {
   const [unavailable, setUnavailable] = createSignal(false);
   const [tourNode, setTourNode] = createSignal<SceneSelection | null>(null);
   const [tourPoint, setTourPoint] = createSignal<TourAnchor>({ x: 0, y: 0 });
+  const [tourAnchored, setTourAnchored] = createSignal(false);
   let canvas: HTMLCanvasElement | undefined;
   let container: HTMLDivElement | undefined;
   let controller: PowerScene | null = null;
   let tourTarget: SceneSelection | null = null;
   let tourFocus: TourAnchor = { x: 0, y: 0 };
+  let settleFrame: number | undefined;
 
   createTrackedEffect(() => {
     if (!ready()) return;
@@ -102,28 +111,7 @@ export const PowerCanvas = (props: {
       timer = setTimeout(load, FALLBACK_DELAY_MS);
     };
 
-    const rectOf = (element: Element | null): ScreenRect | null => {
-      if (element === null) return null;
-      const rect = element.getBoundingClientRect();
-
-      return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom };
-    };
-
-    const onTour = (event: Event): void => {
-      // SAFETY: only the tutorial dispatches this event, always with a SceneSelection or null.
-      const selection = (event as CustomEvent<SceneSelection | null>).detail ?? null;
-
-      tourTarget = selection;
-      setTourNode(selection);
-
-      if (selection === null) {
-        tourFocus = { x: 0, y: 0 };
-        setTourPoint(tourFocus);
-        controller?.focusSelection(null);
-
-        return;
-      }
-
+    const applyTourFocus = (selection: SceneSelection): void => {
       const drawer = document.querySelector(".workspace-drawer");
       const tutorial = document.querySelector(".tutorial-modal");
       const rail = document.querySelector(".dock-left");
@@ -136,15 +124,84 @@ export const PowerCanvas = (props: {
 
       tourFocus = anchor;
       setTourPoint(anchor);
+      setTourAnchored(true);
       controller?.focusSelection(selection, anchor);
     };
 
+    const focusTourWhenSettled = (selection: SceneSelection): void => {
+      if (settleFrame !== undefined) cancelAnimationFrame(settleFrame);
+
+      const wide = window.matchMedia("(min-width: 1340px)").matches;
+      const started = performance.now();
+      let lastLeft: number | null = null;
+      let stable = 0;
+
+      const step = (now: number): void => {
+        const drawer = document.querySelector(".workspace-drawer");
+
+        if (drawer === null) {
+          if (wide && now - started < 600) {
+            settleFrame = requestAnimationFrame(step);
+
+            return;
+          }
+
+          applyTourFocus(selection);
+
+          return;
+        }
+
+        const left = drawer.getBoundingClientRect().left;
+
+        stable = lastLeft !== null && Math.abs(left - lastLeft) < 0.5 ? stable + 1 : 0;
+        lastLeft = left;
+
+        if (stable >= 2 || now - started > 1_200) {
+          applyTourFocus(selection);
+
+          return;
+        }
+
+        settleFrame = requestAnimationFrame(step);
+      };
+
+      settleFrame = requestAnimationFrame(step);
+    };
+
+    const onTour = (event: Event): void => {
+      // SAFETY: only the tutorial dispatches this event, always with a SceneSelection or null.
+      const selection = (event as CustomEvent<SceneSelection | null>).detail ?? null;
+
+      tourTarget = selection;
+      setTourNode(selection);
+      setTourAnchored(false);
+
+      if (selection === null) {
+        if (settleFrame !== undefined) cancelAnimationFrame(settleFrame);
+        tourFocus = { x: 0, y: 0 };
+        setTourPoint(tourFocus);
+        controller?.focusSelection(null);
+
+        return;
+      }
+
+      focusTourWhenSettled(selection);
+    };
+
+    const onResize = (): void => {
+      if (tourTarget !== null) focusTourWhenSettled(tourTarget);
+    };
+
     window.addEventListener("grid:tour-focus", onTour);
+    window.addEventListener("resize", onResize);
     frame = requestAnimationFrame(schedule);
 
     return () => {
       cancelled = true;
       window.removeEventListener("grid:tour-focus", onTour);
+      window.removeEventListener("resize", onResize);
+
+      if (settleFrame !== undefined) cancelAnimationFrame(settleFrame);
 
       if (frame !== undefined) cancelAnimationFrame(frame);
 
@@ -229,7 +286,7 @@ export const PowerCanvas = (props: {
           <span>Căn lại góc nhìn</span>
         </button>
       </div>
-      <Show when={tourNode()}>
+      <Show when={tourAnchored() ? tourNode() : null}>
         {(selection) => (
           <div
             class="scene-tour-focus"

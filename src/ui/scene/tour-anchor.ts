@@ -39,7 +39,11 @@ export const tourAnchor = (
   const candidates: TourAnchor[] = [];
 
   if (drawer !== null && rail !== null && drawer.left - rail.right > 120) {
-    candidates.push({ x: (rail.right + drawer.left) / 2, y: height / 2 });
+    const gapX = (rail.right + drawer.left) / 2;
+
+    candidates.push({ x: gapX, y: height / 2 });
+
+    if (tutorial !== null) candidates.push({ x: gapX, y: tutorial.top / 2 });
   }
 
   if (drawer !== null && drawer.left > 320) {
@@ -76,7 +80,9 @@ export const tourAnchor = (
 
     const blockedByTutorial = tutorial !== null && contains(tutorial, candidate.x, candidate.y);
 
-    return !blockedByDrawer && !blockedByTutorial;
+    const blockedByRail = rail !== null && contains(rail, candidate.x, candidate.y);
+
+    return !blockedByDrawer && !blockedByTutorial && !blockedByRail;
   });
 
   const point = free ?? { x: width / 2, y: height / 2 };

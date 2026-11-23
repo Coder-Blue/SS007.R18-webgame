@@ -99,6 +99,44 @@ export const TutorialModal = (props: {
   let stepTimer: ReturnType<typeof setTimeout> | undefined;
   const current = () => steps[step()] ?? steps[0];
 
+  const focusWhenSettled = (): void => {
+    const started = performance.now();
+    let lastLeft: number | null = null;
+    let stable = 0;
+
+    const tick = (now: number): void => {
+      if (!props.open) return;
+
+      const content = document.querySelector<HTMLElement>(".tutorial-modal");
+      const drawer = document.querySelector<HTMLElement>(".workspace-drawer");
+
+      if (content === null) return;
+
+      if (drawer === null && now - started < 600) {
+        requestAnimationFrame(tick);
+
+        return;
+      }
+
+      if (drawer !== null) {
+        const left = drawer.getBoundingClientRect().left;
+
+        stable = lastLeft !== null && Math.abs(left - lastLeft) < 0.5 ? stable + 1 : 0;
+        lastLeft = left;
+
+        if (stable < 2 && now - started < 600) {
+          requestAnimationFrame(tick);
+
+          return;
+        }
+      }
+
+      content.focus({ preventScroll: true });
+    };
+
+    requestAnimationFrame(tick);
+  };
+
   createTrackedEffect(() => {
     store.setHold(props.open);
     document.documentElement.dataset.tour = props.open ? "open" : "";
@@ -118,9 +156,7 @@ export const TutorialModal = (props: {
 
     if (active?.panel !== undefined && wide) {
       props.onOpenPanel(active.panel);
-      requestAnimationFrame(() =>
-        document.querySelector<HTMLElement>(".tutorial-modal")?.focus({ preventScroll: true }),
-      );
+      focusWhenSettled();
     } else {
       props.onClosePanel();
     }

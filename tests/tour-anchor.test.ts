@@ -44,6 +44,21 @@ describe("tour anchor", () => {
     expect(point.y).toBeLessThan(320);
   });
 
+  it("keeps the focus between the rail and a short desktop drawer", () => {
+    const anchor = tourAnchor(1366, 768, {
+      drawer: { left: 546, top: 0, right: 1366, bottom: 768 },
+      rail: { left: 14, top: 100, right: 314, bottom: 680 },
+      tutorial: { left: 24, top: 360, right: 464, bottom: 672 },
+    });
+
+    const point = inside(anchor, 1366, 768);
+
+    expect(point.x).toBeGreaterThan(314);
+    expect(point.x).toBeLessThan(546);
+    expect(point.y).toBeGreaterThan(100);
+    expect(point.y).toBeLessThan(360);
+  });
+
   it("keeps the centre when no overlay covers it", () => {
     expect(tourAnchor(1440, 900, {})).toEqual({ x: 0, y: 0 });
   });
