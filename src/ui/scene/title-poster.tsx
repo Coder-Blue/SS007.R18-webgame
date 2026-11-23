@@ -7,11 +7,6 @@ export const TitlePoster = (): JSX.Element => (
       <g class="poster-tower">
         <path d="M1050 780 L1120 260 L1190 780 M1085 580 L1155 580 M1070 680 L1170 680 M1100 400 L1140 400" />
       </g>
-      <g class="poster-cable">
-        <path d="M780 300 C 900 380, 1040 340, 1120 280" />
-        <path d="M780 340 C 900 430, 1040 380, 1120 320" />
-        <path d="M780 380 C 900 470, 1040 420, 1120 360" />
-      </g>
       <g class="poster-node">
         <circle cx="1120" cy="260" r="5" />
         <circle cx="960" cy="420" r="4" />

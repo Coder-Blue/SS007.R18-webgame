@@ -61,12 +61,6 @@
   stroke-width: 2;
 }
 
-.poster-cable path {
-  fill: none;
-  stroke: oklch(0.8167 0.1361 219.52 / 0.32);
-  stroke-width: 1.5;
-}
-
 .poster-node circle {
   fill: var(--electric);
 }
