@@ -87,10 +87,10 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
 1 passed
 ```
 
-The final `main` push workflow passed both gates: lint in 23 s, and
-`unit and build` plus `browser` in 6m35s. Its production smoke run reported
-12 passed / 1 skipped, and the responsive browser run reported 70 passed /
-14 skipped.
+The final `main` push workflow for the polish merge passed both gates: lint in
+22 s, and `unit and build` plus `browser` in 8m52s. Its production smoke run
+reported 14 passed / 1 skipped, and the responsive browser run reported 70
+passed / 14 skipped.
 
 The headless shell exposes no WebGL in this container, so the scene factory
 shows the graceful `Bản đồ 3D cần WebGL` fallback during E2E. The same scene is
