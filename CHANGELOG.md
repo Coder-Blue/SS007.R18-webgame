@@ -25,7 +25,7 @@ the project uses semantic versioning for save-compatible releases.
 - The title screen uses a lightweight CSS/SVG poster and renders the Three.js
   scene only during play, so the first visit does not pay for the renderer.
 - The game surface, save menu and tutorial are lazy chunks; the current initial
-  shell preloads 629.6 kB minified / 211.8 kB gzip with no Three.js or GSAP.
+  shell preloads 630.5 kB minified / 212.2 kB gzip with no Three.js or GSAP.
 - The title and HUD reserve their layout, preload the visible font weights, and
   expose named meters, a single main landmark, accessible mobile tabs and the
   reduced-motion switch.
@@ -36,6 +36,10 @@ the project uses semantic versioning for save-compatible releases.
   dynamic `robots.txt` for the public deployment.
 
 ### Design
+
+- Rebuilt the title as an asymmetric operations briefing: the title, role and
+  actions sit left over a quiet grid, while the four acts form a vertical route
+  timeline. Removed the centered pill hero, four equal cards and poster glow.
 
 - Applied a second UI polish pass: gold reform progress across the HUD and
   policy panel, active reforms ordered first, mobile pause/toast clearance under

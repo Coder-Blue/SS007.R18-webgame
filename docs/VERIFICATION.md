@@ -51,7 +51,7 @@ pnpm check:bundle
 ```
 
 All 15 client chunks are below 500 kB minified. The initial shell preloads
-629.6 kB minified / 211.8 kB gzip and contains no Three.js or GSAP. The deferred
+630.5 kB minified / 212.2 kB gzip and contains no Three.js or GSAP. The deferred
 `create-power-scene-*.js` chunk is loaded only after the game starts.
 
 ## Favicon set
@@ -82,7 +82,9 @@ Tests       185 passed (185)
 Playwright  78 passed, 14 skipped
 ```
 
-The summary selector tests cover two- and three-month windows, previous-quarter
+The title is an asymmetric briefing: the route timeline replaces the centered
+four-card hero, and the poster keeps one transmission tower with no glow. The
+summary selector tests cover two- and three-month windows, previous-quarter
 comparison, zero-energy tariff fallback and closing balance selection. A
 hold-lease unit test covers the approval guard so a closed approval cannot
 release a hold owned by another modal. The
