@@ -162,13 +162,13 @@
 }
 
 .sheet-tabs {
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  padding: 8px 12px;
+  background: var(--panel);
   border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
   position: sticky;
   top: 57px;
-  background: var(--panel);
   z-index: 2;
 }
