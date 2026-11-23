@@ -73,9 +73,9 @@ versioned document links at every viewport.
 The theme now uses oklch tokens and Tailwind utilities in components. The
 quarter summary aggregates the last three ledgers into one report; its monthly
 toast is suppressed, its continue action is sticky on mobile, and the
-generation mix shares always sum to 100. Overview and finance empty states, the grid action hierarchy and the
-tariff/supplier strips were rewritten with Tailwind utilities and shared empty
-states.
+generation mix shares always sum to 100. Overview and finance empty states and the tariff/supplier strips were rewritten
+with Tailwind utilities and shared empty states. The grid action hierarchy was
+quieted through the shared ActionButton primitive.
 
 ```
 Tests       185 passed (185)

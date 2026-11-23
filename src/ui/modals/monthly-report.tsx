@@ -86,13 +86,7 @@ export const MonthlyReport = (): JSX.Element => {
 
   return (
     <Show when={visible() && ledger() !== undefined && !blocked()}>
-      <aside
-        class="monthly-toast"
-        role="status"
-        aria-live="polite"
-        data-hold={store.hold() ? "true" : "false"}
-        data-blocked={blocked() ? "true" : "false"}
-      >
+      <aside class="monthly-toast" role="status" aria-live="polite">
         <div class="monthly-head">
           <div>
             <p class="eyebrow">Báo cáo tháng</p>

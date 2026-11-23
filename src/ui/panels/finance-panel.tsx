@@ -45,7 +45,7 @@ export const FinancePanel = (): JSX.Element => {
                 : formatBillion(state().finance.accumulatedLoss)
             }
             hint="Mục tiêu cấu trúc 5 năm"
-            tone="bad"
+            tone={state().finance.accumulatedLoss > 0 ? "bad" : "neutral"}
           />
           <Show when={recovery().eligibleLoss > 0}>
             <Stat
