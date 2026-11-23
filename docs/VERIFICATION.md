@@ -51,7 +51,7 @@ pnpm check:bundle
 ```
 
 All 15 client chunks are below 500 kB minified. The initial shell preloads
-624.8 kB minified / 210.4 kB gzip and contains no Three.js or GSAP. The deferred
+624.8 kB minified / 210.3 kB gzip and contains no Three.js or GSAP. The deferred
 `create-power-scene-*.js` chunk is loaded only after the game starts.
 
 ## Browser matrix
@@ -67,11 +67,15 @@ the short-wide tour check outside the desktop project, and the production-chunk
 test in dev mode. The suite covers `1440x900`, `1366x768`, `768x1024`, `390x844`
 and `360x740`, no horizontal overflow, 44 px controls,
 mobile speed selectors and reserve, pause/resume, month advance, tutorial panel
-tours with an uncovered scene focus anchor, tutorial reset, live map text
-summaries, the WebGL fallback dashboard action, mobile overlay clearance,
+tours with an uncovered scene focus anchor, tutorial reset, hidden map text
+descriptions, the WebGL fallback dashboard action, mobile overlay clearance
+(scene badges 172, toast 210, pause 280 at 390x844 and 360x740; 168/206/250 at
+768x1024),
 save/reload/continue, scene chunk deferral and failure recovery, named meters,
 Iconify without API calls, OG metadata, chart/table overlap assertions and
-screenshots.
+screenshots. A CDP accessibility probe at 1440x900 returned one image node named
+"Bản đồ lưới điện quốc gia" with the full coverage/weather/reserve/reform
+description and no duplicate paragraph in the reading order.
 
 The production chunk check was also run against the built server:
 

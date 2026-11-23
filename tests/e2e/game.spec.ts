@@ -339,6 +339,7 @@ test("title and first month stay inside every viewport", async ({ page }) => {
   await expect(page.locator(".power-canvas")).toBeVisible();
   await expect(page.locator(".power-canvas")).toHaveAttribute("aria-describedby", "scene-summary");
   await expect(page.locator("#scene-summary")).toContainText("phủ điện");
+  await expect(page.locator("#scene-summary")).toBeHidden();
   await expectNoOverflow(page);
   await expectMonth(page, "Tháng 1/2022");
 });

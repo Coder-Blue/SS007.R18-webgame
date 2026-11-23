@@ -70,8 +70,8 @@ pointer handlers. `plants.ts` owns hydro dams, thermal stacks, solar/wind farms,
 substations and city/industrial/rural loads. `grid-lines.ts` owns transmission
 corridors, flow pulses, DPPA feeds and the duplicate private lines.
 `weather.ts` owns sky, fog, sun, rain and reservoir level. A gold beacon over the
-urban load grows with aggregate reform execution. The canvas exposes a live
-screen-reader summary, and its WebGL fallback links back to the overview panel.
+urban load grows with aggregate reform execution. The canvas exposes a hidden
+screen-reader description, and its WebGL fallback links back to the overview panel.
 GSAP cameras and seasonal tweens are closures, never classes.
 
 ### `src/ui/`

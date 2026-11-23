@@ -259,7 +259,7 @@ export const PowerCanvas = (props: {
         aria-describedby="scene-summary"
         role="img"
       />
-      <p id="scene-summary" class="sr-only">
+      <p id="scene-summary" hidden>
         {sceneSummary()}
       </p>
       <div class="scene-vignette" />

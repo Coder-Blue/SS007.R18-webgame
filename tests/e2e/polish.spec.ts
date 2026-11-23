@@ -12,26 +12,44 @@ const startGame = async (page: Page): Promise<void> => {
 test("keeps pause and scene badges below the top bar", async ({ page }) => {
   await startGame(page);
 
+  await expect(page.locator(".toast")).toBeVisible();
+
   const boxes = await page.evaluate(() => {
     const rect = (selector: string) => {
       const element = document.querySelector(selector);
 
-      if (element === null) return null;
+      if (element === null) throw new Error(`missing ${selector}`);
       const box = element.getBoundingClientRect();
 
-      return { top: box.top, bottom: box.bottom };
+      return { top: box.top, bottom: box.bottom, left: box.left, right: box.right };
     };
 
     return {
       topBar: rect(".top-bar"),
       paused: rect(".paused-banner"),
       badges: rect(".scene-badges"),
+      toast: rect(".toast"),
     };
   });
 
-  if (boxes.paused) expect(boxes.paused.top).toBeGreaterThanOrEqual(boxes.topBar?.bottom ?? 0);
+  const overlaps = (
+    left: { left: number; right: number },
+    right: { left: number; right: number },
+  ) => left.left < right.right && right.left < left.right;
 
-  if (boxes.badges) expect(boxes.badges.top).toBeGreaterThanOrEqual(boxes.topBar?.bottom ?? 0);
+  expect(boxes.badges.top).toBeGreaterThanOrEqual(boxes.topBar.bottom);
+  expect(boxes.toast.top).toBeGreaterThanOrEqual(boxes.topBar.bottom);
+  expect(boxes.paused.top).toBeGreaterThanOrEqual(boxes.topBar.bottom);
+
+  if (overlaps(boxes.badges, boxes.toast)) {
+    expect(boxes.toast.top).toBeGreaterThanOrEqual(boxes.badges.bottom);
+  }
+
+  if (overlaps(boxes.toast, boxes.paused)) {
+    expect(boxes.paused.top).toBeGreaterThanOrEqual(boxes.toast.bottom);
+  } else if (overlaps(boxes.badges, boxes.paused)) {
+    expect(boxes.paused.top).toBeGreaterThanOrEqual(boxes.badges.bottom);
+  }
 });
 
 test("offers the dashboard from the WebGL fallback", async ({ page }) => {

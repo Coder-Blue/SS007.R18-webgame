@@ -97,11 +97,11 @@
   }
 
   .toast {
-    top: 168px;
+    top: 206px;
   }
 
   .paused-banner {
-    top: 206px;
+    top: 250px;
   }
 }
 
@@ -226,12 +226,12 @@
   .paused-banner {
     flex-wrap: wrap;
     justify-content: center;
-    top: 236px;
+    top: 280px;
     width: calc(100vw - 20px);
   }
 
   .toast {
-    top: 172px;
+    top: 210px;
   }
 
   .paused-hint {

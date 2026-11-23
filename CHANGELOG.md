@@ -12,7 +12,7 @@ the project uses semantic versioning for save-compatible releases.
 - The title screen uses a lightweight CSS/SVG poster and renders the Three.js
   scene only during play, so the first visit does not pay for the renderer.
 - The game surface, save menu and tutorial are lazy chunks; the current initial
-  shell preloads 624.8 kB minified / 210.4 kB gzip with no Three.js or GSAP.
+  shell preloads 624.8 kB minified / 210.3 kB gzip with no Three.js or GSAP.
 - The title and HUD reserve their layout, preload the visible font weights, and
   expose named meters, a single main landmark, accessible mobile tabs and the
   reduced-motion switch.
@@ -26,7 +26,7 @@ the project uses semantic versioning for save-compatible releases.
 
 - Applied a second UI polish pass: gold reform progress across the HUD and
   policy panel, active reforms ordered first, mobile pause/toast clearance under
-  the expanded top bar, a live map text summary for screen readers and a
+  the expanded top bar, a hidden map text description for screen readers and a
   dashboard action in the WebGL fallback.
 - Applied the unslop pass to the title, HUD, docks, panels, tables, modals and
   mobile sheet: quieter chrome, 4px spacing, sentence-case labels, metric-weight
