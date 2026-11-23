@@ -28,15 +28,15 @@ Observed sub-results:
 
 ```
 Line budget: OK (owned source files <= 500 lines; 36 vendored files exempt)
-Emoji audit: OK (159 text files scanned)
-Domain boundary: OK (31 pure files)
+Emoji audit: OK (164 text files scanned)
+Domain boundary: OK (32 pure files)
 Test Files  22 passed (22)
-Tests       170 passed (170)
+Tests       171 passed (171)
 
-Statements   : 100% (828/828)
-Branches     : 100% (470/470)
-Functions    : 100% (161/161)
-Lines        : 100% (710/710)
+Statements   : 100% (826/826)
+Branches     : 100% (460/460)
+Functions    : 100% (160/160)
+Lines        : 100% (709/709)
 ```
 
 The deterministic 60-month playthrough test completes at full coverage with a
@@ -59,7 +59,7 @@ All 15 client chunks are below 500 kB minified. The initial shell preloads
 ```
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
   pnpm exec playwright test
-61 passed, 11 skipped
+62 passed, 14 skipped
 ```
 
 The skipped checks are desktop-only workspace/overlap tests on mobile projects
@@ -83,8 +83,8 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
 
 The final `main` push workflow passed both gates: lint in 23 s, and
 `unit and build` plus `browser` in 6m35s. Its production smoke run reported
-12 passed / 1 skipped, and the responsive browser run reported 61 passed /
-11 skipped.
+12 passed / 1 skipped, and the responsive browser run reported 62 passed /
+14 skipped.
 
 The headless shell exposes no WebGL in this container, so the scene factory
 shows the graceful `Bản đồ 3D cần WebGL` fallback during E2E. The same scene is
