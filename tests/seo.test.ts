@@ -20,7 +20,7 @@ const faviconSource = readSource("../public/favicon.svg");
 
 describe("production metadata", () => {
   test("uses the deployed host for absolute URLs", () => {
-    expect(siteSource).toContain("https://monopoly-nhom5.vercel.app");
+    expect(siteSource).toContain("https://monopoly-nhom7.vercel.app");
     expect(siteSource).not.toContain("ss007-r18-webgame.vercel.app");
     expect(rootSource).not.toContain("ss007-r18-webgame.vercel.app");
   });
