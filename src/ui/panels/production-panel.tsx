@@ -94,11 +94,9 @@ export const ProductionPanel = (): JSX.Element => {
               >
                 <div class="supplier-head">
                   <span class="supplier-kind">{supplierLabel[supplier.kind]}</span>
-                  <Badge
-                    tone={supplier.id === state().operations.supplierId ? "electric" : "neutral"}
-                  >
-                    {supplier.id === state().operations.supplierId ? "Đang chọn" : "Chào giá"}
-                  </Badge>
+                  <Show when={supplier.id === state().operations.supplierId}>
+                    <Badge tone="electric">Đang chọn</Badge>
+                  </Show>
                 </div>
                 <strong>{formatPrice(supplier.priceVndPerKwh)}</strong>
                 <span class="supplier-meta">
@@ -124,7 +122,7 @@ export const ProductionPanel = (): JSX.Element => {
           >
             <div class="preview-head">
               <span>Dự đoán đổi nhà cung cấp</span>
-              <Badge tone="electric">Trước → Sau</Badge>
+              <Badge tone="neutral">Trước và sau</Badge>
             </div>
             <div class="preview-grid">
               <div>
@@ -245,7 +243,7 @@ export const ProductionPanel = (): JSX.Element => {
         >
           <div class="preview-head">
             <span>Dự đoán kết quả tức thì</span>
-            <Badge tone="electric">Trước → Sau</Badge>
+            <Badge tone="neutral">Trước và sau</Badge>
           </div>
           <div class="preview-grid">
             <div>
