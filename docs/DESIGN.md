@@ -66,7 +66,7 @@ sub-11 px data text, 44 px controls, visible focus and reduced-motion support.
 - Tablet `768x1024`: rails hidden, mobile tab bar, bottom-sheet panels.
 - Mobile `390x844` and narrow `360x740`: five-item bottom navigation (overview,
   production, transmission, distribution, finance), all six sheet tabs wrap into
-  two rows so every panel is reachable, 44 px targets.
+  two or three rows so every panel is reachable, 44 px targets.
 - Scene badges clear the expanded mobile top bar at 172 px, toasts follow at
   210 px and the paused banner stacks at 280 px. Tablet uses 168/206/270 and
   desktop pauses at 168; the mobile WebGL fallback shifts below the pause pill. The tutorial begins below the bar at 158 px.
