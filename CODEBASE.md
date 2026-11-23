@@ -80,7 +80,8 @@ Presentational Solid components with Vietnamese copy written inline. The HUD is
 desktop-persistent and mobile-compact. The top bar owns the pause/resume button,
 speed selectors and five live gauges. Side rails show active reform bars, long-term
 missions, press pressure, MW balance and project progress; the policy panel
-promotes in-flight reforms above available and enabled ones. The bottom dock opens an accessible
+promotes in-flight reforms above available and enabled ones. The mobile sheet
+wraps all six tabs and switches panels reactively. The bottom dock opens an accessible
 right drawer with six panels: overview, production, grid, tariffs, policy and
 finance. The five-step tutorial opens the production, grid and tariff panels on
 wide desktop (1340 px and up), narrows the drawer to keep the map visible,

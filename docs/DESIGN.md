@@ -65,11 +65,11 @@ sub-11 px data text, 44 px controls, visible focus and reduced-motion support.
   rail, bottom dock, right workspace drawer.
 - Tablet `768x1024`: rails hidden, mobile tab bar, bottom-sheet panels.
 - Mobile `390x844` and narrow `360x740`: five-item bottom navigation (overview,
-  production, transmission, distribution, finance), all panels reachable from
-  the sheet tabs, 44 px targets. The policy panel is one sheet tab away.
+  production, transmission, distribution, finance), all six sheet tabs wrap into
+  two rows so every panel is reachable, 44 px targets.
 - Scene badges clear the expanded mobile top bar at 172 px, toasts follow at
-  210 px and the paused banner stacks at 280 px. Tablet uses 168/206/250 and
-  desktop pauses at 168. The tutorial begins below the bar at 158 px.
+  210 px and the paused banner stacks at 280 px. Tablet uses 168/206/270 and
+  desktop pauses at 168; the mobile WebGL fallback shifts below the pause pill. The tutorial begins below the bar at 158 px.
 - The 3D canvas uses `touch-action: none`, pointer drag, wheel zoom and pinch
   zoom. Its `img` role references a hidden text description of coverage, weather,
   reserve and active reforms, and the WebGL fallback offers a dashboard action.
