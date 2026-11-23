@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { WIDE_DESKTOP_MIN } from "../../src/ui/tour-config";
 
 const startGame = async (page: Page): Promise<void> => {
   await page.goto("/");
@@ -137,6 +138,127 @@ test("loads the scene from a deferred production chunk", async ({ page }) => {
   await expect.poll(() => sceneChunks.length, { timeout: 15_000 }).toBeGreaterThan(0);
   await expect(page.locator(".scene-loading")).toHaveCount(0, { timeout: 20_000 });
   await expect(page.locator(".power-canvas")).toHaveCount(1);
+});
+
+const expectFreeTourFocus = async (page: Page, node: string) => {
+  await expect(page.locator(`.scene-tour-focus[data-tour-node="${node}"]`)).toBeVisible();
+
+  const geometry = await page.evaluate(() => {
+    const chip = document.querySelector<HTMLElement>(".scene-tour-focus");
+
+    if (chip === null) return null;
+    const x = (Number(chip.dataset.anchorX) + 0.5) * window.innerWidth;
+    const y = (Number(chip.dataset.anchorY) + 0.5) * window.innerHeight;
+    const top = document.elementFromPoint(x, y);
+
+    return {
+      x,
+      y,
+      overDrawer: top?.closest(".workspace-drawer") !== null,
+      overTutorial: top?.closest(".tutorial-modal") !== null,
+      overRail: top?.closest(".dock-left") !== null,
+    };
+  });
+
+  expect(geometry).not.toBeNull();
+  expect(geometry?.overDrawer).toBe(false);
+  expect(geometry?.overTutorial).toBe(false);
+  expect(geometry?.overRail).toBe(false);
+
+  return geometry;
+};
+
+test("walks the tutorial through live panels and map nodes", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Bắt đầu nhiệm kỳ/i }).click();
+  await page.evaluate(() => {
+    window.addEventListener("grid:tour-focus", (event) => {
+      document.body.dataset.tourTarget = event instanceof CustomEvent ? String(event.detail) : "";
+    });
+  });
+
+  const tutorial = page.locator(".tutorial-modal");
+  await expect(tutorial).toBeVisible();
+  const width = page.viewportSize()?.width ?? 0;
+  const desktop = width >= WIDE_DESKTOP_MIN;
+
+  test.skip(width > 1180 && !desktop, "panels auto-open only from 1340 px");
+
+  await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
+
+  if (desktop) {
+    await expect(page.locator(".workspace-drawer")).toBeVisible();
+    await expect(page.locator('[data-tutorial="production-panel"]')).toBeVisible();
+  } else {
+    await expect(
+      page.locator('.mobile-nav [data-tutorial="production"][data-tutorial-active="true"]').first(),
+    ).toBeVisible();
+  }
+
+  const productionFocus = await expectFreeTourFocus(page, "thermal");
+
+  await expect
+    .poll(() => page.evaluate(() => document.activeElement?.closest(".tutorial-modal") !== null))
+    .toBe(true);
+
+  if (desktop) {
+    const drawer = await page.locator(".workspace-drawer").boundingBox();
+    const rail = await page.locator(".dock-left").boundingBox();
+
+    expect(productionFocus?.x).toBeGreaterThan((rail?.x ?? 0) + (rail?.width ?? 0));
+    expect(productionFocus?.x).toBeLessThan(drawer?.x ?? 0);
+  }
+
+  await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
+
+  if (desktop) await expect(page.locator('[data-tutorial="grid-panel"]')).toBeVisible();
+  await expectFreeTourFocus(page, "rural");
+
+  await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
+
+  if (desktop) await expect(page.locator('[data-tutorial="tariff-panel"]')).toBeVisible();
+  await expectFreeTourFocus(page, "urban");
+
+  await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
+  await expect(page.locator(".workspace-drawer")).toHaveCount(0);
+  await expect(page.locator(".scene-tour-focus")).toHaveCount(0);
+  await expect.poll(() => page.locator("body").getAttribute("data-tour-target")).toBe("null");
+
+  const pause = page.getByRole("button", { name: /mô phỏng/i }).first();
+  const pauseBox = await pause.boundingBox();
+
+  expect(pauseBox).not.toBeNull();
+
+  const pauseHit = await page.evaluate(
+    ({ x, y }) =>
+      document.elementFromPoint(x, y)?.closest("button")?.getAttribute("aria-label") ?? null,
+    {
+      x: (pauseBox?.x ?? 0) + (pauseBox?.width ?? 0) / 2,
+      y: (pauseBox?.y ?? 0) + (pauseBox?.height ?? 0) / 2,
+    },
+  );
+
+  expect(pauseHit).toMatch(/mô phỏng/i);
+
+  await tutorial.getByRole("button", { name: "Bắt đầu điều hành" }).click();
+  await expect(page.locator(".tutorial-modal")).toHaveCount(0);
+});
+
+test("keeps the tutorial focus free on a short wide desktop", async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < WIDE_DESKTOP_MIN, "wide desktop only");
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto("/");
+  await page.getByRole("button", { name: /Bắt đầu nhiệm kỳ/i }).click();
+  const tutorial = page.locator(".tutorial-modal");
+  await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
+  await expect(page.locator(".workspace-drawer")).toBeVisible();
+
+  const geometry = await expectFreeTourFocus(page, "thermal");
+  const drawer = await page.locator(".workspace-drawer").boundingBox();
+  const rail = await page.locator(".dock-left").boundingBox();
+
+  expect(geometry?.x).toBeGreaterThan((rail?.x ?? 0) + (rail?.width ?? 0));
+  expect(geometry?.x).toBeLessThan(drawer?.x ?? 0);
 });
 
 test("keeps the tutorial step when it is reopened", async ({ page }) => {

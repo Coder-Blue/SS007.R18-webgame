@@ -16,7 +16,6 @@ const BASE_EFFECTS: EventEffects = {
   demandDelta: 0,
   mediaMonths: 0,
   unlockDecisions: [],
-  enablePolicy: [],
   disablePriceCap: false,
 };
 
@@ -124,7 +123,6 @@ export const EVENTS: readonly GameEventDefinition[] = [
         effects: effects({
           citizenTrustDelta: 3,
           institutionalTrustDelta: 6,
-          enablePolicy: ["n2", "nsmo", "dppa", "vrem"],
         }),
       },
       {

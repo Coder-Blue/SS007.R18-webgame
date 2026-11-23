@@ -4,6 +4,7 @@ import {
   buildLineAction,
   createInitialState,
   enableN2Action,
+  enablePolicyAction,
   requestTariffAction,
   resolveApprovalAction,
   resolveEvent,
@@ -88,6 +89,14 @@ const play = (): GameState => {
       if (enabled.ok) state = enabled.value;
     }
 
+    if (state.events.flags.includes("event:revised-law:enact-law")) {
+      for (const key of ["nsmo", "dppa", "vrem", "twoPart"] as const) {
+        const enabled = enablePolicyAction(state, key);
+
+        if (enabled.ok) state = enabled.value;
+      }
+    }
+
     const summer = state.clock.month >= 4 && state.clock.month <= 8;
 
     const dispatch = setDispatchAction(
@@ -120,6 +129,12 @@ describe("five-year playthrough", () => {
     expect(cumulative).toBeGreaterThan(-46_000);
     expect(state.finance.debt).toBeLessThan(100_000);
     expect(state.finance.debt).toBeGreaterThan(85_000);
+    expect(state.policy.n2Enabled).toBe(true);
+    expect(state.policy.nsmo).toBe(true);
+    expect(state.policy.dppa).toBe(true);
+    expect(state.policy.vrem).toBe(true);
+    expect(state.policy.twoPartTariff).toBe(true);
+    expect(state.policy.reformProgress).toEqual([]);
     expect(state.ending).not.toBeNull();
   });
 

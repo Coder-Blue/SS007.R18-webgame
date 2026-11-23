@@ -69,6 +69,9 @@ export const PolicyPanel = (): JSX.Element => {
     setRate(state().policy.n2Rate);
   });
 
+  const reformProgress = (key: (typeof reforms)[number]["key"]) =>
+    state().policy.reformProgress.find((project) => project.key === key);
+
   const isActive = (id: DecisionId): boolean =>
     state().operations.projects.some(
       (project) => project.kind === "decision" && project.targetId === id,
@@ -178,35 +181,62 @@ export const PolicyPanel = (): JSX.Element => {
                         ? state().policy.vrem
                         : state().policy.twoPartTariff;
 
+              const pending = reformProgress(reform.key);
+
+              const progress =
+                pending === undefined
+                  ? 0
+                  : ((pending.totalMonths - pending.monthsLeft) / pending.totalMonths) * 100;
+
               return (
-                <div class="reform-row" data-enabled={enabled ? "true" : "false"}>
-                  <div>
-                    <strong>{reform.name}</strong>
+                <div
+                  class="reform-row"
+                  data-enabled={enabled ? "true" : "false"}
+                  data-pending={pending === undefined ? "false" : "true"}
+                >
+                  <div class="reform-copy">
+                    <div class="reform-head">
+                      <strong>{reform.name}</strong>
+                      <Badge
+                        tone={enabled ? "good" : pending === undefined ? "neutral" : "electric"}
+                      >
+                        {enabled
+                          ? "Đang áp dụng"
+                          : pending === undefined
+                            ? "Chưa áp dụng"
+                            : `${Math.round(progress)}%`}
+                      </Badge>
+                    </div>
                     <span>{reform.detail}</span>
+                    {pending === undefined ? null : (
+                      <>
+                        <Bar value={progress} tone="electric" label={`Tiến trình ${reform.name}`} />
+                        <span class="project-meta">
+                          {`Đang thực thi · còn ${pending.monthsLeft} tháng`}
+                        </span>
+                      </>
+                    )}
                   </div>
                   <div class="reform-actions">
-                    <Badge tone={enabled ? "good" : "neutral"}>
-                      {enabled ? "Đang áp dụng" : "Chưa áp dụng"}
-                    </Badge>
                     {reform.key === "n2" ? (
                       <ActionButton
                         size="sm"
                         variant="gold"
-                        disabled={enabled}
+                        disabled={enabled || pending !== undefined}
                         icon="tabler:report-money"
                         onClick={actions.enableN2}
                       >
-                        Ban hành N-2
+                        {pending === undefined ? "Ban hành N-2" : "Đang thực hiện"}
                       </ActionButton>
                     ) : (
                       <ActionButton
                         size="sm"
                         variant="secondary"
-                        disabled={enabled}
+                        disabled={enabled || pending !== undefined}
                         icon="tabler:gavel"
                         onClick={() => actions.enablePolicy(reform.key)}
                       >
-                        Áp dụng
+                        {pending === undefined ? "Áp dụng" : "Đang thực hiện"}
                       </ActionButton>
                     )}
                   </div>

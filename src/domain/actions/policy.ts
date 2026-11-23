@@ -2,6 +2,7 @@ import type { DecisionId, GameState, PolicyKey } from "../types";
 import { err, ok, type Result } from "../types";
 import { DECISIONS, RECOVERY_RATE_MAX, RECOVERY_RATE_MIN } from "../constants";
 import { addProject, charge } from "./helpers";
+import { isReformPending, startReform } from "../reform-progress";
 
 export const enableN2Action = (state: GameState): Result<GameState> => {
   if (state.policy.n2Enabled) return err("policy.already-enabled");
@@ -12,7 +13,9 @@ export const enableN2Action = (state: GameState): Result<GameState> => {
     return err("policy.requires-petition");
   }
 
-  return ok({ ...state, policy: { ...state.policy, n2Enabled: true } });
+  if (isReformPending(state.policy, "n2")) return err("policy.pending");
+
+  return ok({ ...state, policy: startReform(state.policy, "n2") });
 };
 
 export const enablePolicyAction = (state: GameState, key: PolicyKey): Result<GameState> => {
@@ -35,6 +38,14 @@ export const enablePolicyAction = (state: GameState, key: PolicyKey): Result<Gam
   if (key === "twoPart" && !current.vrem) return err("policy.requires-vrem");
 
   if (
+    key === "n2" &&
+    (state.clock.year < 2024 ||
+      (!current.petitionDone && !state.events.flags.includes("event:revised-law:enact-law")))
+  ) {
+    return err("policy.requires-petition");
+  }
+
+  if (
     key !== "n2" &&
     key !== "twoPart" &&
     !state.events.flags.includes("event:revised-law:enact-law")
@@ -42,16 +53,9 @@ export const enablePolicyAction = (state: GameState, key: PolicyKey): Result<Gam
     return err("policy.requires-law");
   }
 
-  const next = {
-    ...current,
-    n2Enabled: current.n2Enabled || key === "n2",
-    nsmo: current.nsmo || key === "nsmo",
-    dppa: current.dppa || key === "dppa",
-    vrem: current.vrem || key === "vrem",
-    twoPartTariff: current.twoPartTariff || key === "twoPart",
-  };
+  if (isReformPending(current, key)) return err("policy.pending");
 
-  return ok({ ...state, policy: next });
+  return ok({ ...state, policy: startReform(current, key) });
 };
 
 export const setRecoveryRate = (state: GameState, rate: number): Result<GameState> => {

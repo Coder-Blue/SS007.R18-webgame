@@ -407,3 +407,27 @@
   gap: 10px;
   margin-top: 4px;
 }
+
+.tutorial-modal {
+  bottom: 96px;
+  height: fit-content;
+  inset: auto auto 96px 24px;
+  margin: 0;
+  max-height: min(72dvh, 680px);
+  max-width: min(440px, calc(100vw - 48px));
+  transform: none;
+  width: min(440px, calc(100vw - 48px));
+  z-index: 90;
+}
+
+@media (max-width: 1180px) {
+  .tutorial-modal {
+    bottom: auto;
+    left: 10px;
+    max-height: 52dvh;
+    max-width: calc(100vw - 20px);
+    right: 10px;
+    top: 158px;
+    width: auto;
+  }
+}

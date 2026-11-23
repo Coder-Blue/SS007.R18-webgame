@@ -1,4 +1,4 @@
-import type { DecisionId, EventEffects, GameState, PolicyKey, Zone } from "../types";
+import type { DecisionId, EventEffects, GameState, Zone } from "../types";
 import { clamp } from "../clock";
 import { DECISIONS } from "../constants";
 
@@ -9,15 +9,6 @@ const unique = <T>(items: readonly T[], additions: readonly T[]): readonly T[] =
 
   return [...seen];
 };
-
-const applyPolicy = (state: GameState, keys: readonly PolicyKey[]): GameState["policy"] => ({
-  ...state.policy,
-  n2Enabled: state.policy.n2Enabled || keys.includes("n2"),
-  nsmo: state.policy.nsmo || keys.includes("nsmo"),
-  dppa: state.policy.dppa || keys.includes("dppa"),
-  vrem: state.policy.vrem || keys.includes("vrem"),
-  twoPartTariff: state.policy.twoPartTariff || keys.includes("twoPart"),
-});
 
 const shiftZone = (zone: Zone, amount: number): Zone => ({
   ...zone,
@@ -73,7 +64,7 @@ export const applyEffects = (state: GameState, effects: EventEffects): GameState
     activeMonths: Math.max(state.media.activeMonths, effects.mediaMonths),
   },
   policy: {
-    ...applyPolicy(state, effects.enablePolicy),
+    ...state.policy,
     branch: effects.setBranch ?? state.policy.branch,
     priceCap: effects.disablePriceCap ? false : state.policy.priceCap,
   },

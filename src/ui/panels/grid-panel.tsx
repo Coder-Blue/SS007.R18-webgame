@@ -18,7 +18,7 @@ export const GridPanel = (): JSX.Element => {
   const zones: readonly ZoneId[] = ["urban", "industrial", "rural"];
 
   return (
-    <div class="stack-lg">
+    <div class="stack-lg" data-tutorial="grid-panel">
       <Panel title="Bản đồ phủ điện" kicker="Bước 2 · Truyền tải" icon="lucide:utility-pole">
         <p class="panel-lead">
           Mỗi tuyến 500kV/220kV đưa một vùng tiến gần hơn tới 100% phủ điện. Công trình chạy theo

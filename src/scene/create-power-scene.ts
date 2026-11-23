@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import type { GameState } from "~/domain";
-import { createCameraRig, type CameraRig } from "./camera-rig";
+import { createCameraRig, type CameraRig, type ScreenAnchor } from "./camera-rig";
 import { createTerrain } from "./terrain";
 import { createPlants, type SceneSelection } from "./plants";
 import { createGrid } from "./grid-lines";
@@ -12,6 +12,7 @@ export type PowerScene = {
   readonly update: (state: GameState, running: boolean) => void;
   readonly resize: () => void;
   readonly resetView: () => void;
+  readonly focusSelection: (selection: SceneSelection | null, anchor?: ScreenAnchor) => void;
   readonly dispose: () => void;
   readonly selected: () => SceneSelection | null;
 };
@@ -92,6 +93,23 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
   const grid = createGrid();
   const weather = createWeather(scene, terrain.water);
 
+  const tourRing = new THREE.Mesh(
+    new THREE.TorusGeometry(1.15, 0.08, 8, 36),
+    new THREE.MeshBasicMaterial({ color: 0x8fe9ff, transparent: true, opacity: 0.9 }),
+  );
+
+  tourRing.rotation.x = -Math.PI / 2;
+  tourRing.visible = false;
+  scene.add(tourRing);
+
+  const reformBeacon = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.1, 0.28, 1, 10),
+    new THREE.MeshBasicMaterial({ color: 0xffc857, transparent: true, opacity: 0.85 }),
+  );
+
+  reformBeacon.visible = false;
+  scene.add(reformBeacon);
+
   const progressBeacons = Array.from({ length: 3 }, () => {
     const beacon = new THREE.Mesh(
       new THREE.CylinderGeometry(0.09, 0.09, 1, 6),
@@ -157,6 +175,22 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
     highlight(hit.object);
     cameraRig.focus(hit.point, options.reducedMotion());
     options.onSelect?.(selection);
+  };
+
+  const selectionPoint = (selection: SceneSelection): THREE.Vector3 => {
+    if (selection === "hydro") return new THREE.Vector3(-9, 1.2, -3.5);
+
+    if (selection === "thermal") return new THREE.Vector3(-1.5, 1.2, -7.2);
+
+    if (selection === "renewable") return new THREE.Vector3(7, 1.2, 2.6);
+
+    if (selection === "urban") return new THREE.Vector3(4.2, 1.2, 5.4);
+
+    if (selection === "industrial") return new THREE.Vector3(8.2, 1.2, -1.2);
+
+    if (selection === "rural") return new THREE.Vector3(-7.2, 1.2, 6.2);
+
+    return new THREE.Vector3(0, 1.2, 0.4);
   };
 
   const focusForEvent = (state: GameState): void => {
@@ -227,6 +261,23 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
       beacon.material.color.setHex(project.kind === "decision" ? 0xffb347 : 0x39d7ff);
     }
 
+    const reforms = state.policy.reformProgress;
+
+    if (reforms.length > 0) {
+      const progress =
+        reforms.reduce(
+          (sum, project) => sum + (project.totalMonths - project.monthsLeft) / project.totalMonths,
+          0,
+        ) / reforms.length;
+
+      reformBeacon.position.set(4.2, 1.5 + progress * 0.9, 5.4);
+      reformBeacon.scale.set(1, Math.max(0.2, progress * 1.8), 1);
+      reformBeacon.material.opacity = currentRunning ? 0.65 + Math.sin(elapsed * 3) * 0.2 : 0.85;
+      reformBeacon.visible = true;
+    } else {
+      reformBeacon.visible = false;
+    }
+
     if (state.act !== lastAct) {
       lastAct = state.act;
       focusForEvent(state);
@@ -274,6 +325,20 @@ export const createPowerScene = (options: PowerSceneOptions): PowerScene => {
       cameraRig.reset(options.reducedMotion());
       highlight(null);
       selected = null;
+      tourRing.visible = false;
+    },
+    focusSelection: (selection, anchor) => {
+      if (selection === null) {
+        tourRing.visible = false;
+
+        return;
+      }
+
+      const point = selectionPoint(selection);
+
+      tourRing.position.set(point.x, 1.1, point.z);
+      tourRing.visible = true;
+      cameraRig.focus(point, options.reducedMotion(), anchor);
     },
     selected: () => selected,
     dispose: () => {

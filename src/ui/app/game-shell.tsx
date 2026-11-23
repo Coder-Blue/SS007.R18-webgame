@@ -10,6 +10,7 @@ import {
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { TitlePoster } from "../scene/title-poster";
+import { selectionLabel } from "../scene/scene-labels";
 import { TitleScreen } from "../screens/title-screen";
 import { Icon } from "../components/icons";
 import { hasAnySave, latestSave, readSession, writeSession } from "~/state/persistence";
@@ -59,6 +60,7 @@ const errorMessages = new Map<string, string>([
   ["save.invalid-state", "Dữ liệu nhiệm kỳ không hợp lệ."],
   ["save.storage-unavailable", "Trình duyệt không cho phép lưu trữ."],
   ["save.write-failed", "Không ghi được vào bộ nhớ trình duyệt."],
+  ["policy.pending", "Cải cách này đang được thực hiện."],
 ]);
 
 const noticeMessages = new Map<string, string>([
@@ -80,26 +82,24 @@ const noticeMessage = (code: string): string => {
 
   if (code.startsWith("notice.project:")) return "Một công trình đã hoàn tất.";
 
-  return noticeMessages.get(code) ?? code;
-};
+  if (code.startsWith("notice.reform:")) {
+    const key = code.slice("notice.reform:".length);
 
-const selectionLabel = (selection: string): string => {
-  switch (selection) {
-    case "hydro":
-      return "Cụm thủy điện";
-    case "thermal":
-      return "Nhà máy nhiệt điện";
-    case "renewable":
-      return "Trang trại tái tạo";
-    case "substation":
-      return "Trạm biến áp";
-    case "urban":
-      return "Phụ tải đô thị";
-    case "industrial":
-      return "Khu công nghiệp";
-    default:
-      return "Phụ tải nông thôn";
+    const label =
+      key === "n2"
+        ? "N-2"
+        : key === "nsmo"
+          ? "NSMO"
+          : key === "dppa"
+            ? "DPPA"
+            : key === "vrem"
+              ? "VREM"
+              : "Biểu giá hai thành phần";
+
+    return `${label} đã có hiệu lực.`;
   }
+
+  return noticeMessages.get(code) ?? code;
 };
 
 type Screen = "title" | "game";
@@ -339,7 +339,13 @@ export const GameShell = (): JSX.Element => {
         </Loading>
       </Show>
       <Show when={tutorialOpen()}>
-        <TutorialModal open onClose={() => setTutorialOpen(false)} onFinish={finishTutorial} />
+        <TutorialModal
+          open
+          onClose={() => setTutorialOpen(false)}
+          onFinish={finishTutorial}
+          onOpenPanel={openPanel}
+          onClosePanel={() => setWorkspaceOpen(false)}
+        />
       </Show>
       <Show when={toast()}>
         {(current) => (

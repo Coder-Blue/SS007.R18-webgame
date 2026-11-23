@@ -87,7 +87,7 @@ const copy: Readonly<Record<EventId, Copy>> = {
     choices: {
       "enact-law": {
         label: "Ban hành ngay",
-        body: "Kích hoạt N-2, NSMO, DPPA và VREM. Niềm tin thể chế tăng, lỗ lũy kế có cơ hội được thu hồi.",
+        body: "Mở khóa N-2, NSMO, DPPA và VREM. Mỗi cải cách cần thời gian thực thi trước khi có hiệu lực. Niềm tin thể chế tăng.",
         tone: "good",
       },
       "delay-law": {
