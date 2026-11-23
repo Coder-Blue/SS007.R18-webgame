@@ -55,7 +55,6 @@ export const Stat = (props: {
   <div class={cx("stat", props.class)} data-tone={props.tone ?? "neutral"}>
     <div class="stat-top">
       <span class="stat-label">{props.label}</span>
-      {props.icon === undefined ? null : <Icon icon={props.icon} size={16} class="stat-icon" />}
     </div>
     <span class="stat-value">{props.value}</span>
     {props.hint === undefined ? null : <span class="stat-hint">{props.hint}</span>}

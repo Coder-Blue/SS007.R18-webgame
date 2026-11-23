@@ -85,7 +85,6 @@ export const TariffPanel = (): JSX.Element => {
             value={formatPrice(preview().after.averageTariff)}
             hint={`Trần năm: ${formatPrice(state().tariffs.ceiling)}`}
             tone="gold"
-            icon="tabler:cash-banknote"
           />
           <Stat
             label="Thay đổi dự kiến"
@@ -101,7 +100,6 @@ export const TariffPanel = (): JSX.Element => {
             value={formatPrice(industrial())}
             hint="Giá trợ cấp, thấp hơn chi phí biên"
             tone="warn"
-            icon="tabler:building-factory-2"
           />
           <Stat
             label="Lợi nhuận tháng"

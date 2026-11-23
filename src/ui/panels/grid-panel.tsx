@@ -86,7 +86,7 @@ export const GridPanel = (): JSX.Element => {
                     </span>
                   </div>
                   <div class="zone-preview">
-                    <span>Trước → Sau</span>
+                    <span>Dự kiến sau khi nối</span>
                     <strong>
                       {formatPercent(zone().coverage)} →{" "}
                       {formatPercent(Math.min(100, zone().coverage + plan.coverage))}
@@ -95,7 +95,7 @@ export const GridPanel = (): JSX.Element => {
                   </div>
                   <ActionButton
                     size="sm"
-                    variant={complete() ? "ghost" : "primary"}
+                    variant={complete() ? "ghost" : "secondary"}
                     icon={complete() ? "lucide:check" : "lucide:plus"}
                     disabled={complete() || pending() || state().operations.projects.length >= 3}
                     onClick={() => store.dispatch(buildLineAction(state(), zoneId))}
@@ -118,18 +118,12 @@ export const GridPanel = (): JSX.Element => {
           <Stat
             label="Đường dây 500kV"
             value={`${Math.round(state().infrastructure.lineKm500)} km`}
-            icon="lucide:utility-pole"
           />
           <Stat
             label="Đường dây 220kV"
             value={`${Math.round(state().infrastructure.lineKm220)} km`}
-            icon="lucide:cable"
           />
-          <Stat
-            label="Trạm biến áp"
-            value={`${state().infrastructure.substations}`}
-            icon="tabler:stack-2"
-          />
+          <Stat label="Trạm biến áp" value={`${state().infrastructure.substations}`} />
           <Stat
             label="Độ mạnh lưới"
             value={formatPercent(state().infrastructure.gridStrength)}

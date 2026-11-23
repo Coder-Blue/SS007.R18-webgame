@@ -2,28 +2,51 @@
   --font-sans: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-panel-3: var(--panel-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-electric: var(--electric);
+  --color-electric-soft: var(--electric-soft);
+  --color-cyan-soft: var(--cyan-soft);
+  --color-amber: var(--amber);
+  --color-gold: var(--gold);
+  --color-lime: var(--lime);
+  --color-rose: var(--rose);
+  --color-green: var(--green);
+  --radius-panel: var(--radius);
+  --radius-control: var(--radius-sm);
+}
+
 :root {
   color-scheme: dark;
-  --bg: #07121b;
-  --bg-deep: #040b10;
-  --panel: #0c1f28;
-  --panel-2: #102730;
-  --panel-3: #15313b;
-  --line: rgba(137, 199, 214, 0.16);
-  --line-strong: rgba(137, 199, 214, 0.3);
-  --ink: #e7f2f4;
-  --ink-soft: #a8bec4;
-  --ink-faint: #8aa4ab;
-  --electric: #39d7ff;
-  --electric-soft: #8fe9ff;
-  --cyan-soft: #58b6c8;
-  --amber: #ffb347;
-  --gold: #f2d06b;
-  --lime: #7ee787;
-  --rose: #ff6b6b;
-  --green: #5bd6a2;
-  --shadow-panel: 0 8px 24px rgba(1, 7, 10, 0.2);
-  --shadow-lift: 0 18px 44px rgba(1, 7, 10, 0.34);
+  --bg: oklch(0.1765 0.025 243.87);
+  --bg-deep: oklch(0.1437 0.0171 235.16);
+  --panel: oklch(0.2278 0.0304 230.63);
+  --panel-2: oklch(0.2585 0.0335 225.88);
+  --panel-3: oklch(0.2961 0.0383 223.79);
+  --line: oklch(0.7928 0.0667 214.51 / 0.16);
+  --line-strong: oklch(0.7928 0.0667 214.51 / 0.3);
+  --ink: oklch(0.9535 0.012 209.8);
+  --ink-soft: oklch(0.7867 0.0256 215.95);
+  --ink-faint: oklch(0.7012 0.0307 215.82);
+  --electric: oklch(0.8167 0.1361 219.52);
+  --electric-soft: oklch(0.8852 0.0913 215.12);
+  --cyan-soft: oklch(0.7261 0.0922 211.84);
+  --amber: oklch(0.8208 0.1486 72.1);
+  --gold: oklch(0.8666 0.1262 91.02);
+  --lime: oklch(0.8416 0.1641 145.75);
+  --rose: oklch(0.7116 0.1812 22.84);
+  --green: oklch(0.7925 0.1341 162.76);
+  --shadow-panel: 0 8px 24px oklch(0.1203 0.0178 220.32 / 0.2);
+  --shadow-lift: 0 18px 44px oklch(0.1203 0.0178 220.32 / 0.34);
   --radius: 12px;
   --radius-sm: 8px;
   --font: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -43,7 +66,8 @@ body,
 
 body {
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(57, 215, 255, 0.08), transparent 55%), var(--bg);
+    radial-gradient(ellipse at 50% 0%, oklch(0.8167 0.1361 219.52 / 0.08), transparent 55%),
+    var(--bg);
   color: var(--ink);
   font-family: var(--font);
   font-size: 14px;
@@ -90,13 +114,15 @@ a {
   color: var(--electric);
 }
 
-:focus-visible {
-  outline: 2px solid var(--electric);
-  outline-offset: 2px;
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--electric);
+    outline-offset: 2px;
+  }
 }
 
 ::selection {
-  background: rgba(57, 215, 255, 0.28);
+  background: oklch(0.8167 0.1361 219.52 / 0.28);
   color: var(--ink);
 }
 
@@ -126,7 +152,6 @@ a {
 .tabular-nums,
 .data-table,
 .stat-value,
-.top-gauge strong,
-.summary-trust strong {
+.top-gauge strong {
   font-variant-numeric: tabular-nums;
 }

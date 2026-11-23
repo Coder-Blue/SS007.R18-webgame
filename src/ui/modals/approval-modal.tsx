@@ -20,11 +20,21 @@ export const ApprovalModal = (): JSX.Element => {
   const approval = () => store.state().approval;
   const open = () => approval() !== null || result() !== null;
 
+  let held = false;
+
   createTrackedEffect(() => {
-    store.setHold(open());
+    if (open()) {
+      store.setHold(true);
+      held = true;
+    } else if (held) {
+      store.setHold(false);
+      held = false;
+    }
   });
 
-  onCleanup(() => store.setHold(false));
+  onCleanup(() => {
+    if (held) store.setHold(false);
+  });
 
   const preview = () => {
     const request = approval();
@@ -88,13 +98,11 @@ export const ApprovalModal = (): JSX.Element => {
                   label="Mức tăng"
                   value={formatPercent(approval()?.changePct ?? 0)}
                   tone="warn"
-                  icon="lucide:trending-up"
                 />
                 <Stat
                   label="Giá bình quân mới"
                   value={formatPrice(approval()?.average ?? 0)}
                   hint={`Hiện tại ${formatPrice(preview()?.before.averageTariff ?? 0)}`}
-                  icon="tabler:cash-banknote"
                 />
                 <Stat
                   label="Lãi/lỗ tháng"

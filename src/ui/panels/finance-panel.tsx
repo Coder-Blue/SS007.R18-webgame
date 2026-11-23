@@ -3,6 +3,7 @@ import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { Badge, Bar, Panel, Stat } from "../components/base";
 import { Icon } from "../components/icons";
+import { EmptyState } from "../components/empty-state";
 import { RevenueCostChart } from "../components/charts";
 import {
   formatBillion,
@@ -29,7 +30,6 @@ export const FinancePanel = (): JSX.Element => {
             value={formatBillion(state().finance.cash)}
             hint="Thanh khoản cuối tháng"
             tone="gold"
-            icon="lucide:wallet"
           />
           <Stat
             label="Dư nợ"
@@ -43,132 +43,148 @@ export const FinancePanel = (): JSX.Element => {
             value={formatBillion(state().finance.accumulatedLoss)}
             hint="Mục tiêu cấu trúc 5 năm"
             tone="bad"
-            icon="lucide:trending-down"
           />
           <Stat
             label="Thu hồi N-2 tháng"
             value={formatBillion(recovery().monthlyCredit)}
             hint={`Năm kiểm toán ${recovery().eligibleYear}`}
             tone="good"
-            icon="tabler:cash-banknote"
           />
         </div>
-        <RevenueCostChart rows={state().finance.monthlyHistory} />
-        <div class="breakdown-grid">
-          <div class="breakdown-card">
-            <div class="breakdown-head">
-              <span>Doanh thu tháng gần nhất</span>
-              <strong>
-                {formatBillion((last()?.revenueElectricity ?? 0) + (last()?.revenueOther ?? 0))}
-              </strong>
+        <Show
+          when={last() !== undefined}
+          fallback={
+            <EmptyState
+              title="Chưa có sổ tháng"
+              body="Biểu đồ doanh thu, chi phí và bảng phân rã sẽ có dữ liệu sau tháng đầu tiên."
+            />
+          }
+        >
+          <RevenueCostChart rows={state().finance.monthlyHistory} />
+          <div class="breakdown-grid">
+            <div class="breakdown-card">
+              <div class="breakdown-head">
+                <span>Doanh thu tháng gần nhất</span>
+                <strong>
+                  {formatBillion((last()?.revenueElectricity ?? 0) + (last()?.revenueOther ?? 0))}
+                </strong>
+              </div>
+              <div class="breakdown-row">
+                <span>Doanh thu điện</span>
+                <strong>{formatBillion(last()?.revenueElectricity ?? 0)}</strong>
+              </div>
+              <div class="breakdown-row">
+                <span>Doanh thu khác</span>
+                <strong>{formatBillion(last()?.revenueOther ?? 0)}</strong>
+              </div>
             </div>
-            <div class="breakdown-row">
-              <span>Doanh thu điện</span>
-              <strong>{formatBillion(last()?.revenueElectricity ?? 0)}</strong>
-            </div>
-            <div class="breakdown-row">
-              <span>Doanh thu khác</span>
-              <strong>{formatBillion(last()?.revenueOther ?? 0)}</strong>
+            <div class="breakdown-card">
+              <div class="breakdown-head">
+                <span>Chi phí tháng gần nhất</span>
+                <strong>
+                  {formatBillion((last()?.costSupply ?? 0) + (last()?.costManagement ?? 0))}
+                </strong>
+              </div>
+              <div class="breakdown-row">
+                <span>Chi phí trong cung ứng điện</span>
+                <strong>{formatBillion(last()?.costSupply ?? 0)}</strong>
+              </div>
+              <div class="breakdown-row">
+                <span>Chi phí quản lý</span>
+                <strong>{formatBillion(last()?.costManagement ?? 0)}</strong>
+              </div>
             </div>
           </div>
-          <div class="breakdown-card">
-            <div class="breakdown-head">
-              <span>Chi phí tháng gần nhất</span>
-              <strong>
-                {formatBillion((last()?.costSupply ?? 0) + (last()?.costManagement ?? 0))}
-              </strong>
-            </div>
-            <div class="breakdown-row">
-              <span>Chi phí trong cung ứng điện</span>
-              <strong>{formatBillion(last()?.costSupply ?? 0)}</strong>
-            </div>
-            <div class="breakdown-row">
-              <span>Chi phí quản lý</span>
-              <strong>{formatBillion(last()?.costManagement ?? 0)}</strong>
-            </div>
-          </div>
-        </div>
+        </Show>
       </Panel>
 
       <Panel title="Báo cáo tháng" kicker="Mười hai tháng gần nhất" icon="tabler:file-analytics">
-        <div class="table-scroll">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th scope="col">Tháng</th>
-                <th scope="col">Điện bán</th>
-                <th scope="col">Giá bình quân</th>
-                <th scope="col">Doanh thu</th>
-                <th scope="col">Chi phí</th>
-                <th scope="col">Lãi/lỗ</th>
-                <th scope="col">Nợ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <For each={rows()}>
-                {(row) => (
-                  <tr>
-                    <td>{`T${row.month}/${row.year}`}</td>
-                    <td>{formatEnergy(row.energySoldMillionKwh)}</td>
-                    <td>{formatPrice(row.averageRetailTariff)}</td>
-                    <td>{formatBillion(row.revenueTotal)}</td>
-                    <td>{formatBillion(row.costTotal)}</td>
-                    <td data-tone={row.netResult >= 0 ? "good" : "bad"}>
-                      {formatSignedBillion(row.netResult)}
-                    </td>
-                    <td>{formatBillion(row.debt)}</td>
-                  </tr>
-                )}
-              </For>
-            </tbody>
-          </table>
-        </div>
-        <Show when={rows().length === 0}>
-          <p class="rail-note">
-            <Icon icon="lucide:clock" size={14} />
-            Chưa có tháng nào được ghi sổ.
-          </p>
+        <Show
+          when={rows().length > 0}
+          fallback={
+            <EmptyState
+              title="Chưa có sổ tháng"
+              body="Bảng điện bán, giá bình quân và lãi/lỗ sẽ xuất hiện sau tháng đầu tiên."
+            />
+          }
+        >
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Tháng</th>
+                  <th scope="col">Điện bán</th>
+                  <th scope="col">Giá bình quân</th>
+                  <th scope="col">Doanh thu</th>
+                  <th scope="col">Chi phí</th>
+                  <th scope="col">Lãi/lỗ</th>
+                  <th scope="col">Nợ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <For each={rows()}>
+                  {(row) => (
+                    <tr>
+                      <td>{`T${row.month}/${row.year}`}</td>
+                      <td>{formatEnergy(row.energySoldMillionKwh)}</td>
+                      <td>{formatPrice(row.averageRetailTariff)}</td>
+                      <td>{formatBillion(row.revenueTotal)}</td>
+                      <td>{formatBillion(row.costTotal)}</td>
+                      <td data-tone={row.netResult >= 0 ? "good" : "bad"}>
+                        {formatSignedBillion(row.netResult)}
+                      </td>
+                      <td>{formatBillion(row.debt)}</td>
+                    </tr>
+                  )}
+                </For>
+              </tbody>
+            </table>
+          </div>
         </Show>
       </Panel>
 
       <Panel title="Kiểm toán năm" kicker="Báo cáo thường niên" icon="tabler:chart-bar">
-        <div class="table-scroll">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th scope="col">Năm</th>
-                <th scope="col">Doanh thu</th>
-                <th scope="col">Chi phí</th>
-                <th scope="col">Kết quả</th>
-                <th scope="col">Nợ cuối năm</th>
-                <th scope="col">Phủ điện</th>
-                <th scope="col">Tin cậy</th>
-              </tr>
-            </thead>
-            <tbody>
-              <For each={state().finance.annualHistory}>
-                {(row) => (
-                  <tr>
-                    <td>{row.year}</td>
-                    <td>{formatBillion(row.revenue)}</td>
-                    <td>{formatBillion(row.costs)}</td>
-                    <td data-tone={row.netResult >= 0 ? "good" : "bad"}>
-                      {formatSignedBillion(row.netResult)}
-                    </td>
-                    <td>{formatBillion(row.debtEnd)}</td>
-                    <td>{formatPercent(row.coverage)}</td>
-                    <td>{formatPercent(row.trustAverage)}</td>
-                  </tr>
-                )}
-              </For>
-            </tbody>
-          </table>
-        </div>
-        <Show when={state().finance.annualHistory.length === 0}>
-          <p class="rail-note">
-            <Icon icon="lucide:clock" size={14} />
-            Báo cáo năm đầu tiên được chốt vào tháng 12.
-          </p>
+        <Show
+          when={state().finance.annualHistory.length > 0}
+          fallback={
+            <EmptyState
+              title="Chưa có báo cáo năm"
+              body="Báo cáo năm đầu tiên được chốt vào tháng 12."
+            />
+          }
+        >
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Năm</th>
+                  <th scope="col">Doanh thu</th>
+                  <th scope="col">Chi phí</th>
+                  <th scope="col">Kết quả</th>
+                  <th scope="col">Nợ cuối năm</th>
+                  <th scope="col">Phủ điện</th>
+                  <th scope="col">Tin cậy</th>
+                </tr>
+              </thead>
+              <tbody>
+                <For each={state().finance.annualHistory}>
+                  {(row) => (
+                    <tr>
+                      <td>{row.year}</td>
+                      <td>{formatBillion(row.revenue)}</td>
+                      <td>{formatBillion(row.costs)}</td>
+                      <td data-tone={row.netResult >= 0 ? "good" : "bad"}>
+                        {formatSignedBillion(row.netResult)}
+                      </td>
+                      <td>{formatBillion(row.debtEnd)}</td>
+                      <td>{formatPercent(row.coverage)}</td>
+                      <td>{formatPercent(row.trustAverage)}</td>
+                    </tr>
+                  )}
+                </For>
+              </tbody>
+            </table>
+          </div>
         </Show>
       </Panel>
 

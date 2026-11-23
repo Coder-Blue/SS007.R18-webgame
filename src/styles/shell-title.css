@@ -11,8 +11,8 @@
 }
 
 .sheet-tab[data-active="true"] {
-  background: rgba(57, 215, 255, 0.1);
-  border-color: rgba(57, 215, 255, 0.35);
+  background: oklch(0.8167 0.1361 219.52 / 0.1);
+  border-color: oklch(0.8167 0.1361 219.52 / 0.35);
   color: var(--electric);
 }
 
@@ -41,8 +41,8 @@
 
 .poster-grid {
   background-image:
-    linear-gradient(rgba(57, 215, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(57, 215, 255, 0.06) 1px, transparent 1px);
+    linear-gradient(oklch(0.8167 0.1361 219.52 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(0.8167 0.1361 219.52 / 0.06) 1px, transparent 1px);
   background-size: 60px 60px;
   inset: 0;
   position: absolute;
@@ -57,36 +57,40 @@
 
 .poster-tower path {
   fill: none;
-  stroke: rgba(143, 233, 255, 0.5);
+  stroke: oklch(0.8852 0.0913 215.12 / 0.5);
   stroke-width: 2;
 }
 
 .poster-cable path {
   fill: none;
-  stroke: rgba(57, 215, 255, 0.32);
+  stroke: oklch(0.8167 0.1361 219.52 / 0.32);
   stroke-width: 1.5;
 }
 
 .poster-node circle {
   fill: var(--electric);
-  filter: drop-shadow(0 0 8px rgba(57, 215, 255, 0.8));
+  filter: drop-shadow(0 0 8px oklch(0.8167 0.1361 219.52 / 0.8));
 }
 
 .poster-horizon path {
-  stroke: rgba(137, 199, 214, 0.12);
+  stroke: oklch(0.7928 0.0667 214.51 / 0.12);
   stroke-width: 1;
 }
 
 .poster-glow {
-  background: radial-gradient(ellipse at 50% 30%, rgba(57, 215, 255, 0.16), transparent 60%);
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    oklch(0.8167 0.1361 219.52 / 0.16),
+    transparent 60%
+  );
   inset: 0;
   position: absolute;
 }
 
 .title-vignette {
   background:
-    radial-gradient(ellipse at 50% 0%, rgba(57, 215, 255, 0.1), transparent 55%),
-    linear-gradient(180deg, rgba(4, 11, 16, 0.4), rgba(4, 11, 16, 0.88));
+    radial-gradient(ellipse at 50% 0%, oklch(0.8167 0.1361 219.52 / 0.1), transparent 55%),
+    linear-gradient(180deg, oklch(0.1437 0.0171 235.16 / 0.4), oklch(0.1437 0.0171 235.16 / 0.88));
   inset: 0;
   position: absolute;
 }
@@ -105,8 +109,8 @@
 
 .title-kicker {
   align-items: center;
-  background: rgba(57, 215, 255, 0.08);
-  border: 1px solid rgba(57, 215, 255, 0.24);
+  background: oklch(0.8167 0.1361 219.52 / 0.08);
+  border: 1px solid oklch(0.8167 0.1361 219.52 / 0.24);
   border-radius: 999px;
   color: var(--electric);
   display: inline-flex;
@@ -178,7 +182,7 @@
 }
 
 .title-act {
-  background: rgba(7, 22, 29, 0.62);
+  background: oklch(0.1904 0.0253 229.73 / 0.62);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   display: flex;

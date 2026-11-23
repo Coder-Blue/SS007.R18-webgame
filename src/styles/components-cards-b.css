@@ -7,7 +7,7 @@
 }
 
 .reform-row[data-enabled="true"] {
-  background: rgba(91, 214, 162, 0.04);
+  background: oklch(0.7925 0.1341 162.76 / 0.04);
 }
 
 .mission-list,
@@ -36,7 +36,7 @@
 
 .mission-icon {
   align-items: center;
-  background: rgba(57, 215, 255, 0.1);
+  background: oklch(0.8167 0.1361 219.52 / 0.1);
   border-radius: 7px;
   color: var(--electric);
   display: inline-flex;
@@ -105,7 +105,7 @@
 
 .goal-check {
   align-items: center;
-  background: rgba(120, 170, 185, 0.12);
+  background: oklch(0.708 0.0572 218.44 / 0.12);
   border-radius: 50%;
   color: var(--ink-faint);
   display: inline-flex;
@@ -115,14 +115,14 @@
 }
 
 .goal[data-done="true"] .goal-check {
-  background: rgba(91, 214, 162, 0.16);
+  background: oklch(0.7925 0.1341 162.76 / 0.16);
   color: var(--green);
 }
 
 .callout {
   align-items: flex-start;
-  background: rgba(57, 215, 255, 0.07);
-  border: 1px solid rgba(57, 215, 255, 0.2);
+  background: oklch(0.8167 0.1361 219.52 / 0.07);
+  border: 1px solid oklch(0.8167 0.1361 219.52 / 0.2);
   border-radius: var(--radius-sm);
   color: var(--ink-soft);
   display: flex;
@@ -134,8 +134,8 @@
 }
 
 .callout[data-tone="bad"] {
-  background: rgba(255, 107, 107, 0.08);
-  border-color: rgba(255, 107, 107, 0.3);
+  background: oklch(0.7116 0.1812 22.84 / 0.08);
+  border-color: oklch(0.7116 0.1812 22.84 / 0.3);
 }
 
 .callout svg {
@@ -149,7 +149,7 @@
 }
 
 .preview-card {
-  background: rgba(4, 14, 19, 0.7);
+  background: oklch(0.1557 0.0199 228.03 / 0.7);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
   display: flex;
@@ -160,15 +160,15 @@
 }
 
 .preview-card[data-tone="good"] {
-  border-color: rgba(91, 214, 162, 0.3);
+  border-color: oklch(0.7925 0.1341 162.76 / 0.3);
 }
 
 .preview-card[data-tone="warn"] {
-  border-color: rgba(255, 179, 71, 0.35);
+  border-color: oklch(0.8208 0.1486 72.1 / 0.35);
 }
 
 .preview-card[data-tone="bad"] {
-  border-color: rgba(255, 107, 107, 0.35);
+  border-color: oklch(0.7116 0.1812 22.84 / 0.35);
 }
 
 .preview-head {
@@ -212,7 +212,7 @@
 }
 
 .dispatch-control {
-  background: rgba(7, 22, 29, 0.55);
+  background: oklch(0.1904 0.0253 229.73 / 0.55);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
@@ -274,15 +274,15 @@
 }
 
 .media-card {
-  background: rgba(7, 22, 29, 0.6);
+  background: oklch(0.1904 0.0253 229.73 / 0.6);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 12px;
 }
 
 .media-card[data-active="true"] {
-  border-color: rgba(255, 107, 107, 0.35);
-  background: rgba(255, 107, 107, 0.05);
+  border-color: oklch(0.7116 0.1812 22.84 / 0.35);
+  background: oklch(0.7116 0.1812 22.84 / 0.05);
 }
 
 .media-head {
@@ -316,7 +316,7 @@
 
 .pending-approval,
 .project-row {
-  background: rgba(7, 22, 29, 0.6);
+  background: oklch(0.1904 0.0253 229.73 / 0.6);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   display: flex;
@@ -368,7 +368,7 @@
 }
 
 .mini-report {
-  background: rgba(4, 14, 19, 0.55);
+  background: oklch(0.1557 0.0199 228.03 / 0.55);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   display: flex;
@@ -414,7 +414,7 @@
   gap: 4px;
   padding: 10px 16px;
   border-bottom: 1px solid var(--line);
-  background: rgba(4, 14, 19, 0.55);
+  background: oklch(0.1557 0.0199 228.03 / 0.55);
   position: sticky;
   top: 0;
   z-index: 2;
@@ -439,8 +439,8 @@
 }
 
 .workspace-tabs [role="tab"][aria-selected="true"] {
-  background: rgba(57, 215, 255, 0.1);
-  border-color: rgba(57, 215, 255, 0.35);
+  background: oklch(0.8167 0.1361 219.52 / 0.1);
+  border-color: oklch(0.8167 0.1361 219.52 / 0.35);
   color: var(--electric);
 }
 
@@ -458,8 +458,8 @@
 }
 
 .zone-preview {
-  background: rgba(57, 215, 255, 0.05);
-  border: 1px solid rgba(57, 215, 255, 0.18);
+  background: oklch(0.8167 0.1361 219.52 / 0.05);
+  border: 1px solid oklch(0.8167 0.1361 219.52 / 0.18);
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;

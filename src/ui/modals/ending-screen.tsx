@@ -125,7 +125,6 @@ export const EndingScreen = (props: { readonly onNewGame: () => void }): JSX.Ele
                   3,
               )}
               tone="good"
-              icon="lucide:utility-pole"
             />
             <Stat
               label="Niềm tin dân"
@@ -143,7 +142,6 @@ export const EndingScreen = (props: { readonly onNewGame: () => void }): JSX.Ele
               label="Dư nợ"
               value={formatBillion(state().finance.debt)}
               tone={isBad() ? "bad" : "warn"}
-              icon="tabler:building-bank"
             />
           </div>
 
