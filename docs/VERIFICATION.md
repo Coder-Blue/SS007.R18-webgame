@@ -51,7 +51,7 @@ pnpm check:bundle
 ```
 
 All 15 client chunks are below 500 kB minified. The initial shell preloads
-624.4 kB minified / 210.2 kB gzip and contains no Three.js or GSAP. The deferred
+624.5 kB minified / 210.2 kB gzip and contains no Three.js or GSAP. The deferred
 `create-power-scene-*.js` chunk is loaded only after the game starts.
 
 ## Browser matrix
@@ -62,9 +62,10 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
 62 passed, 14 skipped
 ```
 
-The skipped checks are desktop-only workspace/overlap tests on mobile projects
-and the production-chunk test in dev mode. The suite covers `1440x900`,
-`768x1024`, `390x844` and `360x740`, no horizontal overflow, 44 px controls,
+The skipped checks are desktop-only workspace/overlap tests on mobile projects,
+the short-wide tour check outside the desktop project, and the production-chunk
+test in dev mode. The suite covers `1440x900`, `1366x768`, `768x1024`, `390x844`
+and `360x740`, no horizontal overflow, 44 px controls,
 mobile speed selectors and reserve, pause/resume, month advance, tutorial panel
 tours with an uncovered scene focus anchor, tutorial reset,
 save/reload/continue, scene chunk deferral and failure recovery, named meters,

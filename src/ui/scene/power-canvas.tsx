@@ -5,6 +5,7 @@ import { Icon } from "../components/icons";
 import type { PowerScene, SceneSelection } from "~/scene/create-power-scene";
 import { seasonOf } from "~/domain";
 import { selectionLabel } from "./scene-labels";
+import { WIDE_DESKTOP_MIN } from "../tour-config";
 import { tourAnchor, type ScreenRect, type TourAnchor } from "./tour-anchor";
 
 type SceneModule = typeof import("~/scene/create-power-scene");
@@ -131,7 +132,7 @@ export const PowerCanvas = (props: {
     const focusTourWhenSettled = (selection: SceneSelection): void => {
       if (settleFrame !== undefined) cancelAnimationFrame(settleFrame);
 
-      const wide = window.matchMedia("(min-width: 1340px)").matches;
+      const wide = window.matchMedia(`(min-width: ${WIDE_DESKTOP_MIN}px)`).matches;
       const started = performance.now();
       let lastLeft: number | null = null;
       let stable = 0;
@@ -189,7 +190,10 @@ export const PowerCanvas = (props: {
     };
 
     const onResize = (): void => {
-      if (tourTarget !== null) focusTourWhenSettled(tourTarget);
+      if (tourTarget !== null) {
+        setTourAnchored(false);
+        focusTourWhenSettled(tourTarget);
+      }
     };
 
     window.addEventListener("grid:tour-focus", onTour);

@@ -6,8 +6,7 @@ import { useGame } from "../game-context";
 import { Icon, type IconName } from "../components/icons";
 import type { PanelId } from "../mobile/mobile-nav";
 import type { SceneSelection } from "~/scene/create-power-scene";
-
-const PANEL_TOUR_MIN_WIDTH = 1340;
+import { WIDE_DESKTOP_MIN } from "../tour-config";
 
 type Step = {
   readonly kicker: string;
@@ -97,6 +96,7 @@ export const TutorialModal = (props: {
   const [step, setStep] = createSignal(0);
   let wasOpen = false;
   let stepTimer: ReturnType<typeof setTimeout> | undefined;
+  let focusFrame: number | undefined;
   const current = () => steps[step()] ?? steps[0];
 
   const focusWhenSettled = (): void => {
@@ -125,7 +125,7 @@ export const TutorialModal = (props: {
         lastLeft = left;
 
         if (stable < 2 && now - started < 600) {
-          requestAnimationFrame(tick);
+          focusFrame = requestAnimationFrame(tick);
 
           return;
         }
@@ -134,7 +134,7 @@ export const TutorialModal = (props: {
       content.focus({ preventScroll: true });
     };
 
-    requestAnimationFrame(tick);
+    focusFrame = requestAnimationFrame(tick);
   };
 
   createTrackedEffect(() => {
@@ -152,7 +152,7 @@ export const TutorialModal = (props: {
     }
 
     const active = current();
-    const wide = window.matchMedia(`(min-width: ${PANEL_TOUR_MIN_WIDTH}px)`).matches;
+    const wide = window.matchMedia(`(min-width: ${WIDE_DESKTOP_MIN}px)`).matches;
 
     if (active?.panel !== undefined && wide) {
       props.onOpenPanel(active.panel);
@@ -174,6 +174,8 @@ export const TutorialModal = (props: {
 
   onCleanup(() => {
     cleanupSpotlight?.();
+
+    if (focusFrame !== undefined) cancelAnimationFrame(focusFrame);
 
     if (stepTimer !== undefined) clearTimeout(stepTimer);
     delete document.documentElement.dataset.tour;

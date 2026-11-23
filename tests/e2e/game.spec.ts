@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { WIDE_DESKTOP_MIN } from "../../src/ui/tour-config";
 
 const startGame = async (page: Page): Promise<void> => {
   await page.goto("/");
@@ -178,7 +179,10 @@ test("walks the tutorial through live panels and map nodes", async ({ page }) =>
 
   const tutorial = page.locator(".tutorial-modal");
   await expect(tutorial).toBeVisible();
-  const desktop = (page.viewportSize()?.width ?? 0) > 1340;
+  const width = page.viewportSize()?.width ?? 0;
+  const desktop = width >= WIDE_DESKTOP_MIN;
+
+  test.skip(width > 1180 && !desktop, "panels auto-open only from 1340 px");
 
   await tutorial.getByRole("button", { name: "Tiếp tục" }).click();
 
@@ -241,7 +245,7 @@ test("walks the tutorial through live panels and map nodes", async ({ page }) =>
 });
 
 test("keeps the tutorial focus free on a short wide desktop", async ({ page }) => {
-  test.skip((page.viewportSize()?.width ?? 0) < 1300, "wide desktop only");
+  test.skip((page.viewportSize()?.width ?? 0) < WIDE_DESKTOP_MIN, "wide desktop only");
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto("/");
   await page.getByRole("button", { name: /Bắt đầu nhiệm kỳ/i }).click();
