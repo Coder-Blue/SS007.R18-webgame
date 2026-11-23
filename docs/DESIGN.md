@@ -69,6 +69,9 @@ sub-11 px data text, 44 px controls, visible focus and reduced-motion support.
 
 ## Responsive rules
 
+- Title `1440x900`: asymmetric split with the title/actions on the left and the
+  four-act route as a vertical dossier on the right; the mobile layout stacks
+  them in reading order.
 - Desktop `1440x900`: persistent top bar, left mission rail, right operations
   rail, bottom dock, right workspace drawer.
 - Tablet `768x1024`: rails hidden, mobile tab bar, bottom-sheet panels.

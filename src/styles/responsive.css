@@ -152,10 +152,6 @@
     font-size: 10px;
   }
 
-  .title-acts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .stat-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -240,31 +236,6 @@
 
   .paused-hint {
     display: none;
-  }
-
-  .title-main {
-    font-size: clamp(32px, 10vw, 48px);
-  }
-
-  .title-tagline {
-    font-size: 13px;
-  }
-
-  .title-acts {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .title-content {
-    gap: 10px;
-  }
-
-  .title-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .title-actions .btn {
-    width: 100%;
   }
 
   .pillar-grid,
