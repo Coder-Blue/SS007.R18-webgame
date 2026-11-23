@@ -67,8 +67,9 @@ sub-11 px data text, 44 px controls, visible focus and reduced-motion support.
 - Mobile `390x844` and narrow `360x740`: five-item bottom navigation (overview,
   production, transmission, distribution, finance), all panels reachable from
   the sheet tabs, 44 px targets. The policy panel is one sheet tab away.
-- Paused, toast and scene badge overlays clear the expanded mobile top bar at
-  172 px; the tutorial begins below the bar at 158 px.
+- Toast and scene badge overlays clear the expanded mobile top bar at 172 px;
+  the paused banner stacks beneath the badges at 236 px. The tutorial begins
+  below the bar at 158 px.
 - The 3D canvas uses `touch-action: none`, pointer drag, wheel zoom and pinch
   zoom. Its `img` role points to a live text summary of coverage, weather,
   reserve and active reforms, and the WebGL fallback offers a dashboard action.

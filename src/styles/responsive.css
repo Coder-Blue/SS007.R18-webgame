@@ -101,7 +101,7 @@
   }
 
   .paused-banner {
-    top: 168px;
+    top: 206px;
   }
 }
 
@@ -226,7 +226,7 @@
   .paused-banner {
     flex-wrap: wrap;
     justify-content: center;
-    top: 172px;
+    top: 236px;
     width: calc(100vw - 20px);
   }
 
