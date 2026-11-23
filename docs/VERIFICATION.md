@@ -28,7 +28,7 @@ Observed sub-results:
 
 ```
 Line budget: OK (owned source files <= 500 lines; 36 vendored files exempt)
-Emoji audit: OK (164 text files scanned)
+Emoji audit: OK (165 text files scanned)
 Domain boundary: OK (32 pure files)
 Test Files  22 passed (22)
 Tests       171 passed (171)
