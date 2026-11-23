@@ -337,6 +337,9 @@ test("title and first month stay inside every viewport", async ({ page }) => {
   await startGame(page);
   await expect(page.locator(".top-bar")).toBeVisible();
   await expect(page.locator(".power-canvas")).toBeVisible();
+  await expect(page.locator(".power-canvas")).toHaveAttribute("aria-describedby", "scene-summary");
+  await expect(page.locator("#scene-summary")).toContainText("phủ điện");
+  await expect(page.locator("#scene-summary")).toBeHidden();
   await expectNoOverflow(page);
   await expectMonth(page, "Tháng 1/2022");
 });
@@ -424,6 +427,14 @@ test("mobile navigation opens the tariff sheet with large touch targets", async 
     expect(slider.height).toBeGreaterThanOrEqual(43.5);
     expect(slider.width).toBeGreaterThanOrEqual(43.5);
   }
+
+  await page.waitForTimeout(1_000);
+  await page.locator(".sheet-tab").filter({ hasText: "Chính sách" }).click();
+  await expect(page.locator(".mobile-sheet")).toContainText("Cải cách cơ cấu");
+  await page.locator(".sheet-tab").filter({ hasText: "Tổng quan" }).click();
+  await expect(
+    page.locator(".mobile-sheet .panel-title").filter({ hasText: "Bức tranh điều hành" }),
+  ).toBeVisible();
 
   await expectNoOverflow(page);
 });

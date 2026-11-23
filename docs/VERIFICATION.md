@@ -28,10 +28,10 @@ Observed sub-results:
 
 ```
 Line budget: OK (owned source files <= 500 lines; 36 vendored files exempt)
-Emoji audit: OK (165 text files scanned)
+Emoji audit: OK (168 text files scanned)
 Domain boundary: OK (32 pure files)
-Test Files  22 passed (22)
-Tests       171 passed (171)
+Test Files  23 passed (23)
+Tests       174 passed (174)
 
 Statements   : 100% (826/826)
 Branches     : 100% (460/460)
@@ -51,7 +51,7 @@ pnpm check:bundle
 ```
 
 All 15 client chunks are below 500 kB minified. The initial shell preloads
-624.5 kB minified / 210.2 kB gzip and contains no Three.js or GSAP. The deferred
+625.1 kB minified / 210.4 kB gzip and contains no Three.js or GSAP. The deferred
 `create-power-scene-*.js` chunk is loaded only after the game starts.
 
 ## Browser matrix
@@ -59,7 +59,7 @@ All 15 client chunks are below 500 kB minified. The initial shell preloads
 ```
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
   pnpm exec playwright test
-62 passed, 14 skipped
+70 passed, 14 skipped
 ```
 
 The skipped checks are desktop-only workspace/overlap tests on mobile projects,
@@ -67,10 +67,15 @@ the short-wide tour check outside the desktop project, and the production-chunk
 test in dev mode. The suite covers `1440x900`, `1366x768`, `768x1024`, `390x844`
 and `360x740`, no horizontal overflow, 44 px controls,
 mobile speed selectors and reserve, pause/resume, month advance, tutorial panel
-tours with an uncovered scene focus anchor, tutorial reset,
+tours with an uncovered scene focus anchor, tutorial reset, hidden map text
+descriptions, the WebGL fallback dashboard action, mobile overlay clearance
+(scene badges 172, toast 210, pause 280 at 390x844 and 360x740; 168/206/270 at
+768x1024), mobile sheet tab wrapping and reactive policy/overview switching,
 save/reload/continue, scene chunk deferral and failure recovery, named meters,
 Iconify without API calls, OG metadata, chart/table overlap assertions and
-screenshots.
+screenshots. A CDP accessibility probe at 1440x900 returned one image node named
+"Bản đồ lưới điện quốc gia" with the full coverage/weather/reserve/reform
+description and no duplicate paragraph in the reading order.
 
 The production chunk check was also run against the built server:
 
@@ -84,7 +89,7 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/tmp/grid-browser/chrome-headless-shell \
 
 The final `main` push workflow passed both gates: lint in 23 s, and
 `unit and build` plus `browser` in 6m35s. Its production smoke run reported
-12 passed / 1 skipped, and the responsive browser run reported 62 passed /
+12 passed / 1 skipped, and the responsive browser run reported 70 passed /
 14 skipped.
 
 The headless shell exposes no WebGL in this container, so the scene factory

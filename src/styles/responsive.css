@@ -39,7 +39,7 @@
 
   .scene-badges {
     left: 14px;
-    top: 128px;
+    top: 168px;
   }
 
   .scene-controls {
@@ -97,11 +97,11 @@
   }
 
   .toast {
-    top: 152px;
+    top: 206px;
   }
 
   .paused-banner {
-    top: 152px;
+    top: 270px;
   }
 }
 
@@ -220,14 +220,22 @@
   }
 
   .scene-badges {
-    top: 142px;
+    top: 172px;
   }
 
   .paused-banner {
     flex-wrap: wrap;
     justify-content: center;
-    top: 142px;
+    top: 280px;
     width: calc(100vw - 20px);
+  }
+
+  .toast {
+    top: 210px;
+  }
+
+  .scene-stage[data-paused="true"] .scene-empty {
+    top: 58%;
   }
 
   .paused-hint {

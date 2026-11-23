@@ -25,10 +25,12 @@
 | Warning | `--amber` | `#ffb347` |
 | Positive | `--green` | `#5bd6a2` |
 | Danger | `--rose` | `#ff6b6b` |
-| Cost series | `--gold` | `#f2d06b` |
+| Cost series / reform execution | `--gold` | `#f2d06b` |
 
 Surfaces are neutral navy steps with hairline borders. The bright color belongs
-to the map, the charts and live status, not to the chrome. Type is Be Vietnam
+to the map, the charts and live status, not to the chrome. Electric cyan marks
+missions and the grid; gold marks money and structural reform, including the
+policy bars, the reform HUD and the map beacon. Type is Be Vietnam
 Pro throughout; figures use tabular numerals. Buttons are solid, not gradient.
 Labels are sentence case, 10 to 12 px in dense chrome and 14 px in body copy.
 
@@ -51,8 +53,9 @@ sub-11 px data text, 44 px controls, visible focus and reduced-motion support.
   asset totals and construction progress.
 - **Distribution**: six tariff tiers, industrial tariff, State approval
   likelihood and before/after profit.
-- **Policy**: long-term missions, post-event decisions, N-2/NSMO/DPPA/VREM and
-  the private-branch warning.
+- **Policy**: active reforms first with gold 0-100% bars, then long-term
+  missions, post-event decisions, available reforms and the private-branch
+  warning.
 - **Finance**: monthly ledger, annual audit and the structural-deficit
   diagnosis.
 
@@ -62,10 +65,14 @@ sub-11 px data text, 44 px controls, visible focus and reduced-motion support.
   rail, bottom dock, right workspace drawer.
 - Tablet `768x1024`: rails hidden, mobile tab bar, bottom-sheet panels.
 - Mobile `390x844` and narrow `360x740`: five-item bottom navigation (overview,
-  production, transmission, distribution, finance), all panels reachable from
-  the sheet tabs, 44 px targets. The policy panel is one sheet tab away.
+  production, transmission, distribution, finance), all six sheet tabs wrap into
+  two or three rows so every panel is reachable, 44 px targets.
+- Scene badges clear the expanded mobile top bar at 172 px, toasts follow at
+  210 px and the paused banner stacks at 280 px. Tablet uses 168/206/270 and
+  desktop pauses at 168; the mobile WebGL fallback shifts below the pause pill. The tutorial begins below the bar at 158 px.
 - The 3D canvas uses `touch-action: none`, pointer drag, wheel zoom and pinch
-  zoom.
+  zoom. Its `img` role references a hidden text description of coverage, weather,
+  reserve and active reforms, and the WebGL fallback offers a dashboard action.
 
 ## Motion
 
