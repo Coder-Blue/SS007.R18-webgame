@@ -61,7 +61,7 @@ export const MissionRail = (props: {
                   </div>
                   <Bar
                     value={progress}
-                    tone="electric"
+                    tone="gold"
                     label={`Tiến trình ${reformNames[project.key]}`}
                   />
                   <span class="project-meta">{`Còn ${project.monthsLeft} tháng`}</span>

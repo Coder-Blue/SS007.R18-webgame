@@ -1,6 +1,7 @@
 import { For, Show, createSignal, createTrackedEffect } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
+import { orderReforms } from "./reform-order";
 import { ActionButton, Badge, Bar, Panel, RangeSlider, Stat } from "../components/base";
 import { Icon } from "../components/icons";
 import { formatBillion, formatPercent } from "~/state/format";
@@ -71,6 +72,20 @@ export const PolicyPanel = (): JSX.Element => {
 
   const reformProgress = (key: (typeof reforms)[number]["key"]) =>
     state().policy.reformProgress.find((project) => project.key === key);
+
+  const isReformEnabled = (key: (typeof reforms)[number]["key"]): boolean =>
+    key === "n2"
+      ? state().policy.n2Enabled
+      : key === "nsmo"
+        ? state().policy.nsmo
+        : key === "dppa"
+          ? state().policy.dppa
+          : key === "vrem"
+            ? state().policy.vrem
+            : state().policy.twoPartTariff;
+
+  const orderedReforms = () =>
+    orderReforms(reforms, state().policy.reformProgress, isReformEnabled);
 
   const isActive = (id: DecisionId): boolean =>
     state().operations.projects.some(
@@ -168,19 +183,9 @@ export const PolicyPanel = (): JSX.Element => {
 
       <Panel title="Cải cách cơ cấu" kicker="Luật Điện lực sửa đổi" icon="tabler:gavel">
         <div class="reform-list">
-          <For each={reforms}>
+          <For each={orderedReforms()}>
             {(reform) => {
-              const enabled =
-                reform.key === "n2"
-                  ? state().policy.n2Enabled
-                  : reform.key === "nsmo"
-                    ? state().policy.nsmo
-                    : reform.key === "dppa"
-                      ? state().policy.dppa
-                      : reform.key === "vrem"
-                        ? state().policy.vrem
-                        : state().policy.twoPartTariff;
-
+              const enabled = isReformEnabled(reform.key);
               const pending = reformProgress(reform.key);
 
               const progress =
@@ -197,9 +202,7 @@ export const PolicyPanel = (): JSX.Element => {
                   <div class="reform-copy">
                     <div class="reform-head">
                       <strong>{reform.name}</strong>
-                      <Badge
-                        tone={enabled ? "good" : pending === undefined ? "neutral" : "electric"}
-                      >
+                      <Badge tone={enabled ? "good" : pending === undefined ? "neutral" : "gold"}>
                         {enabled
                           ? "Đang áp dụng"
                           : pending === undefined
@@ -210,7 +213,7 @@ export const PolicyPanel = (): JSX.Element => {
                     <span>{reform.detail}</span>
                     {pending === undefined ? null : (
                       <>
-                        <Bar value={progress} tone="electric" label={`Tiến trình ${reform.name}`} />
+                        <Bar value={progress} tone="gold" label={`Tiến trình ${reform.name}`} />
                         <span class="project-meta">
                           {`Đang thực thi · còn ${pending.monthsLeft} tháng`}
                         </span>
