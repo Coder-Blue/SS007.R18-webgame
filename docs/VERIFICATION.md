@@ -85,7 +85,8 @@ The summary selector tests cover two- and three-month windows, previous-quarter
 comparison, zero-energy tariff fallback and closing balance selection. The
 summary browser test runs at 1440x900, 768x1024, 390x844 and 360x740 and checks
 that no stat cards remain, the toast is gone and the 44 px continue action is
-inside the viewport.
+inside the viewport. The chart/table overlap audit advances to month 2 first so
+it exercises populated plots and the real ledger table.
 
 ## Browser matrix
 
