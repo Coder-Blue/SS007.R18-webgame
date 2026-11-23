@@ -25,7 +25,7 @@ the project uses semantic versioning for save-compatible releases.
 - The title screen uses a lightweight CSS/SVG poster and renders the Three.js
   scene only during play, so the first visit does not pay for the renderer.
 - The game surface, save menu and tutorial are lazy chunks; the current initial
-  shell preloads 630.5 kB minified / 212.2 kB gzip with no Three.js or GSAP.
+  shell preloads 630.3 kB minified / 212.1 kB gzip with no Three.js or GSAP.
 - The title and HUD reserve their layout, preload the visible font weights, and
   expose named meters, a single main landmark, accessible mobile tabs and the
   reduced-motion switch.

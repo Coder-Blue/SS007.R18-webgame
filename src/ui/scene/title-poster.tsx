@@ -9,7 +9,6 @@ export const TitlePoster = (): JSX.Element => (
       </g>
       <g class="poster-node">
         <circle cx="1120" cy="260" r="5" />
-        <circle cx="960" cy="420" r="4" />
       </g>
       <g class="poster-horizon">
         <path d="M0 760 H1440 M0 800 H1440" />

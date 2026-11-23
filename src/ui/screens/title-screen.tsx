@@ -41,7 +41,7 @@ export const TitleScreen = (props: {
           <p class="text-[11px] font-medium text-ink-faint">
             Mô phỏng kinh tế chính trị ngành điện
           </p>
-          <h1 class="mt-4 max-w-[15ch] text-[clamp(36px,5vw,68px)] font-semibold leading-[0.95] tracking-[-0.035em] text-ink">
+          <h1 class="mt-4 max-w-[15ch] text-balance text-[clamp(36px,5vw,68px)] font-semibold leading-[0.95] tracking-[-0.035em] text-ink">
             Điều Hành Lưới Điện Quốc Gia
           </h1>
           <p class="mt-3 text-sm font-medium text-electric">National Grid Command</p>
@@ -80,14 +80,14 @@ export const TitleScreen = (props: {
           <div class="mt-4 flex flex-wrap items-center gap-4">
             <button
               type="button"
-              class="min-h-11 text-xs text-ink-faint underline decoration-line underline-offset-4 transition-colors hover:text-ink"
+              class="min-h-11 text-xs text-ink-faint underline decoration-ink-faint/50 underline-offset-4 transition-colors hover:text-ink"
               onClick={props.onOpenLoad}
             >
               Mở kho lưu
             </button>
             <button
               type="button"
-              class="min-h-11 text-xs text-ink-faint underline decoration-line underline-offset-4 transition-colors hover:text-ink"
+              class="min-h-11 text-xs text-ink-faint underline decoration-ink-faint/50 underline-offset-4 transition-colors hover:text-ink"
               onClick={props.onTutorial}
             >
               Xem hướng dẫn nhập cuộc
