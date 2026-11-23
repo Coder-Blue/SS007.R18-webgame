@@ -15,7 +15,7 @@ committed and is no longer in the repository.
 
 ## 2. Baseline
 
-Live production on `https://monopoly-nhom5.vercel.app`, Lighthouse CLI mobile:
+Live production on `https://monopoly-nhom7.vercel.app`, Lighthouse CLI mobile:
 
 | Metric | Before |
 |---|---:|
@@ -53,7 +53,7 @@ The local TBT is dominated by the 3D scene running under software rendering; the
 - Applied the unslop craft pass: 4px spacing rhythm, sentence-case labels, metric-weight type, hairline borders, quiet chrome, one gold accent, named meters and larger small text.
 - Added one main landmark, a hidden game `<h1>`, named meters, a named reduced-motion switch, per-tab mobile `aria-expanded`, `aria-pressed` sheet tabs, and WCAG AA gold/muted text tokens.
 - Added canonical, `og:url`, `og:locale`, `og:site_name`, `twitter:description`, `twitter:image:alt`, `sitemap.xml`, a dynamic `robots.txt`, and a pre-paint reduced-motion preference script.
-- Fixed the social image fallback from the retired `ss007-r18-webgame.vercel.app` host to `monopoly-nhom5.vercel.app`.
+- Fixed the social image fallback from the retired `ss007-r18-webgame.vercel.app` host to `monopoly-nhom7.vercel.app`.
 
 ### API / Backend
 
@@ -124,7 +124,7 @@ Local production build through the same gzip proxy:
 | Slowest API | none | none | n/a |
 | Slowest DB query | none | none | n/a |
 
-Live production at merge revision `963eddd` (`https://monopoly-nhom5.vercel.app`):
+Live production at merge revision `963eddd` (`https://monopoly-nhom7.vercel.app`):
 
 | Strategy | Performance | Accessibility | Best Practices | SEO | LCP | TBT | CLS | Transfer |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -167,10 +167,10 @@ PLAYWRIGHT_SERVER=start PLAYWRIGHT_PORT=3123 \
   PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/nix/store/.../bin/chromium \
   pnpm exec playwright test --project=desktop --project=mobile
 CHROME_PATH=/nix/store/.../bin/chromium npx lighthouse@12.8.2 \
-  https://monopoly-nhom5.vercel.app/ \
+  https://monopoly-nhom7.vercel.app/ \
   --only-categories=performance,accessibility,best-practices,seo
 CHROME_PATH=/nix/store/.../bin/chromium npx lighthouse@12.8.2 \
-  https://monopoly-nhom5.vercel.app/ --preset=desktop \
+  https://monopoly-nhom7.vercel.app/ --preset=desktop \
   --only-categories=performance,accessibility,best-practices,seo
 ```
 
