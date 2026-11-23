@@ -19,6 +19,8 @@ import {
   formatSignedBillion,
 } from "~/state/format";
 
+const deltaClass = (value: number): string => (value >= 0 ? "text-green" : "text-rose");
+
 const mixRows = (row: {
   hydroMillionKwh: number;
   thermalMillionKwh: number;
@@ -236,8 +238,6 @@ export const SummaryModal = (): JSX.Element => {
 
     return current.netBillionVnd - current.previousNetBillionVnd;
   };
-
-  const deltaClass = (value: number): string => (value >= 0 ? "text-green" : "text-rose");
 
   return (
     <Dialog open={open()} onOpenChange={(next) => (next ? undefined : close())}>
