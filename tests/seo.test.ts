@@ -59,10 +59,13 @@ describe("production metadata", () => {
 
   test("ships the grid favicon set at its declared sizes", () => {
     expect(faviconSource).toContain('viewBox="0 0 64 64"');
+    expect(faviconSource).toContain("#07121b");
     expect(faviconSource).toContain("#39d7ff");
     expect(faviconSource).toContain("#f2d06b");
     expect(faviconSource).toContain("#5bd6a2");
-    expect(rootSource).toContain('sizes: "any", href: "/favicon.svg"');
+    expect(rootSource).toContain('sizes: "any", href: "/favicon.svg?v=2"');
+    expect(rootSource).toContain('href: "/favicon.png?v=2"');
+    expect(rootSource).toContain('href: "/favicon.ico?v=2"');
     expect(rootSource).toContain('sizes: "180x180", href: "/apple-touch-icon.png"');
 
     const png = readBinary("../public/favicon.png");
@@ -72,18 +75,20 @@ describe("production metadata", () => {
     const apple = readBinary("../public/apple-touch-icon.png");
     expect(apple.readUInt32BE(16)).toBe(180);
     expect(apple.readUInt32BE(20)).toBe(180);
+    expect(apple[25]).toBe(2);
 
     const ico = readBinary("../public/favicon.ico");
     const count = ico.readUInt16LE(4);
-    expect(count).toBe(4);
+    const expectedSizes = [16, 32, 48, 64];
+    expect(count).toBe(expectedSizes.length);
 
-    for (let index = 0; index < count; index += 1) {
+    for (const [index, size] of expectedSizes.entries()) {
       const entry = 6 + index * 16;
-      const width = ico[entry] ?? 0;
-      const height = ico[entry + 1] ?? 0;
       const imageOffset = ico.readUInt32LE(entry + 12);
-      expect(ico.readUInt32BE(imageOffset + 16)).toBe(width);
-      expect(ico.readUInt32BE(imageOffset + 20)).toBe(height);
+      expect(ico[entry]).toBe(size);
+      expect(ico[entry + 1]).toBe(size);
+      expect(ico.readUInt32BE(imageOffset + 16)).toBe(size);
+      expect(ico.readUInt32BE(imageOffset + 20)).toBe(size);
     }
   });
 

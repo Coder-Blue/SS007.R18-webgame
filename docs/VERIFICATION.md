@@ -63,9 +63,10 @@ public/apple-touch-icon.png: PNG image data, 180 x 180, 8-bit/color RGB
 ```
 
 The SVG uses the game palette (`#07121b`, `#39d7ff`, `#f2d06b`, `#5bd6a2`) and
-a transmission-pylon mark. The SEO test verifies every declared size and the
-Nitro/Vercel cache rules; `tests/e2e/branding.spec.ts` fetches all four assets
-and checks the document links at every viewport.
+a transmission-pylon mark. The SEO test verifies the 16/32/48/64 ICO frames, every declared PNG
+dimension, Apple's opaque color type and the Nitro/Vercel cache rules;
+`tests/e2e/branding.spec.ts` fetches all four assets and checks all four
+versioned document links at every viewport.
 
 ## Browser matrix
 

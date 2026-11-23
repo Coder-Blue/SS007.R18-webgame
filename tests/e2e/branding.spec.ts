@@ -33,8 +33,13 @@ test("serves the grid favicon set and links it from the document", async ({ page
   await page.goto("/");
   await expect(page.locator('link[rel="icon"][type="image/svg+xml"]')).toHaveAttribute(
     "href",
-    "/favicon.svg",
+    "/favicon.svg?v=2",
   );
+  await expect(page.locator('link[rel="icon"][type="image/png"]')).toHaveAttribute(
+    "href",
+    "/favicon.png?v=2",
+  );
+  await expect(page.locator('link[rel="icon"][href="/favicon.ico?v=2"]')).toHaveCount(1);
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
     "href",
     "/apple-touch-icon.png",
