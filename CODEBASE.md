@@ -58,7 +58,7 @@ module. Randomness is threaded as a seed.
   (`8_000 ms / speed`).
 - `persistence.ts`: `dhl:` localStorage slots, autosave, session preferences,
   JSON export/import with Valibot validation.
-- `selectors.ts`: finance projection, coverage and mission views.
+- `selectors.ts`: finance projection, coverage, mission views and the completed-quarter aggregate used by the summary modal.
 - `format.ts`: Vietnamese number, date, currency, power and energy formatting.
 
 ### `src/scene/`
@@ -77,7 +77,9 @@ GSAP cameras and seasonal tweens are closures, never classes.
 ### `src/ui/`
 
 Presentational Solid components with Vietnamese copy written inline. The HUD is
-desktop-persistent and mobile-compact. The top bar owns the pause/resume button,
+desktop-persistent and mobile-compact. Components use Tailwind utilities over
+semantic oklch tokens; `styles/*.css` keeps the theme, resets, shared primitives
+and UI SDK integration. The top bar owns the pause/resume button,
 speed selectors and five live gauges. Side rails show active reform bars, long-term
 missions, press pressure, MW balance and project progress; the policy panel
 promotes in-flight reforms above available and enabled ones. The mobile sheet
@@ -88,7 +90,9 @@ wide desktop (1340 px and up), narrows the drawer to keep the map visible,
 spotlights the panel anchors and dispatches `grid:tour-focus`. The scene pans
 the matching thermal, rural or urban node into the gap between the mission rail
 and the drawer, rings it and labels it; the final step closes the drawer before
-pointing at the pause and speed controls. Charts are dependency-free SVG. All iconography comes from Lucide and
+pointing at the pause and speed controls. Charts are dependency-free SVG. The quarterly summary aggregates the last
+three ledgers, hides the monthly toast, and presents energy, generation mix,
+revenue/cost rows and trust on one report. All iconography comes from Lucide and
 Tabler through `@iconify-icon/solid`; `icon-names.ts` is the build-time subset.
 
 ## Economy

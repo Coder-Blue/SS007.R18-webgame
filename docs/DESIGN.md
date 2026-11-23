@@ -29,6 +29,8 @@
 | Danger | `--rose` | `#ff6b6b` |
 | Cost series / reform execution | `--gold` | `#f2d06b` |
 
+Tokens are oklch, and components consume them through Tailwind utilities
+(`bg-panel`, `text-ink`, `border-line`) rather than one-off component CSS.
 Surfaces are neutral navy steps with hairline borders. The bright color belongs
 to the map, the charts and live status, not to the chrome. Electric cyan marks
 missions and the grid; gold marks money and structural reform, including the
@@ -58,6 +60,10 @@ sub-11 px data text, 44 px controls, visible focus and reduced-motion support.
 - **Policy**: active reforms first with gold 0-100% bars, then long-term
   missions, post-event decisions, available reforms and the private-branch
   warning.
+- **Quarter summary**: one energy figure and generation mix, a bottom-line
+  ledger, trust at quarter close, and a single continue action. It aggregates
+  the completed three months instead of repeating the latest month in stat
+  cards.
 - **Finance**: monthly ledger, annual audit and the structural-deficit
   diagnosis.
 

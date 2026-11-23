@@ -7,6 +7,11 @@ the project uses semantic versioning for save-compatible releases.
 
 ### Changed
 
+- Replaced the quarterly stat-card grid with a quarter ledger that aggregates
+  three months, hides the monthly toast behind the modal, keeps the continue
+  action visible on mobile and drops decorative stat icons.
+- Moved the theme to oklch tokens and Tailwind utilities in components; the
+  summary, empty states and shared stat shell no longer carry one-off CSS.
 - Replaced the house-and-bolt favicon with a transmission-pylon mark that
   carries the game's cyan grid, amber insulator nodes and green live-status dot;
   the set now ships an SVG, a 16/32/48/64 ICO, a 64 px PNG and a 180 px Apple
