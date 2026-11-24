@@ -153,7 +153,6 @@
   justify-content: space-between;
   padding: 12px 14px;
   background: var(--panel);
-  z-index: 2;
 }
 
 .sheet-tabs {
@@ -163,5 +162,4 @@
   flex-wrap: wrap;
   gap: 6px;
   padding: 8px 12px;
-  z-index: 2;
 }
