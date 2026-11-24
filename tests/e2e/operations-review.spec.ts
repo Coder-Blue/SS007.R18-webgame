@@ -125,7 +125,9 @@ test("desktop workspace drawer fills the right edge and scrolls every panel", as
 
   await page.goto("/");
   await skipTutorial(page);
-  await page.getByRole("button", { name: "Sản xuất & mua điện", exact: true }).click();
+  const productionDock = page.getByRole("button", { name: "Sản xuất & mua điện", exact: true });
+  await productionDock.focus();
+  await productionDock.click();
 
   const drawer = page.locator(".workspace-drawer");
   await expect(drawer).toHaveAttribute("data-side", "right");
@@ -209,4 +211,16 @@ test("desktop workspace drawer fills the right edge and scrolls every panel", as
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
   ).toBe(true);
+
+  await page.getByRole("button", { name: "Kho lưu và cài đặt" }).evaluate((element) => {
+    element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+  await expect(page.locator(".save-modal")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".save-modal")).toHaveCount(0);
+  await expect(page.locator(".workspace-drawer")).toHaveCount(1);
+
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".workspace-drawer")).toHaveCount(0);
+  await expect(productionDock).toBeFocused();
 });

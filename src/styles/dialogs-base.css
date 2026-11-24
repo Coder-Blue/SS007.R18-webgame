@@ -232,13 +232,8 @@
   right: 0;
   top: 0;
   width: min(980px, 100vw);
-  /* The SDK keeps its promote hint after settling; stale raster tiles can leave a band. */
-  will-change: auto !important;
+  will-change: auto;
   z-index: 55;
-}
-
-.workspace-drawer::after {
-  content: none;
 }
 
 .workspace-drawer[data-side="right"] {
