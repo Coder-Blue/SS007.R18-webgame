@@ -225,7 +225,6 @@
   border-left: 1px solid var(--line-strong);
   box-shadow: var(--shadow-lift);
   bottom: 0;
-  contain: paint;
   isolation: isolate;
   max-width: 100vw;
   position: fixed;
