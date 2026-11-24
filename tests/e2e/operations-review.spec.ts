@@ -159,6 +159,7 @@ test("desktop workspace drawer fills the right edge and scrolls every panel", as
     const style = getComputedStyle(element);
 
     return {
+      contain: style.contain,
       willChange: style.willChange,
       isolation: style.isolation,
       backgroundColor: style.backgroundColor,
@@ -166,6 +167,7 @@ test("desktop workspace drawer fills the right edge and scrolls every panel", as
     };
   });
 
+  expect(paint.contain).toBe("none");
   expect(paint.willChange).toBe("auto");
   expect(paint.isolation).toBe("isolate");
   expect(paint.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
@@ -223,4 +225,62 @@ test("desktop workspace drawer fills the right edge and scrolls every panel", as
   await page.keyboard.press("Escape");
   await expect(page.locator(".workspace-drawer")).toHaveCount(0);
   await expect(productionDock).toBeFocused();
+});
+
+test("production drawer stays single-layered at the tutorial width", async ({ page }) => {
+  test.skip((page.viewportSize()?.width ?? 0) < 1181, "wide desktop only");
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto("/");
+  await page.getByRole("button", { name: /Bắt đầu nhiệm kỳ/i }).click();
+  await page.locator(".tutorial-modal").getByRole("button", { name: "Tiếp tục" }).click();
+
+  const drawer = page.locator(".workspace-drawer");
+  await expect(drawer).toBeVisible();
+  await waitForRightDrawer(page);
+  await expect.poll(async () => Math.round((await drawer.boundingBox())?.width ?? 0)).toBe(840);
+
+  const box = await drawer.boundingBox();
+  expect(Math.round(box?.y ?? -1)).toBe(0);
+  expect(Math.round(box?.height ?? 0)).toBe(1080);
+  expect(Math.round((box?.x ?? 0) + (box?.width ?? 0))).toBe(1920);
+
+  const paint = await drawer.evaluate((element) => {
+    const style = getComputedStyle(element);
+
+    return {
+      contain: style.contain,
+      isolation: style.isolation,
+      willChange: style.willChange,
+      backgroundColor: style.backgroundColor,
+    };
+  });
+
+  expect(paint.contain).toBe("none");
+  expect(paint.isolation).toBe("isolate");
+  expect(paint.willChange).toBe("auto");
+  expect(paint.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+
+  await expect(page.locator(".panel-lead")).toHaveCount(1);
+  await expect(page.locator(".preview-card")).toHaveCount(1); // dispatch only
+  await expect(page.locator(".action-row")).toHaveCount(1);
+  await expect(page.locator(".action-row")).toContainText("Áp dụng điều độ");
+  await expect(page.getByRole("button", { name: "Áp dụng nhà cung cấp" })).toHaveCount(0);
+
+  const panel = page.locator(".workspace-panel[data-selected]");
+  expect(await panel.evaluate((element) => getComputedStyle(element).overflowX)).toBe("hidden");
+  expect(await panel.evaluate((element) => getComputedStyle(element).overflowY)).toBe("auto");
+  await panel.evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+  });
+  await expect.poll(async () => panel.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+
+  await panel.evaluate((element) => {
+    element.scrollTop = 0;
+  });
+  await drawer.getByRole("button", { name: /IPP tư nhân/i }).click();
+  const apply = drawer.getByRole("button", { name: "Áp dụng nhà cung cấp" });
+  await expect(apply).toHaveCount(1);
+  await apply.click();
+  await expect(apply).toHaveCount(0);
+  await expect(page.locator(".action-row")).toHaveCount(1);
 });
