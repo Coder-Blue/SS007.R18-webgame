@@ -47,7 +47,7 @@ export const WorkspaceDrawer = (props: {
         {PANEL_TABS.map((tab) => (
           <TabsPanel
             value={tab.id}
-            class="workspace-panel min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-color:var(--ink-faint)_var(--panel)] [scrollbar-gutter:stable]"
+            class="workspace-panel min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain [scrollbar-color:var(--ink-faint)_var(--panel)] [scrollbar-gutter:stable]"
           >
             <PanelView panel={tab.id} />
           </TabsPanel>

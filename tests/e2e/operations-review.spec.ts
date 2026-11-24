@@ -153,6 +153,38 @@ test("desktop workspace drawer fills the right edge and scrolls every panel", as
     })
     .toBeGreaterThanOrEqual(height - 2);
 
+  const paint = await drawer.evaluate((element) => {
+    const style = getComputedStyle(element);
+
+    return {
+      willChange: style.willChange,
+      isolation: style.isolation,
+      backgroundColor: style.backgroundColor,
+      afterContent: getComputedStyle(element, "::after").content,
+    };
+  });
+
+  expect(paint.willChange).toBe("auto");
+  expect(paint.isolation).toBe("isolate");
+  expect(paint.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  expect(paint.afterContent).toBe("none");
+
+  const activePanel = page.locator(".workspace-panel[data-selected]");
+  await expect
+    .poll(async () => activePanel.evaluate((element) => getComputedStyle(element).overflowX))
+    .toBe("hidden");
+
+  const previewHead = page.locator(".preview-head").first();
+  await expect(previewHead).toBeVisible();
+  expect(
+    await previewHead.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const hit = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
+
+      return hit !== null && (hit === element || element.contains(hit));
+    }),
+  ).toBe(true);
+
   const tabs = page.locator(".workspace-tabs [role='tab']");
   await expect(tabs).toHaveCount(6);
 
