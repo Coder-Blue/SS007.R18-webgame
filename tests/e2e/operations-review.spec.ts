@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { createInitialState, SAVE_VERSION } from "../../src/domain/constants";
+import { waitForRightDrawer } from "./helpers";
 
 const skipTutorial = async (page: Page): Promise<void> => {
   await page.getByRole("button", { name: /Bắt đầu nhiệm kỳ/i }).click();
@@ -116,4 +117,64 @@ test("production controls scroll beneath the header and preview a supplier befor
 
   const close = drawer.getByRole("button", { name: "Đóng" });
   await expect(close).toBeInViewport({ ratio: 1 });
+});
+
+test("desktop workspace drawer fills the right edge and scrolls every panel", async ({ page }) => {
+  const viewport = page.viewportSize();
+  test.skip(viewport === null || viewport.width < 1181, "desktop workspace drawer only");
+
+  await page.goto("/");
+  await skipTutorial(page);
+  await page.getByRole("button", { name: "Sản xuất & mua điện", exact: true }).click();
+
+  const drawer = page.locator(".workspace-drawer");
+  await expect(drawer).toHaveAttribute("data-side", "right");
+  await expect(drawer).toBeVisible();
+
+  const height = viewport?.height ?? 900;
+  const width = await waitForRightDrawer(page);
+
+  await expect
+    .poll(async () => {
+      const box = await drawer.boundingBox();
+
+      return box === null ? false : Math.abs(Math.round(box.width) - Math.min(980, width)) <= 1;
+    })
+    .toBe(true);
+
+  await expect
+    .poll(async () => Math.round((await drawer.boundingBox())?.y ?? Number.NaN))
+    .toBeLessThanOrEqual(2);
+  await expect
+    .poll(async () => {
+      const box = await drawer.boundingBox();
+
+      return box === null ? 0 : Math.round(box.y + box.height);
+    })
+    .toBeGreaterThanOrEqual(height - 2);
+
+  const tabs = page.locator(".workspace-tabs [role='tab']");
+  await expect(tabs).toHaveCount(6);
+
+  for (let index = 0; index < 6; index += 1) {
+    await tabs.nth(index).click();
+
+    const panel = page.locator(".workspace-panel[data-selected]");
+    await expect(panel).toBeVisible();
+    await expect
+      .poll(async () => panel.evaluate((element) => element.scrollHeight > element.clientHeight))
+      .toBe(true);
+
+    await panel.evaluate((element) => {
+      element.scrollTop = element.scrollHeight;
+    });
+    await expect
+      .poll(async () => panel.evaluate((element) => element.scrollTop))
+      .toBeGreaterThan(0);
+  }
+
+  await expect(drawer.getByRole("button", { name: "Đóng" })).toBeInViewport();
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
+  ).toBe(true);
 });

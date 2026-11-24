@@ -14,10 +14,11 @@ export const WorkspaceDrawer = (props: {
 }): JSX.Element => (
   <Drawer
     open={props.open}
+    side="right"
     modal={false}
     onOpenChange={(open) => (open ? undefined : props.onClose())}
   >
-    <DrawerContent class="workspace-drawer flex flex-col overflow-hidden" data-side="right">
+    <DrawerContent class="workspace-drawer flex flex-col overflow-hidden">
       <div class="workspace-head shrink-0">
         <div>
           <p class="eyebrow">Bảng điều hành</p>

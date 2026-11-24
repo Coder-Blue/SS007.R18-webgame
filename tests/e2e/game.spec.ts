@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { WIDE_DESKTOP_MIN } from "../../src/ui/tour-config";
+import { expectNoOverflow, waitForRightDrawer } from "./helpers";
 
 const startGame = async (page: Page): Promise<void> => {
   await page.goto("/");
@@ -9,15 +10,6 @@ const startGame = async (page: Page): Promise<void> => {
   await expect(page.locator(".tutorial-modal")).toBeVisible();
   await page.getByRole("button", { name: /Bỏ qua hướng dẫn/i }).click();
   await expect(page.locator(".tutorial-modal")).toHaveCount(0);
-};
-
-const expectNoOverflow = async (page: Page): Promise<void> => {
-  const widths = await page.evaluate(() => ({
-    scroll: document.documentElement.scrollWidth,
-    viewport: window.innerWidth,
-  }));
-
-  expect(widths.scroll).toBeLessThanOrEqual(widths.viewport + 1);
 };
 
 const expectMonth = async (page: Page, label: string): Promise<void> => {
@@ -355,6 +347,8 @@ test("desktop workspace exposes every panel without overlapping chrome", async (
     page.locator(".workspace-drawer .panel-title").filter({ hasText: "Sổ tài chính" }),
   ).toBeVisible();
 
+  const viewportWidth = await waitForRightDrawer(page);
+
   const boxes = await page.evaluate(() => {
     const rect = (selector: string) => {
       const element = document.querySelector(selector);
@@ -381,7 +375,7 @@ test("desktop workspace exposes every panel without overlapping chrome", async (
     expect(boxes.leftDock.bottom).toBeLessThanOrEqual(boxes.bottomDock.top);
   }
 
-  if (boxes.drawer) expect(boxes.drawer.right).toBeLessThanOrEqual(1440);
+  if (boxes.drawer) expect(boxes.drawer.right).toBeLessThanOrEqual(viewportWidth);
 
   await page.locator(".workspace-drawer [role=tab]").filter({ hasText: "Truyền tải" }).click();
   await expect(
