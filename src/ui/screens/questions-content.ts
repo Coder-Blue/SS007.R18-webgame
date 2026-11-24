@@ -41,7 +41,7 @@ export const questions: readonly QuizQuestion[] = [
   {
     number: 3,
     prompt:
-      'Theo cơ chế của Quyết định 24/2017/QĐ-TTg, vì sao EVN phải "gánh trọn" phần chênh lệch chi phí?',
+      'Theo cơ chế của Quyết định 24/2017/QĐ-TTg (giai đoạn 2022–2023), vì sao EVN phải "gánh trọn" phần chênh lệch chi phí?',
     choices: {
       A: "Vì chi phí mua điện chịu ảnh hưởng của thị trường quốc tế, còn giá bán lẻ bình quân bị Nhà nước khống chế trần giá để giữ ổn định chỉ số giá tiêu dùng",
       B: "Vì EVN tự ý giảm giá bán điện để cạnh tranh với các đơn vị phát điện tư nhân",
@@ -55,7 +55,7 @@ export const questions: readonly QuizQuestion[] = [
   {
     number: 4,
     prompt:
-      "Theo Điều 3 Khoản 1 Quyết định 05/2024/QĐ-TTg, chi phí của năm nào được kiểm toán, xem xét để đưa vào giá điện năm N?",
+      "Theo Điều 3 Khoản 1 Quyết định 05/2024/QĐ-TTg, chi phí của năm nào được kiểm tra, xem xét để đưa vào giá điện năm N?",
     choices: {
       A: "Năm N",
       B: "Năm N – 1",
@@ -64,7 +64,7 @@ export const questions: readonly QuizQuestion[] = [
     },
     answer: "D",
     explanation:
-      "Chi phí của năm N – 2 được kiểm toán, xem xét để đưa vào giá điện năm N. Cơ chế này giúp EVN phục hồi tài chính trong dài hạn thay vì phải tăng giá ngay lập tức và gây sốc giá.",
+      "Chi phí của năm N – 2 được kiểm tra, xem xét để đưa vào giá điện năm N. Cơ chế này phân bổ chi phí với độ trễ hai năm, giúp tránh tăng giá đột ngột nhưng cũng làm chậm thu hồi vốn của EVN.",
   },
   {
     number: 5,

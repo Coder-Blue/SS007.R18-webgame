@@ -79,11 +79,17 @@ export const QuestionsScreen = (): JSX.Element => {
     questions.filter((question) => answers()[question.number] === question.answer).length;
 
   let form: HTMLFormElement | undefined;
+  let scoreRef: HTMLParagraphElement | undefined;
 
   const restart = (): void => {
     setAnswers({});
     setSubmitted(false);
     requestAnimationFrame(() => form?.querySelector("input")?.focus());
+  };
+
+  const submit = (): void => {
+    setSubmitted(true);
+    requestAnimationFrame(() => scoreRef?.focus());
   };
 
   return (
@@ -123,7 +129,7 @@ export const QuestionsScreen = (): JSX.Element => {
         class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-6"
         onSubmit={(event) => {
           event.preventDefault();
-          setSubmitted(true);
+          submit();
         }}
       >
         <ol class="grid min-w-0 gap-4">
@@ -164,7 +170,13 @@ export const QuestionsScreen = (): JSX.Element => {
                 </p>
               }
             >
-              <p class="text-base font-semibold text-ink">
+              <p
+                ref={(element) => {
+                  scoreRef = element;
+                }}
+                tabindex="-1"
+                class="text-base font-semibold text-ink"
+              >
                 Kết quả · {score()}/{questions.length} câu đúng
               </p>
             </Show>
