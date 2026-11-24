@@ -3,7 +3,7 @@ import { err, ok } from "./types";
 import { ceilingFor, MONTHS_PER_YEAR } from "./constants";
 import { actOf, clamp, nextClock } from "./clock";
 import { advanceMarket, peakDemandMw, zoneDemand } from "./market";
-import { computeSupply, dispatchWithinCaps, reserveMargin } from "./production";
+import { computeSupply, dispatchWithinCaps, reserveMargin, servedDemandMw } from "./production";
 import {
   aggregateAnnual,
   interestForMonth,
@@ -93,11 +93,7 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
     supplier.capacityMw,
   );
 
-  // Private operators throttle unprofitable rural service in the counterfactual branch.
-  const serviceableDemand =
-    base.policy.branch === "private" ? demand.total - demand.rural * 0.5 : demand.total;
-
-  const servedMw = Math.min(serviceableDemand, supplyStep.supplyMw);
+  const servedMw = servedDemandMw(base.policy.branch, demand, supplyStep.supplyMw);
   const shortageMw = Math.max(0, demand.total - servedMw);
   const reliability = demand.total > 0 ? (servedMw / demand.total) * 100 : 100;
   const peak = peakDemandMw(demand.total);

@@ -2,7 +2,7 @@ import type { Dispatch, GameState, TariffTiers } from "./types";
 import { averageOfTiers, industrialRevenue, lossFactor, residentialRevenue } from "./tariffs";
 import { averageHouseholdTariff } from "./tariffs";
 import { approvalLikelihood, tariffChangePercent } from "./approval";
-import { computeSupply, dispatchWithinCaps, reserveMargin } from "./production";
+import { computeSupply, dispatchWithinCaps, reserveMargin, servedDemandMw } from "./production";
 import { peakDemandMw, zoneDemand } from "./market";
 import { interestForMonth, managementCost, transmissionCost } from "./finance";
 import { recoveryOf } from "./recovery";
@@ -52,7 +52,7 @@ export const projectMonth = (
     supplierQuote(state, supplierId)?.capacityMw ?? 0,
   );
 
-  const served = Math.min(demand.total, supply.supplyMw);
+  const served = servedDemandMw(state.policy.branch, demand, supply.supplyMw);
   const reliability = demand.total > 0 ? (served / demand.total) * 100 : 100;
 
   const reserve = reserveMargin(

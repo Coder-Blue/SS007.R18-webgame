@@ -190,10 +190,6 @@
   .ending-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .workspace-tabs {
-    top: 0;
-  }
 }
 
 @media (max-width: 640px) {

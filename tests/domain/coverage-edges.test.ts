@@ -75,6 +75,24 @@ describe("coverage edges", () => {
     ).toBe(100);
   });
 
+  it("caps the private branch preview at the rural service limit", () => {
+    const state = baseState();
+
+    const privateBranch = {
+      ...state,
+      policy: { ...state.policy, branch: "private" as const, priceCap: false },
+    };
+
+    const forecast = projectMonth(
+      privateBranch,
+      state.operations.dispatch,
+      state.tariffs,
+      state.operations.supplierId,
+    );
+
+    expect(forecast.reliability).toBeLessThan(100);
+  });
+
   it("advances a month with no connected demand", () => {
     const state = baseState();
 

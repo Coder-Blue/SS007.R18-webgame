@@ -1,4 +1,4 @@
-import type { Dispatch, Generation, Market } from "./types";
+import type { Dispatch, GameState, Generation, Market } from "./types";
 import { clamp } from "./clock";
 import {
   HOURS_PER_MONTH,
@@ -24,6 +24,13 @@ export type SupplyStep = {
   readonly supplyMw: number;
   readonly costSupplyVariable: number;
 };
+
+export const servedDemandMw = (
+  branch: GameState["policy"]["branch"],
+  demand: { readonly total: number; readonly rural: number },
+  supplyMw: number,
+): number =>
+  Math.min(branch === "private" ? demand.total - demand.rural * 0.5 : demand.total, supplyMw);
 
 export const availableHydroMw = (generation: Generation): number =>
   generation.hydroCapacityMw *

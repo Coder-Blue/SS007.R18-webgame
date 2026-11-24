@@ -9,7 +9,7 @@ import {
 } from "@ui-sdk/solid/dialog";
 import { useGame } from "../game-context";
 import { quarterReport } from "~/state/selectors";
-import { Badge, IconButton } from "../components/base";
+import { IconButton } from "../components/base";
 import { Icon } from "../components/icons";
 import {
   formatBillion,
@@ -136,12 +136,6 @@ export const MonthlyReport = (): JSX.Element => {
             )}
           </For>
         </div>
-        <Show when={ledger()?.mediaActive === true}>
-          <Badge tone="bad" pulse>
-            <Icon icon="tabler:speakerphone" size={14} />
-            Niềm tin dân giảm nhanh do báo chí
-          </Badge>
-        </Show>
       </aside>
     </Show>
   );
@@ -151,7 +145,6 @@ export const SummaryModal = (): JSX.Element => {
   const { store } = useGame();
   const [open, setOpen] = createSignal(false);
   let lastShown = -1;
-  let wasRunning = false;
   const report = createMemo(() => quarterReport(store.state()));
 
   const mix = () => {
@@ -200,17 +193,13 @@ export const SummaryModal = (): JSX.Element => {
 
     if (quarterReport(state) === null) return;
     lastShown = state.clock.tick;
-    wasRunning = store.running();
     store.setHold(true);
-    store.setRunning(false);
     setOpen(true);
   });
 
   const close = (): void => {
     setOpen(false);
     store.setHold(false);
-
-    if (wasRunning) store.setRunning(true);
   };
 
   const energyDelta = () => {

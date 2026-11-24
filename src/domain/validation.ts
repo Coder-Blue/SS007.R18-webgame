@@ -35,7 +35,7 @@ const MarketSchema = v.object({
   heat: nonNegative,
   renewableFactor: percent,
   demandIndex: nonNegative,
-  suppliers: v.array(SupplierSchema),
+  suppliers: v.pipe(v.array(SupplierSchema), v.nonEmpty()),
 });
 
 const TariffSchema = v.object({

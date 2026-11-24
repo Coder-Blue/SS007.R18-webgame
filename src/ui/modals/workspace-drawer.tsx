@@ -17,8 +17,8 @@ export const WorkspaceDrawer = (props: {
     modal={false}
     onOpenChange={(open) => (open ? undefined : props.onClose())}
   >
-    <DrawerContent class="workspace-drawer" data-side="right">
-      <div class="workspace-head">
+    <DrawerContent class="workspace-drawer flex flex-col overflow-hidden" data-side="right">
+      <div class="workspace-head shrink-0">
         <div>
           <p class="eyebrow">Bảng điều hành</p>
           <DrawerTitle class="modal-title">Điều Hành Lưới Điện Quốc Gia</DrawerTitle>
@@ -29,12 +29,13 @@ export const WorkspaceDrawer = (props: {
         </DrawerClose>
       </div>
       <Tabs
+        class="flex min-h-0 flex-1 flex-col"
         value={props.panel}
         onValueChange={(value) =>
           props.onPanel(PANEL_IDS.find((panel) => panel === value) ?? "overview")
         }
       >
-        <TabsList class="workspace-tabs" aria-label="Bảng điều hành">
+        <TabsList class="workspace-tabs shrink-0" aria-label="Bảng điều hành">
           {PANEL_TABS.map((tab) => (
             <TabsTab value={tab.id}>
               <Icon icon={tab.icon} size={16} />
@@ -43,7 +44,10 @@ export const WorkspaceDrawer = (props: {
           ))}
         </TabsList>
         {PANEL_TABS.map((tab) => (
-          <TabsPanel value={tab.id} class="workspace-panel">
+          <TabsPanel
+            value={tab.id}
+            class="workspace-panel min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-color:var(--ink-faint)_var(--panel)] [scrollbar-gutter:stable]"
+          >
             <PanelView panel={tab.id} />
           </TabsPanel>
         ))}

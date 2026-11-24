@@ -20,6 +20,7 @@ export type GameStore = {
   readonly notice: () => string | null;
   readonly lastError: () => string | null;
   readonly running: () => boolean;
+  readonly wantsRunning: () => boolean;
   readonly speed: () => GameSpeed;
   readonly lastApproval: () => ApprovalResult | null;
   readonly hold: () => boolean;
@@ -55,36 +56,15 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
   const [lastOutcome, setLastOutcome] = createSignal<TickOutcome | null>(null);
   const [notice, setNotice] = createSignal<string | null>(null);
   const [lastError, setLastError] = createSignal<string | null>(null);
-  const [running, setRunningSignal] = createSignal(false);
+  const [wantsRunning, setRunning] = createSignal(false);
   const [speed, setSpeedSignal] = createSignal<GameSpeed>(1);
   const [lastApproval, setLastApproval] = createSignal<ApprovalResult | null>(null);
   const [hold, setHoldSignal] = createSignal(false);
-  let autoPaused = false;
-
-  const syncRunning = (next: GameState): void => {
-    if (needsPause(next) || hold()) {
-      if (running()) {
-        autoPaused = true;
-        setRunningSignal(false);
-      }
-
-      return;
-    }
-
-    if (autoPaused && !hold()) {
-      autoPaused = false;
-      setRunningSignal(true);
-    }
-  };
-
-  const commit = (next: GameState): void => {
-    setStateSignal(next);
-    syncRunning(next);
-  };
+  const running = (): boolean => wantsRunning() && !needsPause(state()) && !hold();
 
   const dispatch = (action: ActionResult): boolean => {
     if (action.ok) {
-      commit(action.value);
+      setStateSignal(action.value);
       setLastError(null);
 
       return true;
@@ -105,13 +85,15 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
     }
 
     setLastOutcome(outcome.value);
-    commit(outcome.value.state);
+    setStateSignal(outcome.value.state);
     setLastError(null);
     saveToSlot("autosave", outcome.value.state);
 
-    if (outcome.value.notices.length > 0) {
-      setNotice(outcome.value.notices[outcome.value.notices.length - 1] ?? null);
-    }
+    const nextNotice = outcome.value.notices.findLast(
+      (code) => code !== "notice.media" && !code.startsWith("notice.event:"),
+    );
+
+    if (nextNotice !== undefined) setNotice(nextNotice);
 
     return outcome;
   };
@@ -125,7 +107,8 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
       return false;
     }
 
-    commit(resolved.value);
+    setStateSignal(resolved.value);
+    saveToSlot("autosave", resolved.value);
     setLastError(null);
 
     return true;
@@ -140,7 +123,7 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
       return false;
     }
 
-    commit(result.value);
+    setStateSignal(result.value);
     setLastError(null);
 
     return true;
@@ -158,7 +141,7 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
 
     const changed = result.value.tariffs.tiers !== before;
     setLastApproval(changed ? "approved" : "refused");
-    commit(result.value);
+    setStateSignal(result.value);
 
     return true;
   };
@@ -166,7 +149,7 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
   const setDispatch = (nextDispatch: Dispatch): void => {
     const result = setDispatchAction(state(), nextDispatch);
 
-    if (result.ok) commit(result.value);
+    if (result.ok) setStateSignal(result.value);
   };
 
   const setSupplier = (supplierId: string): boolean => {
@@ -178,18 +161,17 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
       return false;
     }
 
-    commit(result.value);
+    setStateSignal(result.value);
 
     return true;
   };
 
   const newGame = (seed?: number): void => {
-    autoPaused = false;
     setLastOutcome(null);
     setNotice(null);
     setLastError(null);
     setLastApproval(null);
-    setRunningSignal(false);
+    setRunning(false);
     setStateSignal(initial(seed));
   };
 
@@ -199,12 +181,12 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
     notice,
     lastError,
     running,
+    wantsRunning,
     speed,
     lastApproval,
     hold,
     setState: (next) => {
-      autoPaused = false;
-      setRunningSignal(false);
+      setRunning(false);
       setLastApproval(null);
       setLastOutcome(null);
       setStateSignal(next);
@@ -219,40 +201,18 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
       const current = state();
 
       if (current.approval === null) return;
-      commit({ ...current, approval: null });
+      setStateSignal({ ...current, approval: null });
     },
     setDispatch,
     setSupplier,
     togglePause: () => {
-      if (
-        state().ending !== null ||
-        state().events.activeId !== null ||
-        state().approval !== null ||
-        hold()
-      ) {
-        return;
-      }
-
-      autoPaused = false;
-      setRunningSignal(!running());
+      if (needsPause(state()) || hold()) return;
+      setRunning(!wantsRunning());
     },
-    setRunning: (value) => {
-      if (value && (state().ending !== null || needsPause(state()))) return;
-      autoPaused = false;
-      setRunningSignal(value);
-    },
+    setRunning,
     setSpeed: (next) => setSpeedSignal(next),
     clearNotice: () => setNotice(null),
     clearApprovalResult: () => setLastApproval(null),
-    setHold: (value) => {
-      setHoldSignal(value);
-
-      if (value && running()) {
-        autoPaused = true;
-        setRunningSignal(false);
-      }
-
-      if (!value) syncRunning(state());
-    },
+    setHold: setHoldSignal,
   };
 };

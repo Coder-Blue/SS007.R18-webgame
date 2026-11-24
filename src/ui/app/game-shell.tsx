@@ -68,7 +68,6 @@ const noticeMessages = new Map<string, string>([
   ["notice.blackout", "Độ tin cậy xuống dưới 90%. Nguy cơ cắt điện luân phiên."],
   ["notice.reserve", "Biên dự phòng dưới 5%. Lưới đang rất mỏng."],
   ["notice.debt", "Dư nợ đã vượt 80% trần. Nguy cơ vỡ nợ."],
-  ["notice.media", "Truyền thông đưa tin lỗ EVN. Niềm tin dân giảm nhanh."],
   ["notice.privatization", "Nhánh tư nhân hóa: lưới trùng lặp và giá điện mất trần."],
 ]);
 
@@ -76,8 +75,6 @@ const errorMessage = (code: string): string =>
   errorMessages.get(code) ?? "Thao tác không thực hiện được.";
 
 const noticeMessage = (code: string): string => {
-  if (code.startsWith("notice.event:")) return "Một sự kiện mới cần quyết định.";
-
   if (code.startsWith("notice.mission:")) return "Hoàn thành một nhiệm vụ dài hạn. Tín nhiệm tăng.";
 
   if (code.startsWith("notice.project:")) return "Một công trình đã hoàn tất.";
@@ -124,7 +121,6 @@ export const GameShell = (): JSX.Element => {
   const [toast, setToast] = createSignal<ToastState | null>(null);
   const [workspaceOpen, setWorkspaceOpen] = createSignal(false);
   const [workspacePanel, setWorkspacePanel] = createSignal<PanelId>("overview");
-  let tutorialWasRunning = false;
   let toastTimer: ReturnType<typeof setTimeout> | undefined;
 
   const showToast = (next: ToastState): void => {
@@ -161,9 +157,19 @@ export const GameShell = (): JSX.Element => {
         }
       }
 
+      if (event.defaultPrevented) return;
+
       if (event.code === "Space") {
+        if (
+          target instanceof Element &&
+          target.closest("button, a[href], [role='button'], [role='switch'], [role='tab']")
+        ) {
+          return;
+        }
+
         event.preventDefault();
-        store.togglePause();
+
+        if (!event.repeat) store.togglePause();
 
         return;
       }
@@ -196,7 +202,8 @@ export const GameShell = (): JSX.Element => {
   });
 
   createTrackedEffect(() => {
-    writeSession({ ...readSession(), speed: store.speed(), paused: !store.running() });
+    if (screen() !== "game") return;
+    writeSession({ ...readSession(), speed: store.speed(), paused: !store.wantsRunning() });
   });
 
   onCleanup(() => {
@@ -208,7 +215,6 @@ export const GameShell = (): JSX.Element => {
     setScreen("game");
     setHasSave(true);
     store.setSpeed(1);
-    tutorialWasRunning = false;
     setTutorialOpen(true);
     showToast({ kind: "notice", text: "Nhiệm kỳ mới bắt đầu. Mô phỏng đang tạm dừng." });
   };
@@ -227,21 +233,18 @@ export const GameShell = (): JSX.Element => {
     }
 
     if (latest !== null) {
+      const prefs = readSession();
       store.setState(latest.state);
-      store.setSpeed(readSession().speed);
+      store.setSpeed(prefs.speed);
+      store.setRunning(!prefs.paused && latest.state.ending === null);
       setScreen("game");
       showToast({ kind: "notice", text: "Đã tải nhiệm kỳ đang lưu." });
 
-      const prefs = readSession();
       const panel = PANEL_IDS.find((id) => id === prefs.panel);
 
       if (panel !== undefined) setWorkspacePanel(panel);
 
       if (!prefs.tutorialDone) setTutorialOpen(true);
-      else
-        store.setRunning(
-          !prefs.paused && latest.state.events.activeId === null && latest.state.approval === null,
-        );
 
       return;
     }
@@ -260,30 +263,16 @@ export const GameShell = (): JSX.Element => {
 
     if (panel !== undefined) setWorkspacePanel(panel);
 
-    if (!prefs.tutorialDone) {
-      tutorialWasRunning = false;
-      setTutorialOpen(true);
-
-      return;
-    }
-
-    if (!prefs.paused && current.events.activeId === null && current.approval === null) {
-      store.setRunning(true);
-    }
+    if (!prefs.tutorialDone) setTutorialOpen(true);
+    store.setRunning(!prefs.paused && current.ending === null);
   };
 
   const finishTutorial = (): void => {
     markTutorial();
     setTutorialOpen(false);
-    store.setRunning(
-      tutorialWasRunning &&
-        store.state().events.activeId === null &&
-        store.state().approval === null,
-    );
   };
 
   const openTutorial = (): void => {
-    tutorialWasRunning = store.running();
     setTutorialOpen(true);
   };
 
@@ -321,10 +310,7 @@ export const GameShell = (): JSX.Element => {
           onStart={startGame}
           onContinue={continueGame}
           onOpenLoad={() => setMenuOpen(true)}
-          onTutorial={() => {
-            tutorialWasRunning = false;
-            setTutorialOpen(true);
-          }}
+          onTutorial={openTutorial}
         />
       </Show>
       <Show when={menuOpen()}>
