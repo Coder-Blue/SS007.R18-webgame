@@ -31,6 +31,12 @@ test("works when browser storage is blocked", async ({ page }) => {
   await page.goto("/");
   await skipTutorial(page);
   await expect(page.getByRole("button", { name: "Tiếp tục mô phỏng" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Kho lưu và cài đặt" }).click();
+  const saveModal = page.locator(".save-modal");
+  await expect(saveModal).toBeVisible();
+  await saveModal.getByRole("button", { name: "Lưu", exact: true }).first().click();
+  await expect(page.locator(".toast")).toContainText("Không ghi được vào bộ nhớ trình duyệt.");
 });
 
 test("Space activates settings and reload preserves simulation preferences", async ({ page }) => {
