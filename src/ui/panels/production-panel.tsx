@@ -75,12 +75,32 @@ export const ProductionPanel = (): JSX.Element => {
   const draftSupplier = () => state().market.suppliers.find((row) => row.id === supplierDraft());
 
   const importCap = () =>
-    state().market.suppliers.find((row) => row.id === appliedSupplierId())?.capacityMw ?? 0;
+    Math.min(
+      state().market.suppliers.find((row) => row.id === appliedSupplierId())?.capacityMw ?? 0,
+      draftSupplier()?.capacityMw ?? 0,
+    );
 
   const hydroCap = () => availableHydroMw(state().generation);
 
   const setPart = (key: "hydroMw" | "thermalMw" | "importMw", value: number): void => {
-    setDraft({ ...draft(), [key]: value });
+    const next = key === "importMw" ? Math.min(value, importCap()) : value;
+    setDraft({ ...draft(), [key]: next });
+  };
+
+  const selectSupplier = (supplierId: string, capacityMw: number): void => {
+    setSupplierDraft(supplierId);
+    setDraft((current) => ({
+      ...current,
+      importMw: Math.min(current.importMw, capacityMw),
+    }));
+  };
+
+  const applySupplier = (): void => {
+    const supplier = draftSupplier();
+
+    if (supplier === undefined) return;
+    selectSupplier(supplier.id, supplier.capacityMw);
+    store.setSupplier(supplier.id);
   };
 
   return (
@@ -97,7 +117,7 @@ export const ProductionPanel = (): JSX.Element => {
                 type="button"
                 class="supplier-card"
                 data-active={supplier.id === supplierDraft() ? "true" : "false"}
-                onClick={() => setSupplierDraft(supplier.id)}
+                onClick={() => selectSupplier(supplier.id, supplier.capacityMw)}
                 aria-pressed={supplier.id === supplierDraft() ? "true" : "false"}
               >
                 <div class="supplier-head">
@@ -121,7 +141,9 @@ export const ProductionPanel = (): JSX.Element => {
             )}
           </For>
         </div>
-        <Show when={draftSupplier() !== undefined}>
+        <Show
+          when={draftSupplier() !== undefined && supplierDraft() !== state().operations.supplierId}
+        >
           <div
             class="preview-card"
             data-tone={
@@ -172,7 +194,7 @@ export const ProductionPanel = (): JSX.Element => {
                 variant="primary"
                 icon="lucide:check"
                 disabled={supplierDraft() === state().operations.supplierId}
-                onClick={() => store.setSupplier(supplierDraft())}
+                onClick={applySupplier}
               >
                 Áp dụng nhà cung cấp
               </ActionButton>
@@ -244,7 +266,7 @@ export const ProductionPanel = (): JSX.Element => {
               label="Công suất nhập khẩu"
               onInput={(value) => setPart("importMw", value)}
             />
-            <span class="text-xs text-ink-soft">Hợp đồng với nhà cung cấp đang chọn</span>
+            <span class="text-xs text-ink-soft">Hợp đồng đang áp dụng</span>
           </div>
         </div>
         <div

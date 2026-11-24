@@ -159,6 +159,39 @@ describe("dispatch actions", () => {
     expect(setSupplierAction(baseState(), "ipp-lac-hong").ok).toBe(true);
     expect(setSupplierAction(baseState(), "missing").ok).toBe(false);
   });
+
+  it("keeps the dispatch reference when the new supplier covers the import", () => {
+    const state = baseState();
+    const result = setSupplierAction(state, "ipp-lac-hong");
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.operations.supplierId).toBe("ipp-lac-hong");
+      expect(result.value.operations.dispatch).toBe(state.operations.dispatch);
+    }
+  });
+
+  it("clamps import when the new supplier cannot cover it", () => {
+    const state = baseState();
+
+    const wide = {
+      ...state,
+      operations: {
+        ...state.operations,
+        dispatch: { ...state.operations.dispatch, importMw: 460 },
+      },
+    };
+
+    const result = setSupplierAction(wide, "bot-duyen-hai");
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(result.value.operations.dispatch.importMw).toBe(400);
+      expect(result.value.operations.dispatch).not.toBe(wide.operations.dispatch);
+    }
+  });
 });
 
 describe("tariff actions", () => {

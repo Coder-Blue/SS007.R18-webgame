@@ -30,15 +30,16 @@ export const setSupplierAction = (state: GameState, supplierId: string): Result<
 
   if (supplier === undefined) return err("supplier.unknown");
 
+  const currentDispatch = state.operations.dispatch;
+  const importMw = Math.min(currentDispatch.importMw, supplier.capacityMw);
+
   return ok({
     ...state,
     operations: {
       ...state.operations,
       supplierId,
-      dispatch: {
-        ...state.operations.dispatch,
-        importMw: Math.min(state.operations.dispatch.importMw, supplier.capacityMw),
-      },
+      dispatch:
+        importMw === currentDispatch.importMw ? currentDispatch : { ...currentDispatch, importMw },
     },
   });
 };
