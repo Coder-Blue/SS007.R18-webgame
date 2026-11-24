@@ -1,4 +1,4 @@
-import type { TariffTiers } from "./types";
+import type { Policy, TariffTiers } from "./types";
 import { err, ok, type Result } from "./types";
 import {
   INDUSTRIAL_TARIFF_MAX,
@@ -30,6 +30,17 @@ export const averageOfTiers = (
 
 export const tariffChangePct = (current: number, next: number): number =>
   current <= 0 ? 0 : ((next - current) / current) * 100;
+
+export const effectiveTariffs = (tariffs: TariffTiers, policy: Policy): TariffTiers => {
+  if (policy.priceCap) return tariffs;
+  const [t1, t2, t3, t4, t5, t6] = tariffs.tiers;
+
+  return {
+    ...tariffs,
+    tiers: [t1 * 1.025, t2 * 1.025, t3 * 1.025, t4 * 1.025, t5 * 1.025, t6 * 1.025],
+    industrial: tariffs.industrial * 1.02,
+  };
+};
 
 export const validateTariffs = (input: TariffInput, ceiling: number): Result<TariffTiers> => {
   const entries = [
