@@ -3,7 +3,7 @@ import { err, ok } from "./types";
 import { ceilingFor, MONTHS_PER_YEAR } from "./constants";
 import { actOf, clamp, nextClock } from "./clock";
 import { advanceMarket, peakDemandMw, zoneDemand } from "./market";
-import { computeSupply, dispatchWithinCaps, reserveMargin } from "./production";
+import { computeSupply, dispatchWithinCaps, reserveMargin, servedDemandMw } from "./production";
 import {
   aggregateAnnual,
   interestForMonth,
@@ -21,6 +21,7 @@ import { reformRevenue } from "./reforms";
 import { advanceReforms } from "./reform-progress";
 import {
   averageHouseholdTariff,
+  effectiveTariffs,
   industrialRevenue,
   lossFactor,
   residentialRevenue,
@@ -30,17 +31,6 @@ import { withEndingCheck, withFinalCheck } from "./endings";
 
 const lastLedger = (state: GameState): MonthlyLedger | undefined =>
   state.finance.monthlyHistory[state.finance.monthlyHistory.length - 1];
-
-const privateTariffs = (state: GameState): GameState["tariffs"] => {
-  if (state.policy.priceCap) return state.tariffs;
-  const [t1, t2, t3, t4, t5, t6] = state.tariffs.tiers;
-
-  return {
-    ...state.tariffs,
-    tiers: [t1 * 1.025, t2 * 1.025, t3 * 1.025, t4 * 1.025, t5 * 1.025, t6 * 1.025],
-    industrial: state.tariffs.industrial * 1.02,
-  };
-};
 
 export const advanceMonth = (state: GameState): Result<TickOutcome> => {
   if (state.phase !== "playing") return err("tick.not-playing");
@@ -60,7 +50,7 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
     cooldown: Math.max(0, stateWithReforms.media.cooldown - 1),
   };
 
-  const tariffs = privateTariffs(stateWithReforms);
+  const tariffs = effectiveTariffs(stateWithReforms.tariffs, stateWithReforms.policy);
 
   const marketStep = advanceMarket(
     stateWithReforms.market,
@@ -93,11 +83,7 @@ export const advanceMonth = (state: GameState): Result<TickOutcome> => {
     supplier.capacityMw,
   );
 
-  // Private operators throttle unprofitable rural service in the counterfactual branch.
-  const serviceableDemand =
-    base.policy.branch === "private" ? demand.total - demand.rural * 0.5 : demand.total;
-
-  const servedMw = Math.min(serviceableDemand, supplyStep.supplyMw);
+  const servedMw = servedDemandMw(base.policy.branch, demand, supplyStep.supplyMw);
   const shortageMw = Math.max(0, demand.total - servedMw);
   const reliability = demand.total > 0 ? (servedMw / demand.total) * 100 : 100;
   const peak = peakDemandMw(demand.total);

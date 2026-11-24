@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { withFinalCheck } from "../../src/domain/endings";
+import { averageOfTiers } from "../../src/domain/tariffs";
 import { advanceMarket } from "../../src/domain/market";
 import { missionStatus } from "../../src/domain/missions";
 import { projectMonth } from "../../src/domain/preview";
@@ -73,6 +74,49 @@ describe("coverage edges", () => {
       projectMonth(noDemand, state.operations.dispatch, state.tariffs, "coal-quang-ninh")
         .reliability,
     ).toBe(100);
+  });
+
+  it("caps the private branch preview at the rural service limit", () => {
+    const state = baseState();
+
+    const privateBranch = {
+      ...state,
+      policy: { ...state.policy, branch: "private" as const, priceCap: false },
+    };
+
+    const forecast = projectMonth(
+      privateBranch,
+      state.operations.dispatch,
+      state.tariffs,
+      state.operations.supplierId,
+    );
+
+    expect(forecast.reliability).toBeLessThan(100);
+  });
+
+  it("matches the private-branch forecast with the settled average tariff", () => {
+    const state = baseState();
+
+    const privateState = {
+      ...state,
+      policy: { ...state.policy, branch: "private" as const, priceCap: false },
+    };
+
+    const forecast = projectMonth(
+      privateState,
+      privateState.operations.dispatch,
+      privateState.tariffs,
+      privateState.operations.supplierId,
+    );
+
+    const result = advanceMonth(privateState);
+
+    expect(result.ok).toBe(true);
+
+    if (result.ok) {
+      expect(forecast.averageTariff).toBeCloseTo(result.value.ledger.averageRetailTariff, 6);
+      expect(forecast.averageTariff).toBeGreaterThan(averageOfTiers(privateState.tariffs.tiers));
+    }
   });
 
   it("advances a month with no connected demand", () => {

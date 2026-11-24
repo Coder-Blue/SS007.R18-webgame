@@ -52,14 +52,14 @@ export const MobileNav = (): JSX.Element => {
       </nav>
       <Drawer open={open()} onOpenChange={setOpen}>
         <DrawerBackdrop class="sheet-backdrop" />
-        <DrawerContent class="mobile-sheet">
-          <div class="sheet-head">
+        <DrawerContent class="mobile-sheet flex flex-col overflow-hidden">
+          <div class="sheet-head shrink-0">
             <DrawerTitle class="modal-title">Bảng điều hành</DrawerTitle>
             <DrawerClose class="icon-btn" aria-label="Đóng">
               <Icon icon="lucide:x" size={18} />
             </DrawerClose>
           </div>
-          <div class="sheet-tabs">
+          <div class="sheet-tabs shrink-0">
             {PANEL_TABS.map((tab) => (
               <button
                 type="button"
@@ -72,7 +72,7 @@ export const MobileNav = (): JSX.Element => {
               </button>
             ))}
           </div>
-          <div class="sheet-body">
+          <div class="sheet-body min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-color:var(--ink-faint)_var(--panel)] [scrollbar-gutter:stable]">
             <Show when={open()}>
               <PanelView panel={panel()} />
             </Show>

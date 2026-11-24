@@ -240,7 +240,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.dispatch-meta,
 .tier-meta {
   color: var(--ink-faint);
   font-size: 10px;
@@ -415,9 +414,6 @@
   padding: 10px 16px;
   border-bottom: 1px solid var(--line);
   background: oklch(0.1557 0.0199 228.03 / 0.55);
-  position: sticky;
-  top: 0;
-  z-index: 2;
 }
 
 .workspace-tabs [role="tab"] {

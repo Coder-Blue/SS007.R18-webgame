@@ -59,8 +59,18 @@ export type SaveMeta = {
 
 const keyFor = (slot: SlotId): string => `${PREFIX}${slot}`;
 
-const hasStorage = (): boolean =>
-  typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+const readItem = (
+  key: string,
+  kind: "localStorage" | "sessionStorage" = "localStorage",
+): string | null => {
+  if (typeof window === "undefined") return null;
+
+  try {
+    return window[kind].getItem(key);
+  } catch {
+    return null;
+  }
+};
 
 const nowIso = (): string => new Date().toISOString();
 
@@ -72,11 +82,14 @@ export const makeSaveFile = (state: GameState): SaveFile => ({
 });
 
 export const saveToSlot = (slot: SlotId, state: GameState): Result<SaveFile> => {
-  if (!hasStorage()) return err("save.storage-unavailable");
+  if (typeof window === "undefined") return err("save.storage-unavailable");
   const file = makeSaveFile(state);
 
   try {
-    window.localStorage.setItem(keyFor(slot), JSON.stringify(file));
+    const storage = window.localStorage;
+
+    if (storage === undefined) return err("save.storage-unavailable");
+    storage.setItem(keyFor(slot), JSON.stringify(file));
 
     return ok(file);
   } catch {
@@ -85,25 +98,32 @@ export const saveToSlot = (slot: SlotId, state: GameState): Result<SaveFile> => 
 };
 
 export const loadFromSlot = (slot: SlotId): Result<GameState> => {
-  if (!hasStorage()) return err("save.storage-unavailable");
-  const raw = window.localStorage.getItem(keyFor(slot));
+  if (typeof window === "undefined") return err("save.storage-unavailable");
 
-  if (raw === null) return err("save.empty");
-  const decoded = decodeSaveFile(raw);
+  try {
+    const raw = window.localStorage.getItem(keyFor(slot));
 
-  if (!decoded.ok) return decoded;
+    if (raw === null) return err("save.empty");
+    const decoded = decodeSaveFile(raw);
 
-  return ok(decoded.value.state);
+    return decoded.ok ? ok(decoded.value.state) : decoded;
+  } catch {
+    return err("save.storage-unavailable");
+  }
 };
 
 export const deleteSlot = (slot: SlotId): void => {
-  if (!hasStorage()) return;
-  window.localStorage.removeItem(keyFor(slot));
+  if (typeof window === "undefined") return;
+
+  try {
+    window.localStorage.removeItem(keyFor(slot));
+  } catch {
+    return;
+  }
 };
 
 export const slotMeta = (slot: SlotId): SaveMeta | null => {
-  if (!hasStorage()) return null;
-  const raw = window.localStorage.getItem(keyFor(slot));
+  const raw = readItem(keyFor(slot));
 
   if (raw === null) return null;
   const decoded = decodeSaveFile(raw);
@@ -131,10 +151,8 @@ export const slotMeta = (slot: SlotId): SaveMeta | null => {
 export const listSaves = (): readonly (SaveMeta | null)[] => SLOT_IDS.map((slot) => slotMeta(slot));
 
 export const hasAnySave = (): boolean => {
-  if (!hasStorage()) return false;
-
   return ALL_SLOT_IDS.some((slot) => {
-    const raw = window.localStorage.getItem(keyFor(slot));
+    const raw = readItem(keyFor(slot));
 
     if (raw === null) return false;
 
@@ -151,11 +169,10 @@ export const latestSave = (): {
   readonly state: GameState;
   readonly savedAt: string;
 } | null => {
-  if (!hasStorage()) return null;
   const candidates: { slot: SlotId; state: GameState; savedAt: string }[] = [];
 
   for (const slot of ALL_SLOT_IDS) {
-    const raw = window.localStorage.getItem(keyFor(slot));
+    const raw = readItem(keyFor(slot));
 
     if (raw === null) continue;
     const decoded = decodeSaveFile(raw);
@@ -180,8 +197,7 @@ export const exportSave = (state: GameState): string =>
 export const importSave = (text: string): Result<SaveFile> => decodeSaveFile(text);
 
 export const readSession = (): SessionPrefs => {
-  if (typeof window === "undefined" || !window.sessionStorage) return DEFAULT_PREFS;
-  const raw = window.sessionStorage.getItem(SESSION_KEY);
+  const raw = readItem(SESSION_KEY, "sessionStorage");
 
   if (raw === null) return DEFAULT_PREFS;
 
@@ -195,8 +211,13 @@ export const readSession = (): SessionPrefs => {
 };
 
 export const writeSession = (prefs: SessionPrefs): void => {
-  if (typeof window === "undefined" || !window.sessionStorage) return;
-  window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(prefs));
+  if (typeof window === "undefined") return;
+
+  try {
+    window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(prefs));
+  } catch {
+    return;
+  }
 };
 
 export const clearAllSaves = (): void => {

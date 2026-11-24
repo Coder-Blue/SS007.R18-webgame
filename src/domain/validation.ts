@@ -35,7 +35,7 @@ const MarketSchema = v.object({
   heat: nonNegative,
   renewableFactor: percent,
   demandIndex: nonNegative,
-  suppliers: v.array(SupplierSchema),
+  suppliers: v.pipe(v.array(SupplierSchema), v.nonEmpty()),
 });
 
 const TariffSchema = v.object({
@@ -284,32 +284,37 @@ const EndingSchema = v.object({
   month: finiteNumber,
 });
 
-export const GameStateSchema = v.object({
-  version: v.literal(SAVE_VERSION),
-  phase: v.picklist(["title", "playing", "ended"] as const),
-  seed: finiteNumber,
-  clock: ClockSchema,
-  act: v.picklist([1, 2, 3, 4] as const),
-  zones: v.object({
-    urban: ZoneSchema,
-    industrial: ZoneSchema,
-    rural: ZoneSchema,
+export const GameStateSchema = v.pipe(
+  v.object({
+    version: v.literal(SAVE_VERSION),
+    phase: v.picklist(["title", "playing", "ended"] as const),
+    seed: finiteNumber,
+    clock: ClockSchema,
+    act: v.picklist([1, 2, 3, 4] as const),
+    zones: v.object({
+      urban: ZoneSchema,
+      industrial: ZoneSchema,
+      rural: ZoneSchema,
+    }),
+    market: MarketSchema,
+    generation: GenerationSchema,
+    infrastructure: InfrastructureSchema,
+    operations: OperationsSchema,
+    tariffs: TariffSchema,
+    policy: PolicySchema,
+    metrics: MetricsSchema,
+    media: MediaSchema,
+    finance: FinanceSchema,
+    events: EventStateSchema,
+    missions: MissionsSchema,
+    approval: v.nullable(ApprovalSchema),
+    ending: v.nullable(EndingSchema),
+    tutorialStep: nonNegative,
   }),
-  market: MarketSchema,
-  generation: GenerationSchema,
-  infrastructure: InfrastructureSchema,
-  operations: OperationsSchema,
-  tariffs: TariffSchema,
-  policy: PolicySchema,
-  metrics: MetricsSchema,
-  media: MediaSchema,
-  finance: FinanceSchema,
-  events: EventStateSchema,
-  missions: MissionsSchema,
-  approval: v.nullable(ApprovalSchema),
-  ending: v.nullable(EndingSchema),
-  tutorialStep: nonNegative,
-});
+  v.check((state) =>
+    state.market.suppliers.some((supplier) => supplier.id === state.operations.supplierId),
+  ),
+);
 
 export const SaveFileSchema = v.object({
   format: v.literal("grid-save"),

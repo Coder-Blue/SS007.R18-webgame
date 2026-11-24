@@ -11,8 +11,12 @@ const startGame = async (page: Page): Promise<void> => {
 
 test("keeps pause and scene badges below the top bar", async ({ page }) => {
   await startGame(page);
+  await page.getByRole("button", { name: "Kho lưu và cài đặt" }).click();
+  await page.clock.install({ time: new Date("2026-01-01T00:00:00Z") });
+  await page.clock.pauseAt(new Date("2026-01-01T00:01:00Z"));
+  await page.locator(".slot-card").first().getByRole("button", { name: /^Lưu$/ }).click();
 
-  await expect(page.locator(".toast")).toBeVisible();
+  await expect(page.locator(".toast")).toContainText("Đã lưu nhiệm kỳ.");
 
   const boxes = await page.evaluate(() => {
     const rect = (selector: string) => {

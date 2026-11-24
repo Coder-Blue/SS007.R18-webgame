@@ -1,8 +1,15 @@
 import type { Dispatch, GameState, TariffTiers } from "./types";
-import { averageOfTiers, industrialRevenue, lossFactor, residentialRevenue } from "./tariffs";
-import { averageHouseholdTariff } from "./tariffs";
-import { approvalLikelihood, tariffChangePercent } from "./approval";
-import { computeSupply, dispatchWithinCaps, reserveMargin } from "./production";
+import {
+  averageHouseholdTariff,
+  averageOfTiers,
+  effectiveTariffs,
+  industrialRevenue,
+  lossFactor,
+  residentialRevenue,
+  tariffChangePct,
+} from "./tariffs";
+import { approvalLikelihood } from "./approval";
+import { computeSupply, dispatchWithinCaps, reserveMargin, servedDemandMw } from "./production";
 import { peakDemandMw, zoneDemand } from "./market";
 import { interestForMonth, managementCost, transmissionCost } from "./finance";
 import { recoveryOf } from "./recovery";
@@ -41,6 +48,8 @@ export const projectMonth = (
   tariffs: TariffTiers,
   supplierId: string,
 ): MonthPreview => {
+  const currentTariffs = effectiveTariffs(state.tariffs, state.policy);
+  const nextTariffs = effectiveTariffs(tariffs, state.policy);
   const demand = zoneDemand(state.zones, state.market, state.metrics);
   const capped = dispatchWithinCaps(dispatch, state.generation, state.market, supplierId);
 
@@ -52,7 +61,7 @@ export const projectMonth = (
     supplierQuote(state, supplierId)?.capacityMw ?? 0,
   );
 
-  const served = Math.min(demand.total, supply.supplyMw);
+  const served = servedDemandMw(state.policy.branch, demand, supply.supplyMw);
   const reliability = demand.total > 0 ? (served / demand.total) * 100 : 100;
 
   const reserve = reserveMargin(
@@ -67,11 +76,11 @@ export const projectMonth = (
 
   const residentialShare = demand.total > 0 ? (demand.urban + demand.rural) / demand.total : 1;
 
-  const average = averageHouseholdTariff(tariffs);
+  const average = averageHouseholdTariff(nextTariffs);
 
   const revenue =
     residentialRevenue(delivered * residentialShare, average) +
-    industrialRevenue(delivered * (1 - residentialShare), tariffs.industrial) +
+    industrialRevenue(delivered * (1 - residentialShare), nextTariffs.industrial) +
     recoveryOf(state.finance, state.clock.year, state.policy).monthlyCredit +
     reformRevenue(state.policy).total;
 
@@ -87,13 +96,15 @@ export const projectMonth = (
     ) +
     interestForMonth(state.finance.debt, state.finance.interestRate);
 
-  const householdChange = tariffChangePercent(state, average);
+  const currentAverage = averageHouseholdTariff(currentTariffs);
+
+  const householdChange = tariffChangePct(currentAverage, average);
 
   const industrialChange =
-    state.tariffs.industrial > 0
+    currentTariffs.industrial > 0
       ? Math.max(
           0,
-          ((tariffs.industrial - state.tariffs.industrial) / state.tariffs.industrial) * 100,
+          ((nextTariffs.industrial - currentTariffs.industrial) / currentTariffs.industrial) * 100,
         )
       : 0;
 

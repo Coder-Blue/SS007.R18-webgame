@@ -1,4 +1,4 @@
-import { For, Show, createSignal, createTrackedEffect } from "solid-js";
+import { For, Show, createMemo, createSignal, createTrackedEffect } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { useGame } from "../game-context";
 import { ActionButton, Badge, Bar, Panel, RangeSlider, Stat } from "../components/base";
@@ -59,9 +59,14 @@ export const ProductionPanel = (): JSX.Element => {
   const [draft, setDraft] = createSignal(state().operations.dispatch);
   const [supplierDraft, setSupplierDraft] = createSignal(state().operations.supplierId);
 
+  const appliedDispatch = createMemo(() => state().operations.dispatch);
+  const appliedSupplierId = createMemo(() => state().operations.supplierId);
   createTrackedEffect(() => {
-    setDraft(state().operations.dispatch);
-    setSupplierDraft(state().operations.supplierId);
+    setDraft(appliedDispatch());
+  });
+
+  createTrackedEffect(() => {
+    setSupplierDraft(appliedSupplierId());
   });
 
   const preview = () => dispatchPreview(state(), draft());
@@ -69,10 +74,33 @@ export const ProductionPanel = (): JSX.Element => {
 
   const draftSupplier = () => state().market.suppliers.find((row) => row.id === supplierDraft());
 
+  const importCap = () =>
+    Math.min(
+      state().market.suppliers.find((row) => row.id === appliedSupplierId())?.capacityMw ?? 0,
+      draftSupplier()?.capacityMw ?? 0,
+    );
+
   const hydroCap = () => availableHydroMw(state().generation);
 
   const setPart = (key: "hydroMw" | "thermalMw" | "importMw", value: number): void => {
-    setDraft({ ...draft(), [key]: value });
+    const next = key === "importMw" ? Math.min(value, importCap()) : value;
+    setDraft({ ...draft(), [key]: next });
+  };
+
+  const selectSupplier = (supplierId: string, capacityMw: number): void => {
+    setSupplierDraft(supplierId);
+    setDraft((current) => ({
+      ...current,
+      importMw: Math.min(current.importMw, capacityMw),
+    }));
+  };
+
+  const applySupplier = (): void => {
+    const supplier = draftSupplier();
+
+    if (supplier === undefined) return;
+    selectSupplier(supplier.id, supplier.capacityMw);
+    store.setSupplier(supplier.id);
   };
 
   return (
@@ -88,18 +116,18 @@ export const ProductionPanel = (): JSX.Element => {
               <button
                 type="button"
                 class="supplier-card"
-                data-active={supplier.id === state().operations.supplierId ? "true" : "false"}
-                onClick={() => store.setSupplier(supplier.id)}
-                aria-pressed={supplier.id === state().operations.supplierId ? "true" : "false"}
+                data-active={supplier.id === supplierDraft() ? "true" : "false"}
+                onClick={() => selectSupplier(supplier.id, supplier.capacityMw)}
+                aria-pressed={supplier.id === supplierDraft() ? "true" : "false"}
               >
                 <div class="supplier-head">
                   <span class="supplier-kind">{supplierLabel[supplier.kind]}</span>
                   <Show when={supplier.id === state().operations.supplierId}>
-                    <Badge tone="electric">Đang chọn</Badge>
+                    <Badge tone="neutral">Đang dùng</Badge>
                   </Show>
                 </div>
                 <strong>{formatPrice(supplier.priceVndPerKwh)}</strong>
-                <span class="supplier-meta">
+                <span class="flex flex-wrap items-center gap-1.5 text-xs text-ink-soft">
                   <Icon icon="tabler:bolt" size={14} />
                   Công suất chào {formatPower(supplier.capacityMw)}
                 </span>
@@ -113,7 +141,9 @@ export const ProductionPanel = (): JSX.Element => {
             )}
           </For>
         </div>
-        <Show when={draftSupplier() !== undefined}>
+        <Show
+          when={draftSupplier() !== undefined && supplierDraft() !== state().operations.supplierId}
+        >
           <div
             class="preview-card"
             data-tone={
@@ -164,11 +194,11 @@ export const ProductionPanel = (): JSX.Element => {
                 variant="primary"
                 icon="lucide:check"
                 disabled={supplierDraft() === state().operations.supplierId}
-                onClick={() => store.setSupplier(supplierDraft())}
+                onClick={applySupplier}
               >
                 Áp dụng nhà cung cấp
               </ActionButton>
-              <span class="tier-meta">
+              <span class="text-xs text-ink-soft">
                 Giá nhập {formatPrice(draftSupplier()?.priceVndPerKwh ?? 0)} · Tối đa{" "}
                 {formatPower(draftSupplier()?.capacityMw ?? 0)}
               </span>
@@ -198,7 +228,9 @@ export const ProductionPanel = (): JSX.Element => {
               label="Công suất huy động thủy điện"
               onInput={(value) => setPart("hydroMw", value)}
             />
-            <span class="dispatch-meta">Khả dụng theo hồ chứa: {formatPower(hydroCap())}</span>
+            <span class="text-xs text-ink-soft">
+              Khả dụng theo hồ chứa: {formatPower(hydroCap())}
+            </span>
           </div>
           <div class="dispatch-control">
             <div class="dispatch-head">
@@ -215,7 +247,7 @@ export const ProductionPanel = (): JSX.Element => {
               label="Công suất huy động nhiệt điện"
               onInput={(value) => setPart("thermalMw", value)}
             />
-            <span class="dispatch-meta">
+            <span class="text-xs text-ink-soft">
               Giá nhiên liệu đang ở mức {state().market.fuelPriceIndex.toFixed(2)}x
             </span>
           </div>
@@ -229,12 +261,12 @@ export const ProductionPanel = (): JSX.Element => {
             <RangeSlider
               value={draft().importMw}
               min={0}
-              max={Math.round(draftSupplier()?.capacityMw ?? 0)}
+              max={Math.round(importCap())}
               step={10}
               label="Công suất nhập khẩu"
               onInput={(value) => setPart("importMw", value)}
             />
-            <span class="dispatch-meta">Hợp đồng với nhà cung cấp đang chọn</span>
+            <span class="text-xs text-ink-soft">Hợp đồng đang áp dụng</span>
           </div>
         </div>
         <div

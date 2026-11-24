@@ -111,6 +111,16 @@ describe("preview", () => {
     ).toBeGreaterThan(0);
   });
 
+  it("handles zero household tiers in the preview", () => {
+    const state = baseState();
+    const zero = { ...state, tariffs: { ...state.tariffs, tiers: [0, 0, 0, 0, 0, 0] as const } };
+
+    expect(
+      projectMonth(zero, zero.operations.dispatch, zero.tariffs, "coal-quang-ninh")
+        .approvalLikelihood,
+    ).toBeGreaterThanOrEqual(5);
+  });
+
   it("previews a tariff plan and its average", () => {
     const state = baseState();
     const tiers = [1_806, 2_000, 2_300, 2_800, 3_100, 3_200] as const;

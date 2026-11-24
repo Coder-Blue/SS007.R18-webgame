@@ -40,13 +40,11 @@
   right: 14px;
 }
 
-.dock::-webkit-scrollbar,
-.workspace-drawer::-webkit-scrollbar {
+.dock::-webkit-scrollbar {
   width: 6px;
 }
 
-.dock::-webkit-scrollbar-thumb,
-.workspace-drawer::-webkit-scrollbar-thumb {
+.dock::-webkit-scrollbar-thumb {
   background: oklch(0.708 0.0572 218.44 / 0.25);
   border-radius: 999px;
 }
@@ -143,7 +141,6 @@
   box-shadow: var(--shadow-lift);
   height: min(86dvh, 760px);
   left: 0;
-  overflow-y: auto;
   position: fixed;
   right: 0;
   z-index: 60;
@@ -155,10 +152,7 @@
   display: flex;
   justify-content: space-between;
   padding: 12px 14px;
-  position: sticky;
-  top: 0;
   background: var(--panel);
-  z-index: 2;
 }
 
 .sheet-tabs {
@@ -168,7 +162,4 @@
   flex-wrap: wrap;
   gap: 6px;
   padding: 8px 12px;
-  position: sticky;
-  top: 57px;
-  z-index: 2;
 }
