@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/solid-router";
 import type { JSX } from "@solidjs/web";
 import { ActionButton } from "../components/base";
 import { Icon } from "../components/icons";
@@ -92,6 +93,13 @@ export const TitleScreen = (props: {
             >
               Xem hướng dẫn nhập cuộc
             </button>
+            <Link
+              to="/questions"
+              class="inline-flex min-h-11 items-center gap-1.5 text-xs font-medium text-ink-faint underline decoration-ink-faint/50 underline-offset-4 transition-colors hover:text-ink"
+            >
+              <Icon icon="lucide:book-open" size={15} />
+              Câu hỏi trắc nghiệm
+            </Link>
           </div>
         </section>
 
