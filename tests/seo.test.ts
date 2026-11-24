@@ -10,6 +10,7 @@ const readBinary = (relativePath: string): Buffer =>
 
 const rootSource = readSource("../src/routes/__root.tsx");
 const indexSource = readSource("../src/routes/index.tsx");
+const questionsSource = readSource("../src/routes/questions.tsx");
 const siteSource = readSource("../src/site.ts");
 const sitemapSource = readSource("../routes/sitemap.xml.ts");
 const robotsSource = readSource("../routes/robots.txt.ts");
@@ -25,9 +26,13 @@ describe("production metadata", () => {
     expect(rootSource).not.toContain("ss007-r18-webgame.vercel.app");
   });
 
-  test("publishes canonical and robots metadata only on the index route", () => {
+  test("publishes canonical and robots metadata on the index and questions routes", () => {
     expect(indexSource).toContain('rel: "canonical"');
     expect(indexSource).toContain('name: "robots"');
+    expect(questionsSource).toContain('rel: "canonical"');
+    expect(questionsSource).toContain('name: "robots"');
+    expect(questionsSource).toContain('property: "og:url"');
+    expect(questionsSource).toContain('name: "twitter:title"');
     expect(rootSource).not.toContain('rel: "canonical"');
     expect(rootSource).not.toContain('name: "robots"');
     expect(rootSource).toContain('rel: "sitemap"');
@@ -38,9 +43,10 @@ describe("production metadata", () => {
     expect(rootSource).toContain('name: "twitter:image:alt"');
   });
 
-  test("exposes one crawlable sitemap URL and advertises it from robots.txt", () => {
+  test("lists both public routes in the sitemap and advertises it from robots.txt", () => {
     expect(sitemapSource).toContain("SITE_URL");
     expect(sitemapSource).toContain("<loc>${SITE_URL}/</loc>");
+    expect(sitemapSource).toContain("<loc>${SITE_URL}/questions</loc>");
     expect(robotsSource).toContain("Sitemap: ${SITE_URL}/sitemap.xml");
   });
 
