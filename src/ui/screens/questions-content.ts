@@ -84,14 +84,14 @@ export const questions: readonly QuizQuestion[] = [
     prompt:
       "Tính đến cuối năm 2025, các doanh nghiệp sản xuất điện bên ngoài EVN chiếm bao nhiêu phần trăm sản lượng điện toàn quốc?",
     choices: {
-      A: "17,2%",
+      A: "17,7%",
       B: "24,2%",
       C: "58%",
       D: "100%",
     },
     answer: "C",
     explanation:
-      "Các doanh nghiệp ngoài EVN chiếm 58%, EVNGENCO chiếm 24,2%, công ty mẹ EVN chiếm 17,2%. Từ đó bài kết luận EVN không còn nắm giữ độc quyền ở mảng sản xuất điện.",
+      "Các doanh nghiệp ngoài EVN chiếm 58%, EVNGENCO chiếm 24,2%, công ty mẹ EVN chiếm 17,7%. Từ đó bài kết luận EVN không còn nắm giữ độc quyền ở mảng sản xuất điện.",
   },
   {
     number: 7,
