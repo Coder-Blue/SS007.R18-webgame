@@ -5,10 +5,12 @@ this file describes what the code actually does.
 
 ## Runtime shape
 
-TanStack Start with the Solid adapter serves one file route, `/`. The game is a
-client-side state machine. The only server routes are `/og.png` (Takumi social
-card), `/sitemap.xml` and `/robots.txt`. TanStack Solid Query owns the month
-mutation, snapshots and the speed-aware autoplay loop.
+TanStack Start with the Solid adapter serves two file routes, `/` and
+`/questions`. The game is a client-side state machine; `/questions` is a
+standalone EVN knowledge check with the same document shell. The only server
+routes are `/og.png` (Takumi social card), `/sitemap.xml` and `/robots.txt`.
+TanStack Solid Query owns the month mutation, snapshots and the speed-aware
+autoplay loop.
 
 ```
 UI controls / RTS clock
@@ -92,8 +94,11 @@ the matching thermal, rural or urban node into the gap between the mission rail
 and the drawer, rings it and labels it; the final step closes the drawer before
 pointing at the pause and speed controls. Charts are dependency-free SVG. The quarterly summary aggregates the last
 three ledgers, hides the monthly toast, and presents energy, generation mix,
-revenue/cost rows and trust on one report. All iconography comes from Lucide and
-Tabler through `@iconify-icon/solid`; `icon-names.ts` is the build-time subset.
+revenue/cost rows and trust on one report. The `/questions` route renders the ten
+EVN questions from `screens/questions-content.ts`, scores them after the native
+required-field check, shows the source explanation for each answer and restarts
+the quiz. All iconography comes from Lucide and Tabler through
+`@iconify-icon/solid`; `icon-names.ts` is the build-time subset.
 
 ## Economy
 
@@ -185,5 +190,6 @@ same brand system: a cyan transmission pylon with amber insulator nodes and the
 green live dot on a `#07121b` tile. `favicon.svg` is the primary icon,
 `favicon.ico` bundles 16/32/48/64 px images, `favicon.png` is the 64 px fallback
 and `apple-touch-icon.png` is an opaque 180 px home-screen tile. The root route owns social
-metadata, while the index route owns canonical and robots directives so a 404
-is never advertised as indexable.
+metadata, while the index and questions routes own canonical and robots
+directives so a 404 is never advertised as indexable. The sitemap lists both
+public routes.
