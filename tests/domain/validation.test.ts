@@ -71,6 +71,22 @@ describe("validation", () => {
     expect(decodeSaveFile(JSON.stringify(file)).ok).toBe(false);
   });
 
+  it("rejects a save with an unknown supplier id", () => {
+    const state = createInitialState();
+
+    const file: SaveFile = {
+      format: "grid-save",
+      version: SAVE_VERSION,
+      savedAt: "2026-01-01T00:00:00.000Z",
+      state: {
+        ...state,
+        operations: { ...state.operations, supplierId: "missing-supplier" },
+      },
+    };
+
+    expect(decodeSaveFile(JSON.stringify(file)).ok).toBe(false);
+  });
+
   it("rejects impossible reform progress", () => {
     const initial = createInitialState();
 

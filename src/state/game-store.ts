@@ -124,6 +124,7 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
     }
 
     setStateSignal(result.value);
+    saveToSlot("autosave", result.value);
     setLastError(null);
 
     return true;
@@ -142,6 +143,7 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
     const changed = result.value.tariffs.tiers !== before;
     setLastApproval(changed ? "approved" : "refused");
     setStateSignal(result.value);
+    saveToSlot("autosave", result.value);
 
     return true;
   };
@@ -201,7 +203,9 @@ export const createGameStore = (initialState: GameState = initial()): GameStore 
       const current = state();
 
       if (current.approval === null) return;
-      setStateSignal({ ...current, approval: null });
+      const next = { ...current, approval: null };
+      setStateSignal(next);
+      saveToSlot("autosave", next);
     },
     setDispatch,
     setSupplier,
